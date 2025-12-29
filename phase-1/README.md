@@ -54,7 +54,15 @@ From the `phase-1/` directory:
 
 ```bash
 cd phase-1
-python3 -m src.todo_app.main
+uv run python -m todo_app.main
+```
+
+Or without uv (after activating venv):
+
+```bash
+cd phase-1
+source .venv/bin/activate  # Linux/macOS
+python -m todo_app.main
 ```
 
 You'll see the main menu:
@@ -258,10 +266,10 @@ See `.specify/memory/constitution.md` for full requirements.
 
 ### "ModuleNotFoundError: No module named 'todo_app'"
 
-**Solution**: Ensure you're running as a module from the phase-1/ directory:
+**Solution**: Ensure you're running with uv from the phase-1/ directory:
 ```bash
 cd phase-1
-python3 -m src.todo_app.main
+uv run python -m todo_app.main
 ```
 
 ### "pytest: command not found"
