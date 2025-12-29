@@ -2,6 +2,8 @@
 
 **Phase-1 Training Project**: In-memory Python console todo application demonstrating Spec-Driven Development (SDD) methodology.
 
+**Note**: This is Phase-1 of "The Evolution of Todo" multi-phase project. See the [root README](../ROOT-README.md) for the complete project structure.
+
 ## Overview
 
 A command-line todo application that stores tasks in memory, providing five core operations: Add, View, Update, Delete, and Mark Complete. Built entirely through Claude Code following the Spec-Kit Plus framework and Phase-1 Constitution constraints.
@@ -35,6 +37,7 @@ uv --version       # Should show UV version
 ```bash
 git clone <repository-url>
 cd "The Evolution of Todo – Mastering Spec-Driven Development & Cloud Native AI"
+cd phase-1
 ```
 
 ### 2. Install Dependencies
@@ -47,7 +50,10 @@ This installs pytest (dev dependency) for testing. No runtime dependencies are r
 
 ## Running the Application
 
+From the `phase-1/` directory:
+
 ```bash
+cd phase-1
 python3 -m src.todo_app.main
 ```
 
@@ -179,8 +185,11 @@ specs/001-todo-cli/      # Feature specification documents
 
 ### Running Tests
 
+From the `phase-1/` directory:
+
 ```bash
 # Run all tests
+cd phase-1
 pytest tests/
 
 # Run unit tests only
@@ -249,8 +258,9 @@ See `.specify/memory/constitution.md` for full requirements.
 
 ### "ModuleNotFoundError: No module named 'todo_app'"
 
-**Solution**: Ensure you're running as a module from the repository root:
+**Solution**: Ensure you're running as a module from the phase-1/ directory:
 ```bash
+cd phase-1
 python3 -m src.todo_app.main
 ```
 
