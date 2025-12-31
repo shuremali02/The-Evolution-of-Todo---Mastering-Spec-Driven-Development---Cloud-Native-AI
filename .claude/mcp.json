@@ -1,0 +1,37 @@
+{
+  "mcpServers": {
+    "playwright": {
+      "type": "stdio",
+      "command": "npx",
+      "args": ["@playwright/mcp@latest"],
+      "env": {}
+    },
+    "context7": {
+      "type": "stdio",
+      "command": "npx",
+      "args": ["@upstash/context7-mcp"],
+      "env": {
+        "CTX7_API_KEY": "ctx7sk-3e39b158-9405-467f-ad31-43803c10e8a4"
+      }
+    },
+    "github": {
+      "type": "http",
+      "url": "https://api.githubcopilot.com/mcp/",
+      "headers": {
+        "Authorization": "Bearer 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"
+      }
+    },
+    // "qdrant": {
+    //   "type": "http",
+    //   "url": "https://2aa04938-4f4a-4e3c-9e96-6328c0381059.us-east4-0.gcp.cloud.qdrant.io",
+    //   "headers": {
+    //     "api-key": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJhY2Nlc3MiOiJtIn0.iqhWUBAdUuc0uakiykAf8hBUxUFhMXFkV4edpPYklZ0"
+    //   }
+    // }
+  },
+  "mcpPackages": {
+    "Better Auth": {
+      "url": "https://mcp.chonkie.ai/better-auth/better-auth-builder/mcp"
+    }
+  }
+}

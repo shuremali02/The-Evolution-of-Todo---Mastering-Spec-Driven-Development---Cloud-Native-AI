@@ -53,3 +53,21 @@ Thumbs.db
 
 # UV
 uv.lock
+
+# Node.js / TypeScript / Next.js
+node_modules/
+.next/
+out/
+.cache/
+*.tsbuildinfo
+next-env.d.ts
+
+# Environment variables
+.env*.local
+.env.production
+
+# Package manager locks (optional - keep if you want reproducible installs)
+# package-lock.json
+# yarn.lock
+# pnpm-lock.yaml
+.claude/mcp.json
