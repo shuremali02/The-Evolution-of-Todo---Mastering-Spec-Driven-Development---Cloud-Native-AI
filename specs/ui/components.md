@@ -4,6 +4,20 @@
 
 Reusable React components for the Next.js frontend. All components use TypeScript, Tailwind CSS, and follow App Router conventions.
 
+## Design System (Phase-2 Updates)
+
+### Design Style: Modern Gradient
+- Modern gradient backgrounds on pages
+- Rounded corners (rounded-2xl, rounded-3xl)
+- Vibrant accent colors with subtle shadows
+- Smooth hover transitions and animations
+
+### Task Cards: Status Colors
+- White cards with colored accents based on status
+- Pending tasks: Yellow/amber accent
+- Completed tasks: Green accent
+- Hover effects with slight lift (translate-y)
+
 ## Component List
 
 ### 1. TaskCard
@@ -17,47 +31,49 @@ interface TaskCardProps {
   task: Task
   onComplete: (id: string) => Promise<void>
   onDelete: (id: string) => Promise<void>
-}
-
-interface Task {
-  id: string
-  title: string
-  description: string | null
-  completed: boolean
-  user_id: string
-  created_at: string
-  updated_at: string
+  onEdit: (task: Task) => void
+  loadingOperations?: {
+    complete?: boolean
+    delete?: boolean
+  }
 }
 ```
 
-**Visual Elements**:
+**Visual Elements (Status Colors Design)**:
 - Task title (bold, larger text)
 - Task description (gray, smaller text, truncated if too long)
-- Completion checkbox or button
-- "Edit" button (navigates to `/tasks/{id}/edit`)
-- "Delete" button (with confirmation)
-- Visual indicator if completed (strikethrough, different background)
+- Completion checkbox with status indicator
+- Colored left border based on status:
+  - Pending: Yellow/amber-400
+  - Completed: Green-400
+- "Edit" button (only for pending tasks)
+- "Delete" button with loading spinner
+- Relative time display (e.g., "2 hours ago")
+- Hover effect: lift card slightly (translate-y)
 
-**Example Layout**:
-```
-┌──────────────────────────────────────────┐
-│ [✓] Buy groceries                        │
-│     Get milk, eggs, and bread            │
-│     [Edit] [Delete]                      │
-└──────────────────────────────────────────┘
+**Status Colors Styling**:
+```tsx
+// Pending task - yellow accent
+<div className="border-l-4 border-l-yellow-400 bg-white rounded-r-xl shadow-lg hover:shadow-xl hover:-translate-y-1 transition-all">
+
+// Completed task - green accent
+<div className="border-l-4 border-l-green-400 bg-gray-50 rounded-r-xl shadow-lg hover:shadow-xl hover:-translate-y-1 transition-all opacity-75">
 ```
 
 **Behavior**:
 - Click checkbox/complete button → calls `onComplete(task.id)`
 - Click edit → navigate to edit page
 - Click delete → show confirmation, then call `onDelete(task.id)`
-- Completed tasks have strikethrough text and muted colors
+- Completed tasks have muted colors and strikethrough
+- Show loading spinner on buttons during operations
 
-**Tailwind Classes** (example):
-- Container: `bg-white rounded-lg shadow p-4 hover:shadow-lg transition-shadow`
+**Tailwind Classes (Modern Gradient Style)**:
+- Container: `bg-white rounded-xl shadow-lg hover:shadow-xl hover:-translate-y-1 transition-all`
+- Pending accent: `border-l-yellow-400`
+- Completed accent: `border-l-green-400 opacity-75`
 - Title: `text-lg font-semibold text-gray-900`
 - Description: `text-sm text-gray-600 mt-1`
-- Completed: `line-through text-gray-400`
+- Completed title: `line-through text-gray-500`
 
 ---
 

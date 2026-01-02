@@ -1,174 +1,194 @@
 /**
- * Task: T042, T043, T044, T045, T046, T047
- * Spec: 002-authentication/spec.md - User Login UI (US-2)
+ * Task: T024
+ * Spec: Professional Login Page - Form on right side, clean styling
  */
 
-'use client'
+'use client';
 
-import { useState, FormEvent } from 'react'
-import { useRouter } from 'next/navigation'
-import Link from 'next/link'
-import { apiClient } from '@/lib/api'
+import { useState, FormEvent, useEffect } from 'react';
+import { useRouter } from 'next/navigation';
+import Link from 'next/link';
+import { apiClient } from '@/lib/api';
 
 export default function LoginPage() {
-  const router = useRouter()
+  const router = useRouter();
 
-  const [email, setEmail] = useState('')
-  const [password, setPassword] = useState('')
-  const [error, setError] = useState<string | null>(null)
-  const [loading, setLoading] = useState(false)
+  const [email, setEmail] = useState('');
+  const [password, setPassword] = useState('');
+  const [error, setError] = useState<string | null>(null);
+  const [loading, setLoading] = useState(false);
 
-  // Client-side validation
+  // Check if already logged in
+  useEffect(() => {
+    if (apiClient.isAuthenticated()) {
+      router.push('/tasks');
+    }
+  }, [router]);
+
   const validateForm = (): boolean => {
-    setError(null)
-
-    // Email validation (basic format check)
-    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/
+    setError(null);
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
     if (!email || !emailRegex.test(email)) {
-      setError('Please enter a valid email address')
-      return false
+      setError('Please enter a valid email address');
+      return false;
     }
-
-    // Password required
     if (!password) {
-      setError('Password is required')
-      return false
+      setError('Password is required');
+      return false;
     }
-
-    return true
-  }
+    return true;
+  };
 
   const handleSubmit = async (e: FormEvent) => {
-    e.preventDefault()
-
-    // Client-side validation
-    if (!validateForm()) {
-      return
-    }
+    e.preventDefault();
+    if (!validateForm()) return;
 
     try {
-      setLoading(true)
-      setError(null)
-
-      // Call login API
-      await apiClient.login(email, password)
-
-      // Success: redirect to tasks page
-      router.push('/tasks')
+      setLoading(true);
+      setError(null);
+      await apiClient.login(email, password);
+      router.push('/tasks');
     } catch (err) {
-      // Error handling
       if (err instanceof Error) {
-        const message = err.message.toLowerCase()
-
-        // Map error messages to user-friendly text
+        const message = err.message.toLowerCase();
         if (message.includes('invalid') || message.includes('401')) {
-          setError('Invalid email or password. Please try again.')
+          setError('Invalid email or password. Please try again.');
         } else if (message.includes('network') || message.includes('fetch')) {
-          setError('Network error. Please check your connection and try again.')
+          setError('Network error. Please check your connection and try again.');
         } else {
-          setError(err.message || 'Login failed. Please try again.')
+          setError(err.message || 'Login failed. Please try again.');
         }
       } else {
-        setError('An unexpected error occurred. Please try again.')
+        setError('An unexpected error occurred. Please try again.');
       }
     } finally {
-      setLoading(false)
+      setLoading(false);
     }
-  }
+  };
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-gray-50 px-4">
-      <div className="max-w-md w-full space-y-8">
-        {/* Header */}
-        <div className="text-center">
-          <h1 className="text-3xl font-bold text-gray-900">
-            Welcome Back
-          </h1>
-          <p className="mt-2 text-gray-600">
-            Login to your account to continue
-          </p>
+    <div className="min-h-screen flex">
+      {/* Left Side - Professional Branding */}
+      <div className="hidden lg:flex lg:w-1/2 bg-gradient-to-br from-slate-700 to-slate-900 relative overflow-hidden">
+        {/* Subtle pattern overlay */}
+        <div className="absolute inset-0 opacity-5">
+          <svg className="w-full h-full" viewBox="0 0 100 100" preserveAspectRatio="none">
+            <defs>
+              <pattern id="grid" width="10" height="10" patternUnits="userSpaceOnUse">
+                <path d="M 10 0 L 0 0 0 10" fill="none" stroke="white" strokeWidth="0.5" />
+              </pattern>
+            </defs>
+            <rect width="100" height="100" fill="url(#grid)" />
+          </svg>
         </div>
 
-        {/* Login Form */}
-        <form onSubmit={handleSubmit} className="mt-8 space-y-6">
-          <div className="space-y-4">
-            {/* Email Field */}
-            <div>
-              <label htmlFor="email" className="block text-sm font-medium text-gray-700">
-                Email Address
-              </label>
-              <input
-                id="email"
-                type="email"
-                value={email}
-                onChange={(e) => setEmail(e.target.value)}
-                required
-                disabled={loading}
-                className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500 disabled:bg-gray-100 disabled:cursor-not-allowed"
-                placeholder="you@example.com"
-              />
-            </div>
+        <div className="relative z-10 flex flex-col justify-center px-12 xl:px-20 text-white">
+          <h1 className="text-4xl xl:text-5xl font-bold mb-6 tracking-tight">
+            Todo App
+          </h1>
+          <p className="text-xl text-slate-300 mb-8 leading-relaxed">
+            Manage your tasks efficiently and boost your productivity with our intuitive task management platform.
+          </p>
 
-            {/* Password Field */}
-            <div>
-              <label htmlFor="password" className="block text-sm font-medium text-gray-700">
-                Password
-              </label>
-              <input
-                id="password"
-                type="password"
-                value={password}
-                onChange={(e) => setPassword(e.target.value)}
-                required
-                disabled={loading}
-                className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500 disabled:bg-gray-100 disabled:cursor-not-allowed"
-                placeholder="Enter your password"
-              />
+          {/* Feature highlights */}
+          <div className="space-y-4">
+            <div className="flex items-center gap-3">
+              <div className="w-5 h-5 rounded-full bg-slate-600 flex items-center justify-center">
+                <svg className="w-3 h-3 text-white" fill="currentColor" viewBox="0 0 20 20">
+                  <path fillRule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clipRule="evenodd" />
+                </svg>
+              </div>
+              <span className="text-slate-300">Quick and easy task management</span>
+            </div>
+            <div className="flex items-center gap-3">
+              <div className="w-5 h-5 rounded-full bg-slate-600 flex items-center justify-center">
+                <svg className="w-3 h-3 text-white" fill="currentColor" viewBox="0 0 20 20">
+                  <path fillRule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clipRule="evenodd" />
+                </svg>
+              </div>
+              <span className="text-slate-300">Secure and private data storage</span>
+            </div>
+            <div className="flex items-center gap-3">
+              <div className="w-5 h-5 rounded-full bg-slate-600 flex items-center justify-center">
+                <svg className="w-3 h-3 text-white" fill="currentColor" viewBox="0 0 20 20">
+                  <path fillRule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clipRule="evenodd" />
+                </svg>
+              </div>
+              <span className="text-slate-300">Access from any device</span>
             </div>
           </div>
+        </div>
+      </div>
 
-          {/* Error Message */}
-          {error && (
-            <div className="p-3 bg-red-50 border border-red-200 rounded-md">
-              <p className="text-sm text-red-700">
+      {/* Right Side - Login Form */}
+      <div className="flex-1 flex items-center justify-center p-8 bg-gray-50">
+        <div className="w-full max-w-md">
+          {/* Mobile logo */}
+          <div className="lg:hidden mb-8 text-center">
+            <h1 className="text-2xl font-bold text-gray-900 tracking-tight">Todo App</h1>
+          </div>
+
+          <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-8">
+            <h2 className="text-2xl font-bold text-gray-900 mb-2">Welcome back</h2>
+            <p className="text-gray-600 mb-6">Enter your credentials to access your account</p>
+
+            {error && (
+              <div className="mb-4 p-3 bg-red-50 border border-red-200 rounded-lg text-red-600 text-sm">
                 {error}
-              </p>
-            </div>
-          )}
-
-          {/* Submit Button */}
-          <button
-            type="submit"
-            disabled={loading}
-            className="w-full flex justify-center py-2 px-4 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 disabled:bg-gray-400 disabled:cursor-not-allowed"
-          >
-            {loading ? (
-              <span className="flex items-center">
-                <svg className="animate-spin -ml-1 mr-3 h-5 w-5 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
-                  <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
-                  <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
-                </svg>
-                Logging In...
-              </span>
-            ) : (
-              'Login'
+              </div>
             )}
-          </button>
 
-          {/* Signup Link */}
-          <div className="text-center">
-            <p className="text-sm text-gray-600">
-              Don't have an account?{' '}
-              <Link
-                href="/signup"
-                className="font-medium text-blue-600 hover:text-blue-500"
+            <form onSubmit={handleSubmit} className="space-y-5">
+              <div>
+                <label htmlFor="email" className="block text-sm font-medium text-gray-700 mb-1">
+                  Email
+                </label>
+                <input
+                  id="email"
+                  type="email"
+                  value={email}
+                  onChange={(e) => setEmail(e.target.value)}
+                  required
+                  disabled={loading}
+                  className="w-full px-4 py-2.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-colors text-gray-900"
+                  placeholder="you@example.com"
+                />
+              </div>
+
+              <div>
+                <label htmlFor="password" className="block text-sm font-medium text-gray-700 mb-1">
+                  Password
+                </label>
+                <input
+                  id="password"
+                  type="password"
+                  value={password}
+                  onChange={(e) => setPassword(e.target.value)}
+                  required
+                  disabled={loading}
+                  className="w-full px-4 py-2.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-colors text-gray-900"
+                  placeholder="Enter your password"
+                />
+              </div>
+
+              <button
+                type="submit"
+                disabled={loading}
+                className="w-full py-2.5 bg-blue-600 text-white rounded-lg font-medium hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 disabled:bg-blue-400 transition-colors"
               >
-                Sign up here
+                {loading ? 'Signing in...' : 'Sign in'}
+              </button>
+            </form>
+
+            <p className="mt-6 text-center text-gray-600">
+              Do not have an account?{' '}
+              <Link href="/signup" className="text-blue-600 hover:text-blue-700 font-medium">
+                Sign up
               </Link>
             </p>
           </div>
-        </form>
+        </div>
       </div>
     </div>
-  )
+  );
 }

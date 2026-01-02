@@ -4,6 +4,28 @@
 
 Page specifications for the Next.js App Router frontend. All pages use TypeScript and Tailwind CSS.
 
+## Design System (Phase-2 Updates)
+
+### Design Style: Modern Gradient
+- Modern gradient backgrounds on pages
+- Rounded corners (rounded-2xl, rounded-3xl)
+- Vibrant accent colors with subtle shadows
+- Smooth hover transitions and animations
+
+### Auth Pages: Split Layout
+- Split screen: form on left, branded content/visual on right
+- Gradient or branded background on one side
+- Clean centered form on the other side
+- Consistent with landing page design
+
+### Landing Page: Enhanced
+- Hero section with animations
+- Feature cards with gradient borders
+- How it works with step indicators
+- Testimonials section
+- CTA section with gradient button
+- Footer with links
+
 ## Page Routes
 
 ### 1. Login Page
@@ -13,13 +35,36 @@ Page specifications for the Next.js App Router frontend. All pages use TypeScrip
 
 **Purpose**: Allow existing users to authenticate.
 
+**Layout (Split Design)**:
+```
+┌─────────────────────────────────────────────────────────────────┐
+│                                          │  ┌─────────────────┐ │
+│                                          │  │   Login         │ │
+│         [Branding / Visual /             │  │                 │ │
+│          Gradient Background]            │  │  [Email field]  │ │
+│                                          │  │  [Password]     │ │
+│                                          │  │  [Login button] │ │
+│                                          │  │  [Sign up link] │ │
+│                                          │  └─────────────────┘ │
+└─────────────────────────────────────────────────────────────────┘
+```
+
+**Split Layout Details**:
+- Left side: Branded gradient background (indigo/purple) with app logo/name
+- Right side: White card with form (rounded-2xl, shadow-xl)
+- Responsive: Stack vertically on mobile
+
 **Elements**:
-- Page title: "Login to Todo App"
 - Email input (type=email, required)
 - Password input (type=password, required)
-- "Login" submit button
+- "Login" submit button with loading spinner
 - Link to signup page: "Don't have an account? Sign up"
-- Error message display (for invalid credentials)
+- Error message display (red alert)
+
+**Styling (Modern Gradient)**:
+- Page background: `bg-gradient-to-br from-indigo-500 via-purple-500 to-pink-500`
+- Form card: `bg-white rounded-2xl shadow-xl p-8`
+- Primary button: `bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-700 hover:to-indigo-700 text-white rounded-lg`
 
 **Behavior**:
 - Submit POST to `/api/v1/auth/login`
@@ -36,13 +81,39 @@ Page specifications for the Next.js App Router frontend. All pages use TypeScrip
 
 **Purpose**: Allow new users to create an account.
 
+**Layout (Split Design)**:
+```
+┌─────────────────────────────────────────────────────────────────┐
+│  ┌─────────────────┐                    │                      │
+│  │   Create        │                    │                      │
+│  │   Account       │                    │                      │
+│  │                 │                    │   [Branding /        │
+│  │  [Email field]  │                    │    Visual /         │
+│  │  [Password]     │                    │    Gradient BG]     │
+│  │  [Create]       │                    │                      │
+│  │  [Login link]   │                    │                      │
+│  └─────────────────┘                    │                      │
+└─────────────────────────────────────────────────────────────────┘
+```
+
+**Split Layout Details**:
+- Left side: White card with form (rounded-2xl, shadow-xl)
+- Right side: Branded gradient background (indigo/purple) with app logo/name
+- Reversed from login for visual variety
+- Responsive: Stack vertically on mobile
+
 **Elements**:
-- Page title: "Create Account"
 - Email input (type=email, required)
 - Password input (type=password, required, min=8)
-- "Create Account" submit button
+- "Create Account" submit button with loading spinner
 - Link to login page: "Already have an account? Login"
-- Error message display
+- Error message display (red alert)
+- Password requirements hint
+
+**Styling (Modern Gradient)**:
+- Page background: `bg-gradient-to-br from-indigo-500 via-purple-500 to-pink-500`
+- Form card: `bg-white rounded-2xl shadow-xl p-8`
+- Primary button: `bg-gradient-to-r from-green-500 to-emerald-600 hover:from-green-600 hover:to-emerald-700 text-white rounded-lg`
 
 **Behavior**:
 - Client-side validation: Email format, password length

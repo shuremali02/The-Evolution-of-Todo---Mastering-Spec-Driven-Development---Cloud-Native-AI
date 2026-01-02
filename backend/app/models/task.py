@@ -1,17 +1,26 @@
 """
-Task: T013
-Spec: 003-task-crud - Task Data Model
+Task: T010
+Spec: 005-task-management-ui/task-ui/spec.md - Backend Model Update
 
 Task SQLModel for storing user tasks with foreign key to users table.
+Extended with priority, due_date, and position fields for UI enhancements.
 """
 
 from sqlmodel import SQLModel, Field, Relationship
-from datetime import datetime
-from typing import Optional, TYPE_CHECKING
+from datetime import datetime, timezone
+from typing import Optional, TYPE_CHECKING, Literal
 import uuid
+import enum
 
 if TYPE_CHECKING:
     from app.models.user import User
+
+
+class TaskPriority(str, enum.Enum):
+    """Task priority levels for UI enhancements."""
+    LOW = "low"
+    MEDIUM = "medium"
+    HIGH = "high"
 
 
 class Task(SQLModel, table=True):
@@ -48,12 +57,27 @@ class Task(SQLModel, table=True):
         index=True,
         description="Owner user ID (foreign key to users table, indexed for fast queries)"
     )
+
+    # UI Enhancement Fields
+    priority: TaskPriority = Field(
+        default=TaskPriority.MEDIUM,
+        description="Task priority level (low, medium, high)"
+    )
+    due_date: Optional[datetime] = Field(
+        default=None,
+        description="Optional due date for task deadline"
+    )
+    position: int = Field(
+        default=0,
+        description="Position for drag-and-drop ordering"
+    )
+
     created_at: datetime = Field(
-        default_factory=datetime.utcnow,
+        default_factory=lambda: datetime.now(timezone.utc).replace(tzinfo=None),
         description="Task creation timestamp (UTC)"
     )
     updated_at: datetime = Field(
-        default_factory=datetime.utcnow,
+        default_factory=lambda: datetime.now(timezone.utc).replace(tzinfo=None),
         description="Task last update timestamp (UTC)"
     )
 
