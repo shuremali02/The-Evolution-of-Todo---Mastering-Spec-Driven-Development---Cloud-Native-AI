@@ -32,9 +32,39 @@ See [phase-1/README.md](phase-1/README.md) for complete documentation.
 
 ---
 
-### Phase-2: (Future)
-**Status**: Planned
-**Description**: TBD - Next evolution of todo application
+### Phase-2: Full-Stack Web Application ✓
+**Status**: Complete
+**Location**: Root directory (frontend/, backend/, specs/, etc.)
+**Description**: Multi-user task management web application with Next.js frontend, FastAPI backend, and PostgreSQL database demonstrating full-stack development with JWT authentication and user data isolation.
+
+**Key Features**:
+- Multi-user task management with authentication
+- Next.js 14 App Router frontend with TypeScript
+- FastAPI backend with JWT authentication
+- Neon PostgreSQL database with SQLModel ORM
+- User data isolation and security
+- Responsive UI with Tailwind CSS
+- Real-time updates and interactive components
+- Keyboard shortcuts and toast notifications
+
+**Tech Stack**: Next.js 14, TypeScript, Tailwind CSS, FastAPI, Python 3.11+, SQLModel, PostgreSQL, JWT, Alembic
+
+**Live Demo**: [Hugging Face Spaces](https://huggingface.co/spaces/Shurem/todo-app)
+
+**Quick Start**:
+```bash
+# Frontend
+cd frontend
+npm install
+npm run dev
+
+# Backend
+cd backend
+pip install -r requirements.txt
+uvicorn app.main:app --reload
+```
+
+See [README.md](README.md) for complete documentation.
 
 ---
 
