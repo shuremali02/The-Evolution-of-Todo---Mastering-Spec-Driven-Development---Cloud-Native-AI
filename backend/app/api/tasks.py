@@ -1,46 +1,110 @@
 """
-Task: T018, T026, T031, T036, T042, T047
-Spec: 003-task-crud - Task CRUD API Endpoints
+Task: T013, T014, T015, T016
+Spec: 005-task-management-ui/task-ui/spec.md - Task CRUD API Endpoints with UI Enhancements
 
 REST API endpoints for task management with JWT authentication and user isolation.
+Extended with search, sort, filter, priority, due_date, and reorder functionality.
 """
 
-from fastapi import APIRouter, Depends, HTTPException, status
+from fastapi import APIRouter, Depends, HTTPException, status, Query
 from sqlmodel import select
 from sqlalchemy.ext.asyncio import AsyncSession
-from typing import List
+from typing import List, Optional
 from datetime import datetime
 
 from app.database import get_session
 from app.auth.dependencies import get_current_user_id
 from app.models.task import Task
-from app.schemas.task import TaskCreate, TaskUpdate, TaskResponse
+from app.schemas.task import TaskCreate, TaskUpdate, TaskResponse, TaskListResponse, TaskReorder
 
 router = APIRouter(prefix="/api/v1/tasks", tags=["tasks"])
 
 
-@router.get("", response_model=List[TaskResponse])
+@router.get("", response_model=TaskListResponse)
 async def get_tasks(
     session: AsyncSession = Depends(get_session),
-    user_id: str = Depends(get_current_user_id)
+    user_id: str = Depends(get_current_user_id),
+    search: Optional[str] = Query(None, description="Search in title and description"),
+    filter_status: Optional[str] = Query("all", description="Filter by status: all, active, completed"),
+    sort: Optional[str] = Query("newest", description="Sort by: newest, oldest, title_asc, title_desc, priority, due_date"),
+    limit: int = Query(100, ge=1, le=1000, description="Pagination limit"),
+    offset: int = Query(0, ge=0, description="Pagination offset")
 ):
     """
-    Get all tasks for the authenticated user.
+    Get all tasks for the authenticated user with search, sort, and filter options.
 
-    Task: T018
-    Spec: US-1 View All Tasks
+    Task: T013
+    Spec: US-1 Search Tasks, US-2 Sort Tasks
+
+    Args:
+        search: Search term to match in title or description
+        filter_status: Filter by completion status (all, active, completed)
+        sort: Sort order (newest, oldest, title_asc, title_desc, priority, due_date)
+        limit: Number of tasks to return (1-1000)
+        offset: Number of tasks to skip for pagination
 
     Returns:
-        List of tasks sorted by creation date (newest first)
+        TaskListResponse with tasks and pagination metadata
 
     Security:
         - Requires valid JWT token
         - Returns only tasks belonging to authenticated user
     """
-    statement = select(Task).where(Task.user_id == user_id).order_by(Task.created_at.desc())
+    statement = select(Task).where(Task.user_id == user_id)
+
+    # Apply search filter
+    if search:
+        search_term = f"%{search}%"
+        statement = statement.where(
+            (Task.title.ilike(search_term)) | (Task.description.ilike(search_term))
+        )
+
+    # Apply status filter
+    if filter_status == "active":
+        statement = statement.where(Task.completed == False)
+    elif filter_status == "completed":
+        statement = statement.where(Task.completed == True)
+
+    # Apply sorting
+    if sort == "newest":
+        statement = statement.order_by(Task.created_at.desc())
+    elif sort == "oldest":
+        statement = statement.order_by(Task.created_at.asc())
+    elif sort == "title_asc":
+        statement = statement.order_by(Task.title.asc())
+    elif sort == "title_desc":
+        statement = statement.order_by(Task.title.desc())
+    elif sort == "priority":
+        statement = statement.order_by(Task.priority.asc())
+    elif sort == "due_date":
+        statement = statement.order_by(Task.due_date.asc())
+
+    # Apply pagination
+    statement = statement.offset(offset).limit(limit)
+
     results = await session.execute(statement)
     tasks = results.scalars().all()
-    return tasks
+
+    # Get total count for pagination metadata
+    count_statement = select(Task).where(Task.user_id == user_id)
+    if search:
+        count_statement = count_statement.where(
+            (Task.title.ilike(search_term)) | (Task.description.ilike(search_term))
+        )
+    if filter_status == "active":
+        count_statement = count_statement.where(Task.completed == False)
+    elif filter_status == "completed":
+        count_statement = count_statement.where(Task.completed == True)
+
+    count_results = await session.execute(count_statement)
+    total = len(count_results.scalars().all())
+
+    return TaskListResponse(
+        tasks=tasks,
+        total=total,
+        limit=limit,
+        offset=offset
+    )
 
 
 @router.post("", response_model=TaskResponse, status_code=status.HTTP_201_CREATED)
@@ -52,11 +116,11 @@ async def create_task(
     """
     Create a new task for the authenticated user.
 
-    Task: T026
-    Spec: US-2 Create Task
+    Task: T014
+    Spec: US-3 Priority Levels, US-4 Due Dates
 
     Args:
-        task_data: Task creation data (title required, description optional)
+        task_data: Task creation data with optional priority and due_date
 
     Returns:
         Created task with auto-generated ID and timestamps
@@ -81,8 +145,8 @@ async def get_task(
     """
     Get a specific task by ID.
 
-    Task: T031
-    Spec: US-3 View Single Task
+    Task: T015
+    Spec: US-3 Priority Levels, US-4 Due Dates
 
     Args:
         task_id: Task UUID
@@ -120,12 +184,12 @@ async def update_task(
     """
     Update a task's fields.
 
-    Task: T036
-    Spec: US-4 Update Task
+    Task: T015
+    Spec: US-3 Priority Levels, US-4 Due Dates
 
     Args:
         task_id: Task UUID
-        task_data: Fields to update (all optional)
+        task_data: Fields to update (all optional including priority and due_date)
 
     Returns:
         Updated task with refreshed updated_at timestamp
@@ -167,8 +231,8 @@ async def complete_task(
     """
     Mark a task as completed.
 
-    Task: T042
-    Spec: US-5 Toggle Task Completion
+    Task: T015
+    Spec: US-4 Due Dates
 
     Args:
         task_id: Task UUID
@@ -209,8 +273,8 @@ async def delete_task(
     """
     Delete a task permanently.
 
-    Task: T047
-    Spec: US-6 Delete Task
+    Task: T015
+    Spec: US-4 Due Dates
 
     Args:
         task_id: Task UUID
@@ -238,3 +302,56 @@ async def delete_task(
     await session.delete(task)
     await session.commit()
     return None
+
+
+@router.patch("/reorder", response_model=dict)
+async def reorder_tasks(
+    reorder_data: TaskReorder,
+    session: AsyncSession = Depends(get_session),
+    user_id: str = Depends(get_current_user_id)
+):
+    """
+    Reorder tasks by updating their position field.
+
+    Task: T016
+    Spec: US-10 Drag & Drop Reordering
+
+    Args:
+        reorder_data: List of task IDs in new order
+
+    Returns:
+        Success message with updated task count
+
+    Security:
+        - Requires valid JWT token
+        - Can only reorder tasks owned by authenticated user
+    """
+    # Get all tasks that need to be reordered
+    statement = select(Task).where(
+        Task.id.in_(reorder_data.task_ids),
+        Task.user_id == user_id
+    )
+    result = await session.execute(statement)
+    tasks = result.scalars().all()
+
+    # Verify all tasks belong to the user
+    if len(tasks) != len(reorder_data.task_ids):
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND,
+            detail="One or more tasks not found or don't belong to user"
+        )
+
+    # Update positions based on the new order
+    for index, task_id in enumerate(reorder_data.task_ids):
+        for task in tasks:
+            if task.id == task_id:
+                task.position = index
+                task.updated_at = datetime.utcnow()
+                break
+
+    await session.commit()
+    return {
+        "success": True,
+        "message": f"Successfully reordered {len(reorder_data.task_ids)} tasks",
+        "count": len(reorder_data.task_ids)
+    }

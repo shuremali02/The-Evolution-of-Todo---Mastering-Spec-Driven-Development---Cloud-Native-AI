@@ -339,3 +339,10 @@ The complete Phase-2 constitution is at `.specify/memory/constitution.md`.
 ---
 
 **Remember**: This is a **Spec-Driven project**. Nothing is built without a spec. Always read before coding.
+
+## Active Technologies
+- TypeScript 5.x (Next.js 14+ requirement) + Next.js 14+, React 18+, Tailwind CSS 3.4+ (005-task-management-ui)
+- API-backed (backend PostgreSQL database via REST API) (005-task-management-ui)
+
+## Recent Changes
+- 005-task-management-ui: Added TypeScript 5.x (Next.js 14+ requirement) + Next.js 14+, React 18+, Tailwind CSS 3.4+

@@ -32,8 +32,12 @@ if not DATABASE_URL:
 # echo=True enables SQL query logging (set to False in production)
 engine = create_async_engine(
     DATABASE_URL,
-    echo=True,
-    future=True
+    echo=False,
+    future=True,
+    pool_size=5,
+    max_overflow=10,
+    pool_pre_ping=True,
+    pool_recycle=300,
 )
 
 # Create async session factory
