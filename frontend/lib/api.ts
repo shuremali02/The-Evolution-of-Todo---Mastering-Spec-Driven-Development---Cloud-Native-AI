@@ -120,13 +120,10 @@ class ApiClient {
 
   /**
    * Logout current user.
-   * Clears stored token and redirects to login page.
+   * Clears stored token only. Caller should handle redirect.
    */
   logout(): void {
     this.clearToken()
-    if (typeof window !== 'undefined') {
-      window.location.href = '/login'
-    }
   }
 
   /**
@@ -146,7 +143,8 @@ class ApiClient {
    * Spec: US-1 View All Tasks
    */
   async getTasks(): Promise<Task[]> {
-    return this.request<Task[]>('/tasks')
+    const response = await this.request<{ tasks: Task[] }>('/tasks')
+    return response.tasks || []
   }
 
   /**
