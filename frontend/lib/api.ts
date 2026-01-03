@@ -8,9 +8,9 @@ import type { Task, TaskCreate, TaskUpdate } from '../types/task'
 
 const API_URL = process.env.NEXT_PUBLIC_API_URL ||
   (typeof window !== 'undefined' && window.location.hostname.includes('.hf.space')
-    ? 'https://shurem-todo-app.hf.space/api/v1'
+    ? `${window.location.origin}/api/v1`
     : process.env.NODE_ENV === 'production'
-      ? 'https://shurem-todo-app.hf.space/api/v1'  // Production URL
+      ? `${window.location.origin}/api/v1`  // Production - use same origin
       : 'http://localhost:8000/api/v1')  // Development URL
 
 /**
