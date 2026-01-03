@@ -1,0 +1,63 @@
+# Task: T045
+# Spec: 002-authentication/quickstart.md - Docker Compose for Production Backend
+
+version: '3.8'
+
+services:
+  backend:
+    build:
+      context: ./backend
+      dockerfile: Dockerfile
+    ports:
+      - "8000:8000"
+    environment:
+      - DATABASE_URL=${DATABASE_URL}
+      - JWT_SECRET_KEY=${JWT_SECRET_KEY}
+      - JWT_ALGORITHM=HS256
+      - JWT_ACCESS_TOKEN_EXPIRE_MINUTES=60
+      - ALLOWED_ORIGINS=${ALLOWED_ORIGINS:-http://localhost:3000,https://your-frontend-domain.com}
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8000/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 40s
+    depends_on:
+      - db
+
+  db:
+    image: postgres:15-alpine
+    environment:
+      - POSTGRES_DB=${POSTGRES_DB:-todo_db}
+      - POSTGRES_USER=${POSTGRES_USER:-todo_user}
+      - POSTGRES_PASSWORD=${POSTGRES_PASSWORD:-todo_password}
+    ports:
+      - "5432:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+      - ./init.sql:/docker-entrypoint-initdb.d/init.sql
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U $POSTGRES_USER -d $POSTGRES_DB"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  # Optional: Redis for session management/caching (uncomment if needed)
+  # redis:
+  #   image: redis:7-alpine
+  #   ports:
+  #     - "6379:6379"
+  #   restart: unless-stopped
+
+volumes:
+  postgres_data:
+
+# Environment variables should be set in .env file:
+# DATABASE_URL=postgresql+asyncpg://todo_user:todo_password@db:5432/todo_db
+# JWT_SECRET_KEY=your-super-secret-jwt-key-change-in-production
+# POSTGRES_DB=todo_db
+# POSTGRES_USER=todo_user
+# POSTGRES_PASSWORD=todo_password
+# ALLOWED_ORIGINS=https://your-frontend-domain.com,https://your-vercel-domain.vercel.app

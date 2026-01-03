@@ -318,6 +318,46 @@ npm test
 | `/sp.adr <title>` | Document architectural decision |
 | `/sp.constitution` | Update project constitution |
 
+## Production Deployment
+
+### Hugging Face Spaces (Recommended)
+
+The application is deployed on Hugging Face Spaces:
+
+[![Hugging Face Spaces](https://img.shields.io/badge/%F0%9F%A4%97%20Hugging%20Face-Spaces-blue)](https://huggingface.co/spaces/Shurem/todo-app)
+
+To deploy your own version:
+1. Create a Hugging Face account
+2. Fork this repository
+3. Create a new Space with Docker enabled
+4. Point to your repository
+5. Add required environment variables:
+   ```
+   DATABASE_URL=your_neon_postgres_url
+   JWT_SECRET_KEY=your_jwt_secret
+   NEXT_PUBLIC_API_URL=http://localhost:8000/api/v1
+   ```
+6. The Space will automatically build and deploy both frontend and backend
+
+### Alternative: Vercel + Docker
+
+If you prefer separate deployments:
+
+#### Frontend (Vercel)
+1. Connect your repository to Vercel
+2. Set build command: `cd frontend && npm run build`
+3. Set output directory: `frontend/.next`
+4. Set root directory: `frontend`
+5. Set environment variables:
+   ```
+   NEXT_PUBLIC_API_URL=https://your-backend-domain.com/api/v1
+   ```
+
+#### Backend (Docker)
+1. Deploy with Docker or Docker Compose using the provided configuration
+2. Configure environment variables as needed
+3. Ensure CORS settings allow your frontend domain
+
 ## License
 
 This is a hackathon project. No license specified.
