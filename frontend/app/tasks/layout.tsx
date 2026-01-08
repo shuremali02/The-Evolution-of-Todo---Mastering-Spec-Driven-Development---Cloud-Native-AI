@@ -1,6 +1,6 @@
 /**
- * Task: T-007
- * Spec: Tasks Layout with proper logout redirect to home
+ * Task: T062
+ * Spec: 002-authentication/spec.md - Tasks Layout with Auth Guard and Profile Avatar
  */
 
 'use client'
@@ -14,7 +14,6 @@ export default function TasksLayout({ children }: { children: React.ReactNode })
   const router = useRouter()
 
   const handleLogout = () => {
-    apiClient.logout()
     // Clear any potential localStorage tokens too
     if (typeof window !== 'undefined') {
       localStorage.removeItem('access_token')

@@ -10,6 +10,16 @@ export const VALIDATION = {
   DESCRIPTION_MAX_LENGTH: 1000,
 } as const
 
+// Authentication validation constants
+export const AUTH_VALIDATION = {
+  USERNAME_MIN_LENGTH: 3,
+  USERNAME_MAX_LENGTH: 20,
+  USERNAME_PATTERN: /^[a-zA-Z][a-zA-Z0-9._-]*$/, // Must start with letter, then alphanumeric and allowed special chars
+  EMAIL_PATTERN: /^[^\s@]+@[^\s@]+\.[^\s@]+$/,
+  PASSWORD_MIN_LENGTH: 8,
+  PASSWORD_PATTERN: /^(?=.*[A-Za-z])(?=.*\d)(?=.*[@$!%*#?&_-])[A-Za-z\d@$!%*#?&_-]+$/, // At least 1 letter, 1 number, 1 special char
+} as const
+
 /**
  * Validation result interface
  */
@@ -73,6 +83,86 @@ export function validateTaskForm(title: string, description: string | null | und
     description: descriptionResult,
     isValid: titleResult.isValid && descriptionResult.isValid,
   }
+}
+
+/**
+ * Validate username
+ * - Required (3-20 characters)
+ * - Must start with a letter
+ * - Can contain letters, numbers, dots, underscores, and hyphens
+ */
+export function validateUsername(username: string): ValidationResult | string {
+  if (!username) {
+    return 'Username is required';
+  }
+
+  if (username.length < AUTH_VALIDATION.USERNAME_MIN_LENGTH) {
+    return `Username must be at least ${AUTH_VALIDATION.USERNAME_MIN_LENGTH} characters`;
+  }
+
+  if (username.length > AUTH_VALIDATION.USERNAME_MAX_LENGTH) {
+    return `Username must be ${AUTH_VALIDATION.USERNAME_MAX_LENGTH} characters or less`;
+  }
+
+  if (!AUTH_VALIDATION.USERNAME_PATTERN.test(username)) {
+    return 'Username must start with a letter and can only contain letters, numbers, dots, underscores, and hyphens';
+  }
+
+  return { isValid: true };
+}
+
+/**
+ * Validate email
+ * - Required
+ * - Must match email pattern
+ */
+export function validateEmail(email: string): ValidationResult | string {
+  if (!email) {
+    return 'Email is required';
+  }
+
+  if (!AUTH_VALIDATION.EMAIL_PATTERN.test(email)) {
+    return 'Please enter a valid email address';
+  }
+
+  return { isValid: true };
+}
+
+/**
+ * Validate password
+ * - Required (min 8 characters)
+ * - Must contain at least 1 letter, 1 number, and 1 special character
+ */
+export function validatePassword(password: string): ValidationResult | string {
+  if (!password) {
+    return 'Password is required';
+  }
+
+  if (password.length < AUTH_VALIDATION.PASSWORD_MIN_LENGTH) {
+    return `Password must be at least ${AUTH_VALIDATION.PASSWORD_MIN_LENGTH} characters`;
+  }
+
+  if (!AUTH_VALIDATION.PASSWORD_PATTERN.test(password)) {
+    return 'Password must contain at least 1 letter, 1 number, and 1 special character';
+  }
+
+  return { isValid: true };
+}
+
+/**
+ * Validate password match
+ * - Both passwords must be provided and match
+ */
+export function validatePasswordMatch(password: string, confirmPassword: string): ValidationResult | string {
+  if (!password || !confirmPassword) {
+    return 'Both passwords are required';
+  }
+
+  if (password !== confirmPassword) {
+    return 'Passwords do not match';
+  }
+
+  return { isValid: true };
 }
 
 /**

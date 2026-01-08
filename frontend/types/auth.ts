@@ -49,6 +49,25 @@ export interface JWTPayload {
 }
 
 /**
+ * Authentication token response (from signup/login endpoints).
+ */
+export interface TokenResponse {
+  access_token: string
+  token_type: string
+  username: string
+}
+
+/**
+ * User profile response.
+ */
+export interface UserProfile {
+  id: string
+  email: string
+  username: string
+  created_at: string
+}
+
+/**
  * API error response structure.
  */
 export interface ApiError {

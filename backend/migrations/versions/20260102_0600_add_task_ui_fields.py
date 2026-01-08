@@ -12,7 +12,6 @@ from typing import Sequence, Union
 
 from alembic import op
 import sqlalchemy as sa
-import sqlalchemy as sa_enum
 
 
 # revision identifiers, used by Alembic.
@@ -23,10 +22,10 @@ depends_on: Union[str, Sequence[str], None] = None
 
 
 def upgrade() -> None:
-    # Add priority column with enum
+    # Add priority column as string (SQLite doesn't support enums natively)
     op.add_column('tasks', sa.Column(
         'priority',
-        sa_enum.ENUM('low', 'medium', 'high', name='taskpriority'),
+        sa.String(20),
         nullable=False,
         server_default='medium'
     ))
@@ -52,6 +51,3 @@ def downgrade() -> None:
     op.drop_column('tasks', 'position')
     op.drop_column('tasks', 'due_date')
     op.drop_column('tasks', 'priority')
-
-    # Drop the enum type
-    op.execute('DROP TYPE IF EXISTS taskpriority')

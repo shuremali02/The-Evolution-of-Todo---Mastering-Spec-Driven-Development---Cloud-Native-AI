@@ -23,18 +23,19 @@ if not JWT_SECRET_KEY:
     )
 
 
-def create_access_token(user_id: str) -> str:
+def create_access_token(user_id: str, username: str) -> str:
     """
     Generate a JWT access token for authenticated user.
 
     Args:
         user_id: User UUID to include in token subject (sub claim)
+        username: Username to include in token for frontend display
 
     Returns:
         Encoded JWT token string
 
     Example:
-        >>> token = create_access_token("550e8400-e29b-41d4-a716-446655440000")
+        >>> token = create_access_token("550e8400-e29b-41d4-a716-446655440000", "john_doe")
         >>> token.startswith("eyJ")  # JWT prefix
         True
     """
@@ -44,6 +45,7 @@ def create_access_token(user_id: str) -> str:
     # Create payload with required claims
     to_encode = {
         "sub": user_id,  # Subject (user ID)
+        "username": username,  # Username for frontend display
         "exp": expire,  # Expiration time
         "iat": datetime.utcnow()  # Issued at time
     }
