@@ -16,7 +16,8 @@ async function fetchApi<T>(
   endpoint: string,
   options: RequestInit = {}
 ): Promise<T> {
-  const token = localStorage.getItem('access_token');
+  // Check if we're in the browser environment before accessing localStorage
+  const token = typeof window !== 'undefined' ? localStorage.getItem('access_token') : null;
 
   const headers = {
     'Content-Type': 'application/json',
@@ -43,9 +44,11 @@ export async function signup(data: SignupRequest): Promise<TokenResponse> {
     body: JSON.stringify(data),
   });
 
-  // Store token
-  localStorage.setItem('access_token', response.access_token);
-  localStorage.setItem('username', response.username);
+  // Store token only in browser environment
+  if (typeof window !== 'undefined') {
+    localStorage.setItem('access_token', response.access_token);
+    localStorage.setItem('username', response.username);
+  }
 
   return response;
 }
@@ -56,9 +59,11 @@ export async function login(data: LoginRequest): Promise<TokenResponse> {
     body: JSON.stringify(data),
   });
 
-  // Store token
-  localStorage.setItem('access_token', response.access_token);
-  localStorage.setItem('username', response.username);
+  // Store token only in browser environment
+  if (typeof window !== 'undefined') {
+    localStorage.setItem('access_token', response.access_token);
+    localStorage.setItem('username', response.username);
+  }
 
   return response;
 }
@@ -68,10 +73,15 @@ export async function getProfile(): Promise<UserProfile> {
 }
 
 export function logout(): void {
-  localStorage.removeItem('access_token');
-  localStorage.removeItem('username');
+  if (typeof window !== 'undefined') {
+    localStorage.removeItem('access_token');
+    localStorage.removeItem('username');
+  }
 }
 
 export function isAuthenticated(): boolean {
-  return !!localStorage.getItem('access_token');
+  if (typeof window !== 'undefined') {
+    return !!localStorage.getItem('access_token');
+  }
+  return false;
 }
