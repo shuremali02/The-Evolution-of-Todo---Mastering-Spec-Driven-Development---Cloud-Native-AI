@@ -17,10 +17,11 @@ if TYPE_CHECKING:
 
 class User(SQLModel, table=True):
     """
-    User account for authentication.
+    User account for authentication with username support.
 
     Attributes:
         id: UUID primary key (auto-generated)
+        username: Unique username (3-20 chars, alphanumeric/_/- only, stored lowercase)
         email: Unique email address (login credential)
         hashed_password: BCrypt hashed password (never plaintext)
         created_at: Account creation timestamp
@@ -32,6 +33,13 @@ class User(SQLModel, table=True):
         default_factory=lambda: str(uuid.uuid4()),
         primary_key=True,
         description="UUID primary key"
+    )
+    username: str = Field(
+        unique=True,
+        index=True,
+        max_length=20,
+        nullable=False,
+        description="Username (3-20 chars, alphanumeric/_/- only, stored lowercase)"
     )
     email: str = Field(
         unique=True,

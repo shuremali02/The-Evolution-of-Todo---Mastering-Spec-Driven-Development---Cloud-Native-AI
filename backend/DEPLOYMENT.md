@@ -60,11 +60,23 @@ docker run -d \
 
 ### 4. Database Migrations
 
-The database schema will be automatically managed by Alembic. On first deployment:
+The database schema is automatically managed by Alembic. The startup script automatically runs migrations on container startup:
 
 ```bash
+# Migrations run automatically on startup
+# The startup script runs: python -m alembic upgrade head
+```
+
+For manual migration management:
+```bash
+# Check current migration status
+docker exec -it todo-backend alembic current
+
 # Run migrations manually if needed
 docker exec -it todo-backend alembic upgrade head
+
+# Check migration history
+docker exec -it todo-backend alembic history
 ```
 
 ### 5. Health Check

@@ -19,8 +19,12 @@ RUN pip install --no-cache-dir -r requirements.txt
 # Copy application code
 COPY . .
 
+# Make startup script executable
+COPY startup.sh /app/startup.sh
+RUN chmod +x /app/startup.sh
+
 # Expose port
 EXPOSE 8000
 
-# Run the application
-CMD ["uvicorn", "app.main:app", "--host", "0.0.0.0", "--port", "8000"]
+# Run the application with startup script that handles migrations
+CMD ["/app/startup.sh"]

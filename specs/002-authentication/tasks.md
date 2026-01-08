@@ -1,396 +1,561 @@
-# Implementation Tasks: Authentication
+# Implementation Tasks: Authentication with Profile Editing
 
-**Feature**: 002-authentication
-**Branch**: `002-authentication`
-**Date**: 2025-12-31
-**Plan**: [plan.md](./plan.md) | **Spec**: [spec.md](./spec.md)
-
-## Overview
-
-This task breakdown implements JWT-based authentication for the Phase-2 full-stack web application. Tasks are organized by user story to enable independent implementation and testing.
-
-**Total Estimated Time**: 6-8 hours (per quickstart.md)
-
-## User Stories (from spec.md)
-
-- **US-1** (P1): User Registration - New users create accounts with email/password
-- **US-2** (P1): User Login - Existing users authenticate with credentials
-- **US-3** (P1): Protected Route Access - Authenticated users access protected resources
-
-## Implementation Strategy
-
-**MVP Scope**: US-1 + US-2 (Registration and Login)
-- Delivers core authentication capability
-- Enables user account creation and access
-- Foundation for all protected features
-
-**Incremental Delivery**:
-1. Complete US-1 + US-2 (backend + frontend auth flows)
-2. Add US-3 (protected routes and AuthGuard)
-3. Polish and cross-cutting concerns
-
-## Dependencies Between Stories
-
-```
-US-1 (Registration)
-  ↓
-US-2 (Login) - Depends on User model from US-1
-  ↓
-US-3 (Protected Routes) - Depends on JWT validation from US-2
-```
-
-**Note**: US-1 and US-2 backend components can be developed in parallel after Setup and Foundational phases.
+**Feature**: Enhanced User Authentication with Username Support and Profile Editing
+**Branch**: `002-auth-fixes` | **Date**: 2026-01-06
+**Spec**: [spec.md](./spec.md) | **Plan**: [plan.md](./plan.md)
+**Est. Time**: 12-15 hours (backend: 5-6 hours, frontend: 6-7 hours, integration: 2 hours)
 
 ---
 
-## Phase 1: Setup & Project Initialization
+## Summary
 
-**Goal**: Establish project structure, dependencies, and environment configuration
+Implement JWT-based user authentication with username support and profile editing (password change, email update). Users can register with username/email/password, login using either credential, change password, update email, logout securely, and see their profile with avatar on authenticated pages. Backend uses FastAPI + SQLModel + bcrypt; frontend uses Next.js 14+ with real-time validation, JWT storage, and Snackbar notifications for success/error messages.
 
-**Tasks**:
-
-- [X] T001 Install backend dependencies in backend/requirements.txt (fastapi, sqlmodel, python-jose, passlib, asyncpg, alembic)
-- [X] T002 Install frontend dependencies in frontend/package.json (next, react, js-cookie, types)
-- [X] T003 Create backend/.env with DATABASE_URL, JWT_SECRET_KEY, JWT_ALGORITHM, ALLOWED_ORIGINS
-- [X] T004 Create frontend/.env.local with NEXT_PUBLIC_API_URL
-- [X] T005 Generate secure JWT_SECRET_KEY using python secrets module (32 bytes)
-- [X] T006 Create backend/app/main.py FastAPI application with CORS middleware
-- [X] T007 Create backend/app/database.py with SQLModel async session management
-- [X] T008 Initialize Alembic in backend/migrations/ directory
-- [X] T009 Configure Alembic env.py to use DATABASE_URL and SQLModel metadata
-- [X] T010 Create frontend/app/layout.tsx root layout with metadata
-- [X] T011 Create frontend/lib directory for shared utilities
-- [X] T012 Create frontend/types directory for TypeScript definitions
-- [X] T013 Create frontend/components directory for React components
-
-**Prerequisites**: Neon PostgreSQL database created, connection string available
-
-**Validation**:
-- [ ] Backend server starts without errors: `uvicorn app.main:app --reload`
-- [ ] Frontend dev server starts: `npm run dev`
-- [ ] Environment variables loaded correctly
-- [ ] Database connection successful
+### Tech Stack
+- **Backend**: Python 3.11+, FastAPI, SQLModel, bcrypt, Pydantic, python-jose, psycopg2-binary, @mui/material
+- **Frontend**: TypeScript 5.x, Next.js 14+ (App Router), React 18+, Tailwind CSS, jose, @mui/material, @emotion/react, @emotion/styled
+- **Database**: Neon Serverless PostgreSQL
+- **Testing**: pytest (backend), Jest (frontend - optional, not in scope for Phase-2)
 
 ---
 
-## Phase 2: Foundational Components (Blocking Prerequisites)
+## Phase 1: Setup
 
-**Goal**: Build shared utilities and infrastructure needed by all user stories
+**Goal**: Install dependencies and configure project infrastructure
 
-**Tasks**:
+### Backend Setup
 
-### Backend Utilities
+- [ ] T001 [P] Install backend dependencies in backend/requirements.txt (fastapi, uvicorn, sqlmodel, python-jose, passlib[bcrypt], python-multipart, pydantic[email], psycopg2-binary, @mui/material)
+- [ ] T002 [P] Create .env.example in backend/ with required variables (DATABASE_URL, JWT_SECRET_KEY, CORS_ORIGINS)
+- [ ] T003 [P] Create backend/src directory structure (models/, services/, api/dependencies.py, api/routes/, main.py)
 
-- [X] T014 [P] Create backend/app/auth/password.py with hash_password() and verify_password() using passlib bcrypt
-- [X] T015 [P] Create backend/app/auth/jwt.py with create_access_token() and decode_jwt() using python-jose
-- [X] T016 [P] Create backend/app/auth/dependencies.py with get_current_user_id() dependency using HTTPBearer
-- [X] T017 Create backend/app/models/__init__.py to export all models
-- [X] T018 Create backend/app/schemas/__init__.py to export all schemas
-- [X] T019 Create backend/app/api/__init__.py for API router organization
+### Frontend Setup
 
-### Frontend Utilities
+- [ ] T004 [P] Install frontend dependencies (@mui/material, @emotion/react, @emotion/styled, jose) in frontend/package.json
+- [ ] T005 [P] Create frontend/src directory structure (components/auth/, components/ui/, lib/, app/, middleware.ts)
+- [ ] T006 [P] Update frontend/.env with API_URL configuration (NEXT_PUBLIC_API_URL)
 
-- [X] T020 [P] Create frontend/lib/api.ts API client class with request(), signup(), login(), logout() methods
-- [X] T021 [P] Create frontend/types/auth.ts with User, AuthResponse, SignupRequest, LoginRequest interfaces
+### Database Setup
 
-**Prerequisites**: Phase 1 complete
-
-**Validation**:
-- [ ] Password hashing works: `hash_password("test123")` returns bcrypt hash
-- [ ] JWT creation works: `create_access_token("user-id")` returns valid token
-- [ ] API client instantiates without errors
+- [ ] T007 Create Alembic migration for users table with username support in backend/alembic/versions/001_create_users_with_username.py
 
 ---
 
-## Phase 3: User Story 1 - User Registration
+## Phase 2: Foundational
 
-**Story Goal**: New users can create accounts with email and password, receive JWT token, and are automatically logged in.
+**Goal**: Build blocking prerequisites for all user stories
 
-**Independent Test Criteria**:
-- [ ] POST /api/v1/auth/signup with valid credentials returns 201 and JWT
-- [ ] Duplicate email returns 409 error
-- [ ] Password is hashed in database (never plaintext)
-- [ ] Frontend signup form submits and redirects to /tasks on success
-- [ ] Frontend displays error message for duplicate email
+### Backend Foundational
 
-### Backend Tasks
+- [ ] T008 [P] Create password hashing utilities in backend/src/services/auth_service.py (pwd_context with bcrypt, hash_password, verify_password)
+- [ ] T009 [P] Create JWT utilities in backend/src/services/auth_service.py (create_access_token with username claim, decode_token, JWTError handling)
+- [ ] T010 Configure CORS middleware in backend/src/main.py (dynamic origin list from CORS_ORIGINS env var)
 
-- [ ] T022 [US1] Create backend/app/models/user.py User SQLModel with id, email, hashed_password, created_at, updated_at fields
-- [ ] T023 [US1] Create Alembic migration 001_create_users.py for users table with unique email index
-- [ ] T024 [US1] Run migration: `alembic upgrade head` to create users table in database
-- [ ] T025 [US1] Create backend/app/schemas/auth.py with UserCreate (email: EmailStr, password: str) request schema
-- [ ] T026 [US1] Add UserResponse (id, email, created_at) and AuthResponse (access_token, token_type, user) to schemas/auth.py
-- [ ] T027 [US1] Create backend/app/api/auth.py router with POST /api/v1/auth/signup endpoint
-- [ ] T028 [US1] Implement signup endpoint: check email uniqueness (case-insensitive), hash password, create user, generate JWT
-- [ ] T029 [US1] Register auth router in backend/app/main.py with app.include_router()
-- [ ] T030 [US1] Test signup endpoint manually with curl or Postman: valid signup, duplicate email (409), invalid email (400)
+### Frontend Foundational
 
-### Frontend Tasks
-
-- [ ] T031 [P] [US1] Create frontend/app/signup/page.tsx with email and password form fields
-- [ ] T032 [US1] Implement form submission: call apiClient.signup(), store JWT, redirect to /tasks on success
-- [ ] T033 [US1] Add client-side validation: email format, password minimum 8 characters
-- [ ] T034 [US1] Display error message on failure (409 duplicate, 400 invalid, network errors)
-- [ ] T035 [US1] Add "Already have an account? Login" link to /login page
-- [ ] T036 [US1] Test signup flow: valid registration, duplicate email error, validation errors
-
-**Story Dependencies**: None (first story)
-
-**Parallel Execution**:
-- After T029: Frontend tasks T031-T036 can run in parallel with backend testing T030
+- [ ] T011 [P] Create JWT decoding utilities in frontend/src/lib/jwt.ts (decodeToken helper, JwtPayload interface, extract username from payload)
+- [ ] T012 [P] Create token storage utilities in frontend/src/lib/jwt.ts (getToken from sessionStorage, setToken, clearToken)
+- [ ] T013 Create API client base in frontend/src/lib/api.ts (baseURL, request wrapper with JWT attachment, 401 error handling with redirect and form data preservation)
+- [ ] T014 Create Snackbar context provider in frontend/src/components/ui/Snackbar.tsx (Material-UI Snackbar for notifications)
 
 ---
 
-## Phase 4: User Story 2 - User Login
+## Phase 3: User Story 1 (US1) - User Registration
 
-**Story Goal**: Existing users authenticate with email and password, receive JWT token for session management.
+**Goal**: New users can create accounts with username, email, and password
+**Independent Test Criteria**: User fills signup form → Validations pass → User created in DB → JWT token issued → User automatically logged in
+**Estimated Time**: 2-3 hours
 
-**Independent Test Criteria**:
-- [ ] POST /api/v1/auth/login with valid credentials returns 200 and JWT
-- [ ] Invalid credentials return 401 error
-- [ ] JWT token contains correct user_id in sub claim
-- [ ] Frontend login form submits and redirects to /tasks on success
-- [ ] Frontend displays error message for invalid credentials
+### Backend Implementation (US1)
 
-### Backend Tasks
+- [ ] T015 [P] [US1] Update User model in backend/src/models/user.py with id, username, email, password_hash, created_at, updated_at (SQLModel, table=True)
+- [ ] T016 [US1] Create Pydantic schemas in backend/src/models/user.py (UserCreate with username validator, UserResponse, AuthResponse)
+- [ ] T017 [US1] Implement user creation service in backend/src/services/auth_service.py (create_user with lowercase normalization, duplicate username/email checks, password hashing)
+- [ ] T018 [US1] Implement password confirmation validation in UserCreate schema validator (passwords_match field_validator)
+- [ ] T019 [US1] Create signup endpoint in backend/src/api/routes/auth.py (POST /api/v1/auth/signup, validate UserCreate, call create_user, issue JWT, return AuthResponse)
+- [ ] T020 [US1] Register auth router in backend/src/main.py (include_router for auth routes under /api/v1/auth)
 
-- [ ] T037 [US2] Add UserLogin (email: EmailStr, password: str) schema to backend/app/schemas/auth.py
-- [ ] T038 [US2] Create POST /api/v1/auth/login endpoint in backend/app/api/auth.py
-- [ ] T039 [US2] Implement login endpoint: find user by email (case-insensitive), verify password, generate JWT
-- [ ] T040 [US2] Return 401 for invalid email or wrong password (don't reveal which)
-- [ ] T041 [US2] Test login endpoint: valid credentials, invalid email, wrong password, case-insensitive email
+### Frontend Implementation (US1)
 
-### Frontend Tasks
-
-- [ ] T042 [P] [US2] Create frontend/app/login/page.tsx with email and password form fields
-- [ ] T043 [US2] Implement form submission: call apiClient.login(), store JWT, redirect to /tasks on success
-- [ ] T044 [US2] Add client-side validation: email format, required fields
-- [ ] T045 [US2] Display error message on 401 (invalid credentials) or network errors
-- [ ] T046 [US2] Add "Don't have an account? Sign up" link to /signup page
-- [ ] T047 [US2] Test login flow: valid login, invalid credentials error, network errors
-
-**Story Dependencies**: Depends on US-1 (User model and database table must exist)
-
-**Parallel Execution**:
-- After T041: Frontend tasks T042-T047 can run in parallel with backend testing
+- [ ] T021 [P] [US1] Create username validation utility in frontend/src/lib/validation.ts (validateUsername with regex, 3-20 chars, first char letter/number)
+- [ ] T022 [P] [US1] Create email validation utility in frontend/src/lib/validation.ts (validateEmail with basic regex)
+- [ ] T023 [P] [US1] Create password match validation utility in frontend/src/lib/validation.ts (validatePasswordMatch)
+- [ ] T024 [US1] Create SignupForm component in frontend/src/components/auth/SignupForm.tsx (real-time validation, password confirmation, API client call, token storage, redirect on success, Snackbar notifications)
+- [ ] T025 [US1] Create signup page in frontend/src/app/signup/page.tsx (SignupForm component, layout, link to login)
+- [ ] T026 [US1] Update frontend navigation in frontend/src/app/layout.tsx (add "Sign Up" link for non-authenticated users)
 
 ---
 
-## Phase 5: User Story 3 - Protected Route Access
+## Phase 4: User Story 2 (US2) - User Login
 
-**Story Goal**: Authenticated users can access protected pages and API endpoints; unauthenticated users are redirected to login.
+**Goal**: Existing users can log in with email or username
+**Independent Test Criteria**: User fills login form → Backend validates email/username and password → JWT token issued → User redirected to tasks
+**Estimated Time**: 1-2 hours
 
-**Independent Test Criteria**:
-- [ ] Protected endpoint rejects requests without JWT (401)
-- [ ] Protected endpoint accepts requests with valid JWT
-- [ ] Expired/invalid JWT returns 401
-- [ ] Frontend AuthGuard redirects to /login when no token
-- [ ] Frontend AuthGuard allows access when valid token present
-- [ ] Frontend clears token and redirects on 401 from API
+### Backend Implementation (US2)
 
-### Backend Tasks
+- [ ] T027 [P] [US2] Create UserLogin schema in backend/src/models/user.py (email_or_username field, password field)
+- [ ] T028 [US2] Implement authenticate_user service in backend/src/services/auth_service.py (search by username or email lowercase, verify password hash)
+- [ ] T029 [US2] Create login endpoint in backend/src/api/routes/auth.py (POST /api/v1/auth/login, validate UserLogin, call authenticate_user, issue JWT, return AuthResponse)
+- [ ] T030 [US2] Add error handling for login endpoint (generic 401 error for invalid credentials)
 
-- [ ] T048 [US3] Create test protected endpoint GET /api/v1/protected in backend/app/api/auth.py using get_current_user_id dependency
-- [ ] T049 [US3] Test protected endpoint: no token (401), invalid token (401), valid token (200), expired token (401)
-- [ ] T050 [US3] Verify get_current_user_id() extracts correct user_id from JWT sub claim
+### Frontend Implementation (US2)
 
-### Frontend Tasks
-
-- [ ] T051 [P] [US3] Create frontend/components/AuthGuard.tsx component with token check in useEffect
-- [ ] T052 [US3] Implement AuthGuard: redirect to /login if no token, render children if token exists
-- [ ] T053 [US3] Add loading state to AuthGuard while checking authentication
-- [ ] T054 [US3] Create frontend/app/tasks/layout.tsx wrapping children with AuthGuard component
-- [ ] T055 [US3] Create placeholder frontend/app/tasks/page.tsx showing "Tasks (Coming Soon)"
-- [ ] T056 [US3] Update API client to redirect to /login on 401 response and clear stored token
-- [ ] T057 [US3] Test AuthGuard: access /tasks without login (redirect), login then access /tasks (allowed)
-- [ ] T058 [US3] Test 401 handling: manually expire token, attempt API call, verify redirect to login
-
-**Story Dependencies**: Depends on US-2 (JWT issuance must work)
-
-**Parallel Execution**:
-- After T050: All frontend tasks T051-T058 can run in parallel
+- [ ] T031 [US2] Create LoginForm component in frontend/src/components/auth/LoginForm.tsx (email_or_username field, password field, API client call, token storage, redirect on success, show errors, Snackbar notifications)
+- [ ] T032 [US2] Create login page in frontend/src/app/login/page.tsx (LoginForm component, layout, link to signup, session expired message display)
+- [ ] T033 [US2] Update frontend navigation in frontend/src/app/layout.tsx (add "Login" link for non-authenticated users)
 
 ---
 
-## Phase 6: Polish & Cross-Cutting Concerns
+## Phase 5: User Story 3 (US3) - Protected Route Access
 
-**Goal**: Improve UX, add error handling, finalize production readiness
+**Goal**: Logged-in users can access protected pages and API endpoints
+**Independent Test Criteria**: Authenticated user makes API request → Backend validates JWT token → Request succeeds; Unauthenticated user → 401 → Redirect to login
+**Estimated Time**: 1-2 hours
 
-**Tasks**:
+### Backend Implementation (US3)
+
+- [ ] T034 [P] [US3] Create JWT dependency in backend/src/api/dependencies.py (get_current_user, decode token, extract user_id, handle JWTError, return 401)
+- [ ] T035 [US3] Test JWT dependency by adding to sample protected endpoint (e.g., GET /api/v1/auth/me - optional endpoint from FR-6)
+- [ ] T036 [US3] Verify 401 error response format (detail: "Session expired" or "Invalid token")
+
+### Frontend Implementation (US3)
+
+- [ ] T037 [US3] Create auth middleware in frontend/src/middleware.ts (check for token, redirect to login for protected routes, preserve unsaved form data in sessionStorage)
+- [ ] T038 [US3] Create AuthGuard component in frontend/src/components/auth/AuthGuard.tsx (check authentication status, show loading, redirect if not authenticated)
+- [ ] T039 [US3] Add getCurrentUser method to API client in frontend/src/lib/api.ts (decode token, return {id, username})
+- [ ] T040 [US3] Apply AuthGuard to protected pages in frontend/src/app (tasks page, profile page - if created)
+
+---
+
+## Phase 6: User Story 4 (US4) - User Profile Display
+
+**Goal**: Logged-in users see their username and avatar in navigation
+**Independent Test Criteria**: User logs in → Navigation shows avatar (first letter) and username → Avatar is circular badge
+**Estimated Time**: 30-60 minutes
+
+### Frontend Implementation (US4)
+
+- [ ] T041 [P] [US4] Create Avatar component in frontend/src/components/ui/Avatar.tsx (circular div with centered uppercase first letter, Tailwind styling)
+- [ ] T042 [US4] Create UserProfile component in frontend/src/components/auth/UserProfile.tsx (Avatar + username, displays user identity)
+- [ ] T043 [US4] Update frontend navigation in frontend/src/app/layout.tsx (integrate UserProfile, show only when authenticated, hide login/signup links)
+
+---
+
+## Phase 7: User Story 5 (US5) - User Logout
+
+**Goal**: Logged-in users can securely end their session
+**Independent Test Criteria**: User clicks logout → Token cleared from storage → User redirected to login → Subsequent API requests fail
+**Estimated Time**: 30 minutes
+
+### Backend Implementation (US5)
+
+- [ ] T044 [US5] Create logout endpoint in backend/src/api/routes/auth.py (POST /api/v1/auth/logout, return {"message": "Logged out successfully"})
+
+### Frontend Implementation (US5)
+
+- [ ] T045 [P] [US5] Add logout method to API client in frontend/src/lib/api.ts (call logout endpoint, clearToken)
+- [ ] T046 [US5] Add logout button to UserProfile component in frontend/src/components/auth/UserProfile.tsx (click handler calls API client logout, redirect to login, Snackbar notifications)
+- [ ] T047 [US5] Update navigation in frontend/src/app/layout.tsx (logout button visible only when authenticated)
+
+---
+
+## Phase 8: User Story 6 (US6) - Password Change
+
+**Goal**: Logged-in users can change their password with current password verification
+**Independent Test Criteria**: User fills password change form → Current password verified → New password hashed → User remains logged in → Success message shown
+**Estimated Time**: 2-3 hours
+
+### Backend Implementation (US6)
+
+- [ ] T048 [P] [US6] Create PasswordChange schema in backend/src/models/user.py (current_password, new_password, confirm_password fields)
+- [ ] T049 [US6] Implement change_password service in backend/src/services/auth_service.py (verify current password, validate new password, update password hash)
+- [ ] T050 [US6] Create password change endpoint in backend/src/api/routes/auth.py (POST /api/v1/auth/change-password, validate PasswordChange, call change_password service, return success message)
+- [ ] T051 [US6] Add error handling for password change endpoint (401 for incorrect current password, 400 for password validation)
+
+### Frontend Implementation (US6)
+
+- [ ] T052 [P] [US6] Create PasswordChangeForm component in frontend/src/components/auth/PasswordChangeForm.tsx (current password, new password, confirm password fields, real-time validation, API client call, Snackbar notifications)
+- [ ] T053 [US6] Create password change page in frontend/src/app/profile/change-password/page.tsx (PasswordChangeForm component, layout, link back to profile)
+- [ ] T054 [US6] Add navigation link to password change in frontend/src/app/layout.tsx (profile dropdown or settings menu)
+
+---
+
+## Phase 9: User Story 7 (US7) - Email Update
+
+**Goal**: Logged-in users can update their email with password verification
+**Independent Test Criteria**: User fills email update form → Password verified → New email checked for uniqueness → Email updated in DB → Success message shown
+**Estimated Time**: 2-3 hours
+
+### Backend Implementation (US7)
+
+- [ ] T055 [P] [US7] Create EmailUpdate schema in backend/src/models/user.py (new_email, password fields)
+- [ ] T056 [US7] Implement update_email service in backend/src/services/auth_service.py (verify password, check email uniqueness, update email in database)
+- [ ] T057 [US7] Create email update endpoint in backend/src/api/routes/auth.py (POST /api/v1/auth/update-email, validate EmailUpdate, call update_email service, return success message with new email)
+- [ ] T058 [US7] Add error handling for email update endpoint (401 for incorrect password, 409 for duplicate email)
+
+### Frontend Implementation (US7)
+
+- [ ] T059 [P] [US7] Create EmailUpdateForm component in frontend/src/components/auth/EmailUpdateForm.tsx (new email, password fields, validation, API client call, Snackbar notifications)
+- [ ] T060 [US7] Create email update page in frontend/src/app/profile/update-email/page.tsx (EmailUpdateForm component, layout, link back to profile)
+- [ ] T061 [US7] Add navigation link to email update in frontend/src/app/layout.tsx (profile dropdown or settings menu)
+
+---
+
+## Phase 10: Polish & Cross-Cutting Concerns
+
+**Goal**: Finalize implementation, improve UX, ensure security
+**Estimated Time**: 1-2 hours
 
 ### Error Handling & UX
 
-- [ ] T059 [P] Add loading states to login and signup forms (disable button, show spinner)
-- [ ] T060 [P] Add success feedback after registration (toast or message before redirect)
-- [ ] T061 [P] Improve error messages: map 409 → "Email already registered", 401 → "Invalid credentials"
-- [ ] T062 [P] Add password visibility toggle (show/hide) to login and signup forms
-- [ ] T063 [P] Add "Remember me" checkbox to login form (optional: extends token expiration)
+- [ ] T062 [P] Add loading states to SignupForm component (disable submit button, show spinner during API call)
+- [ ] T063 [P] Add loading states to LoginForm component (disable submit button, show spinner during API call)
+- [ ] T064 [P] Add loading states to PasswordChangeForm component (disable submit button, show spinner during API call)
+- [ ] T065 [P] Add loading states to EmailUpdateForm component (disable submit button, show spinner during API call)
+- [ ] T066 [P] Improve form validation error messages (clear, specific, user-friendly text)
+- [ ] T067 Add success messages for signup, login, password change, and email update (toast or banner notification with Snackbar)
 
-### Security Hardening
+### Security & Validation
 
-- [ ] T064 [P] Add rate limiting to auth endpoints (optional: use slowapi or similar)
-- [ ] T065 [P] Add request logging to backend (log endpoint, status, user_id if authenticated)
-- [ ] T066 [P] Verify CORS configuration allows only intended origins
-- [ ] T067 [P] Add CSP headers to frontend for XSS protection (optional for Phase-2)
+- [ ] T068 Verify JWT_SECRET_KEY is required in backend/src/main.py (raise ValueError if not set)
+- [ ] T069 Verify username uniqueness is case-insensitive in backend/src/services/auth_service.py (normalize to lowercase before checking database)
+- [ ] T070 Verify email uniqueness is case-insensitive in backend/src/services/auth_service.py (normalize to lowercase before checking database)
+- [ ] T071 Verify password confirmation validation on both frontend (real-time) and backend (server-side)
+- [ ] T072 Verify CORS origins are properly configured (test with localhost:3000 and production URL)
 
-### Documentation
+### Documentation & Configuration
 
-- [ ] T068 [P] Add JSDoc comments to frontend API client methods
-- [ ] T069 [P] Add docstrings to backend auth utility functions
-- [ ] T070 [P] Create backend/.env.example with placeholder values and comments
-- [ ] T071 [P] Create frontend/.env.local.example with placeholder values
-- [ ] T072 [P] Update README.md with authentication setup instructions
-
-### Testing (Optional - not required for Phase-2)
-
-- [ ] T073 [P] Create backend/tests/test_auth.py with pytest tests for signup and login endpoints
-- [ ] T074 [P] Add test for password hashing and verification
-- [ ] T075 [P] Add test for JWT creation and validation
-- [ ] T076 [P] Add test for case-insensitive email handling
-- [ ] T077 [P] Create frontend tests for login and signup forms using React Testing Library (optional)
-
-**Prerequisites**: Phases 3, 4, 5 complete
-
-**Parallel Execution**: All tasks in this phase can run in parallel (marked with [P])
+- [ ] T073 Update backend/.env.example with comments explaining each variable (DATABASE_URL, JWT_SECRET_KEY, CORS_ORIGINS)
+- [ ] T074 Update frontend/.env.local.example with NEXT_PUBLIC_API_URL and NEXT_PUBLIC_APP_URL
+- [ ] T075 Add JWT secret generation command to backend/README.md (python -c "import secrets; print(secrets.token_urlsafe(32))")
+- [ ] T076 Update quickstart.md in specs/002-authentication/ with actual file paths (verify all steps work)
 
 ---
 
-## Task Summary
+## Dependencies
 
-**Total Tasks**: 77
-
-**Task Count by User Story**:
-- Setup (Phase 1): 13 tasks
-- Foundational (Phase 2): 8 tasks
-- US-1 Registration (Phase 3): 15 tasks (9 backend, 6 frontend)
-- US-2 Login (Phase 4): 11 tasks (5 backend, 6 frontend)
-- US-3 Protected Routes (Phase 5): 11 tasks (3 backend, 8 frontend)
-- Polish (Phase 6): 19 tasks (16 optional)
-
-**Parallelization Opportunities**:
-- Phase 2: 4 tasks can run in parallel (T014-T016, T020-T021)
-- Phase 3: Frontend tasks (T031-T036) parallel after T029
-- Phase 4: Frontend tasks (T042-T047) parallel after T041
-- Phase 5: Frontend tasks (T051-T058) parallel after T050
-- Phase 6: All 19 tasks can run in parallel
-
-**Critical Path** (Serial Dependencies):
-1. Setup (Phase 1) → 2. Foundational (Phase 2) → 3. US-1 Backend → 4. US-2 Backend → 5. US-3 Backend → 6. Integration Testing
-
-**Suggested MVP** (Minimum Viable Product):
-- Phase 1: Setup (all tasks)
-- Phase 2: Foundational (all tasks)
-- Phase 3: US-1 Registration (all tasks)
-- Phase 4: US-2 Login (all tasks)
-- **Skip Phase 5 and 6 for fastest MVP** (can add later)
-
-**Time Estimates**:
-- Setup + Foundational: 1-2 hours
-- US-1 (Registration): 2-2.5 hours
-- US-2 (Login): 1.5-2 hours
-- US-3 (Protected Routes): 1-1.5 hours
-- Polish: 1-2 hours (optional)
-- **Total: 6-8 hours** (matches quickstart.md estimate)
-
----
-
-## Validation Checklist
-
-Before considering authentication feature complete:
-
-### Backend Validation
-- [ ] Users can register with valid email/password (201 response)
-- [ ] Duplicate emails are rejected (409 response)
-- [ ] Passwords are hashed in database (query users table, verify bcrypt hash)
-- [ ] Users can login with correct credentials (200 response)
-- [ ] Invalid credentials return 401
-- [ ] JWT token issued contains user_id in sub claim (decode token)
-- [ ] Protected endpoint rejects requests without JWT (401)
-- [ ] Protected endpoint accepts requests with valid JWT (200)
-- [ ] CORS allows frontend origin (localhost:3000)
-
-### Frontend Validation
-- [ ] Signup form submits and creates account
-- [ ] Signup form shows error for duplicate email
-- [ ] Signup redirects to /tasks on success
-- [ ] Login form submits and authenticates user
-- [ ] Login form shows error for invalid credentials
-- [ ] Login redirects to /tasks on success
-- [ ] JWT token stored in sessionStorage or cookie
-- [ ] AuthGuard redirects to /login when not authenticated
-- [ ] AuthGuard allows access to /tasks when authenticated
-- [ ] API client automatically attaches JWT to requests
-- [ ] Frontend redirects to /login on 401 from backend
-
-### Security Validation
-- [ ] JWT_SECRET_KEY not hardcoded (in .env only)
-- [ ] Passwords never stored in plaintext
-- [ ] CORS restricted to approved origins
-- [ ] No secrets in git repository (.env in .gitignore)
-- [ ] Email uniqueness enforced (case-insensitive)
-
----
-
-## Implementation Notes
-
-### Task Execution Order
-
-1. **Complete Phase 1 (Setup) first** - Required for all subsequent work
-2. **Complete Phase 2 (Foundational) second** - Provides utilities needed by all stories
-3. **Implement US-1 and US-2 sequentially** - US-2 depends on User model from US-1
-4. **Implement US-3 after US-1 and US-2** - Depends on JWT issuance
-5. **Polish tasks can be done anytime after MVP** - Not blocking
-
-### Parallelization Strategy
-
-Within each phase after Foundational:
-- **Backend tasks complete first** (creates API for frontend to consume)
-- **Frontend tasks start after backend endpoints ready** (can test against real API)
-- **Independent components** (marked [P]) can be developed in parallel
-
-### Testing Strategy
-
-Tests are **optional** for Phase-2 (specified in research.md as "acceptable to defer").
-
-If implementing tests:
-- Unit tests first (password hashing, JWT)
-- Integration tests second (API endpoints)
-- Frontend tests last (forms, AuthGuard)
-
-### File Path Reference
-
-All file paths mentioned in tasks follow the structure defined in plan.md:
+### User Story Completion Order
 
 ```
-backend/
-├── app/
-│   ├── main.py
-│   ├── database.py
-│   ├── models/user.py
-│   ├── schemas/auth.py
-│   ├── auth/
-│   │   ├── password.py
-│   │   ├── jwt.py
-│   │   └── dependencies.py
-│   └── api/auth.py
-├── migrations/versions/001_create_users.py
-└── tests/test_auth.py
+Setup (Phase 1)
+  ↓
+Foundational (Phase 2)
+  ↓
+US1: Registration (Phase 3) - First user story
+  ↓
+US2: Login (Phase 4) - Depends on US1 (users table, auth service)
+  ↓
+US3: Protected Routes (Phase 5) - Depends on US2 (JWT tokens issued)
+  ↓
+US4: Profile Display (Phase 6) - Depends on US3 (authentication state)
+  ↓
+US5: Logout (Phase 7) - Depends on US4 (profile in navigation)
+  ↓
+US6: Password Change (Phase 8) - Depends on US5 (authenticated user context)
+  ↓
+US7: Email Update (Phase 9) - Depends on US6 (authenticated user context)
+  ↓
+Polish (Phase 10) - Final touches
+```
 
-frontend/
-├── app/
-│   ├── layout.tsx
-│   ├── login/page.tsx
-│   ├── signup/page.tsx
-│   └── tasks/
-│       ├── layout.tsx
-│       └── page.tsx
-├── components/AuthGuard.tsx
-├── lib/api.ts
-└── types/auth.ts
+### Critical Dependencies
+
+- **T007 (Database migration)**: MUST run before T015 (User model) and T017 (create_user service)
+- **T008-T010 (Backend foundational)**: MUST complete before any backend user story tasks (T015+)
+- **T011-T014 (Frontend foundational)**: MUST complete before any frontend user story tasks (T021+)
+- **US1 (Registration)**: MUST complete before US2 (Login) - database tables and auth service needed
+- **US2 (Login)**: MUST complete before US3 (Protected Routes) - JWT tokens needed for testing
+- **US3 (Protected Routes)**: MUST complete before US4 (Profile Display) - authentication context needed
+- **US4 (Profile Display)**: MUST complete before US5 (Logout) - logout button in profile component
+- **US5 (Logout)**: MUST complete before US6 (Password Change) - authenticated user context needed
+- **US6 (Password Change)**: MUST complete before US7 (Email Update) - both require authenticated context
+
+---
+
+## Parallel Execution Examples
+
+### Phase 1 (Setup) - Full Parallelization
+
+All tasks in Phase 1 can be executed in parallel (no dependencies):
+
+```bash
+# Terminal 1 - Backend dependencies
+pip install fastapi uvicorn sqlmodel python-jose passlib[bcrypt] python-multipart pydantic[email] psycopg2-binary @mui/material
+
+# Terminal 2 - Frontend dependencies
+cd frontend && npm install @mui/material @emotion/react @emotion/styled jose
+
+# Terminal 3 - Directory structure creation
+mkdir -p backend/src/models backend/src/services backend/src/api/dependencies backend/src/api/routes
+mkdir -p frontend/src/components/auth frontend/src/components/ui frontend/src/lib frontend/src/app
+
+# Terminal 4 - Config files
+echo "DATABASE_URL=postgresql://..." > backend/.env.example
+echo "NEXT_PUBLIC_API_URL=http://localhost:8000/api/v1" > frontend/.env
+```
+
+### Phase 2 (Foundational) - Full Parallelization
+
+All tasks in Phase 2 can be executed in parallel:
+
+```bash
+# Terminal 1 - Password hashing utilities (T008)
+# Create backend/src/services/auth_service.py with pwd_context
+
+# Terminal 2 - JWT utilities (T009)
+# Add create_access_token and decode_token to auth_service.py
+
+# Terminal 3 - CORS configuration (T010)
+# Update backend/src/main.py with CORSMiddleware
+
+# Terminal 4 - JWT decoding utilities (T011)
+# Create frontend/src/lib/jwt.ts with decodeToken
+
+# Terminal 5 - Token storage (T012)
+# Add getToken, setToken, clearToken to jwt.ts
+
+# Terminal 6 - API client base (T013)
+# Create frontend/src/lib/api.ts with request wrapper
+
+# Terminal 7 - Snackbar provider (T014)
+# Create frontend/src/components/ui/Snackbar.tsx
+```
+
+### Phase 3 (US1 Registration) - Partial Parallelization
+
+Backend tasks can parallelize with frontend tasks:
+
+```bash
+# Parallel Group 1 - Backend (T015, T021, T022, T023)
+# Terminal 1: Update User model (T015)
+# Terminal 2: Create validation utilities (T021, T022, T023)
+
+# Parallel Group 2 - Frontend (after Parallel Group 1)
+# Terminal 1: Create Pydantic schemas (T016)
+# Terminal 2: Create user creation service (T017)
+# Terminal 3: Create password confirmation validator (T018)
+
+# Sequential - Backend (after Parallel Group 2)
+# T019: Create signup endpoint (depends on schemas and service)
+# T020: Register auth router (depends on T019)
+
+# Sequential - Frontend (after Parallel Group 1)
+# T024: Create SignupForm (depends on validation utilities)
+# T025: Create signup page (depends on SignupForm)
+# T026: Update navigation (depends on signup page)
+```
+
+### Phase 4 (US2 Login) - Partial Parallelization
+
+```bash
+# Parallel - Backend (T027)
+# Create UserLogin schema
+
+# Parallel - Frontend (after T027)
+# Terminal 1: Create LoginForm (T031)
+# Terminal 2: Create login page (T032)
+
+# Sequential - Backend (after T027)
+# T028: Implement authenticate_user (depends on T027)
+# T029: Create login endpoint (depends on T028)
+# T030: Add error handling (depends on T029)
+
+# Sequential - Frontend (after T032)
+# T033: Update navigation (depends on login page)
+```
+
+### Phase 6 (US4 Profile Display) - Full Parallelization
+
+All frontend tasks can execute in parallel (no dependencies):
+
+```bash
+# Terminal 1 - Create Avatar component (T041)
+# Terminal 2 - Create UserProfile component (T042)
+# Terminal 3 - Update navigation (T043)
+```
+
+### Phase 8 (US6 Password Change) - Partial Parallelization
+
+```bash
+# Parallel - Backend (T048)
+# Create PasswordChange schema
+
+# Parallel - Frontend (after T048)
+# Terminal 1: Create PasswordChangeForm (T052)
+# Terminal 2: Create password change page (T053)
+
+# Sequential - Backend (after T048)
+# T049: Implement change_password service (depends on T048)
+# T050: Create password change endpoint (depends on T049)
+# T051: Add error handling (depends on T050)
+
+# Sequential - Frontend (after T053)
+# T054: Update navigation (depends on password change page)
+```
+
+### Phase 9 (US7 Email Update) - Partial Parallelization
+
+```bash
+# Parallel - Backend (T055)
+# Create EmailUpdate schema
+
+# Parallel - Frontend (after T055)
+# Terminal 1: Create EmailUpdateForm (T059)
+# Terminal 2: Create email update page (T060)
+
+# Sequential - Backend (after T055)
+# T056: Implement update_email service (depends on T055)
+# T057: Create email update endpoint (depends on T056)
+# T058: Add error handling (depends on T057)
+
+# Sequential - Frontend (after T060)
+# T061: Update navigation (depends on email update page)
+```
+
+### Phase 10 (Polish) - Full Parallelization
+
+All tasks can execute in parallel (no dependencies):
+
+```bash
+# Terminal 1 - Add loading states (T062-T065)
+# Terminal 2 - Improve error messages (T066)
+# Terminal 3 - Add success messages (T067)
+# Terminal 4 - Verify security (T068-T072)
+# Terminal 5 - Update documentation (T073-T076)
 ```
 
 ---
 
-**Tasks generated**: 2025-12-31
-**Ready for implementation**: Yes
-**Next command**: Select a task and begin implementation (e.g., `T001`)
+## Implementation Strategy
+
+### MVP Approach
+
+**MVP Scope**: Complete User Story 1 (Registration) + Foundational infrastructure
+
+**Rationale**: US1 provides the core authentication flow and establishes the database schema, user model, and JWT infrastructure that all other stories depend on. Once US1 is complete, users can register and obtain tokens, enabling rapid implementation of login and protected routes.
+
+**MVP Tasks**:
+- Phase 1: Setup (T001-T007)
+- Phase 2: Foundational (T008-T014)
+- Phase 3: US1 Registration (T015-T026)
+
+**MVP Deliverables**:
+- Working signup form with username, email, password, confirmation
+- User model with username support in database
+- JWT token issuance on registration
+- Frontend real-time validation
+- Backend password hashing and validation
+- Auto-login after registration
+- Snackbar notifications for success/error
+
+### Incremental Delivery
+
+After MVP, deliver user stories in priority order:
+
+1. **Sprint 1**: US1 Registration (MVP) - 2-3 hours
+2. **Sprint 2**: US2 Login - 1-2 hours
+3. **Sprint 3**: US3 Protected Routes - 1-2 hours
+4. **Sprint 4**: US4 Profile Display - 30-60 minutes
+5. **Sprint 5**: US5 Logout - 30 minutes
+6. **Sprint 6**: US6 Password Change - 2-3 hours
+7. **Sprint 7**: US7 Email Update - 2-3 hours
+8. **Sprint 8**: Polish & Cross-Cutting - 1-2 hours
+
+### Risk Mitigation
+
+**High-Risk Tasks**:
+- **T007 (Database migration)**: Run migration early in Phase 1 to catch schema errors
+- **T008-T010 (Backend foundational)**: Test JWT utilities independently before user stories
+- **T011-T014 (Frontend foundational)**: Test API client with mock backend before real integration
+
+**Testing Strategy**:
+- After each user story phase: Manual end-to-end testing
+- After Phase 9: Full integration testing (signup → login → password change → email update → view profile → logout)
+- Before Phase 10: Security audit (password hashing, JWT validation, CORS configuration)
+
+---
+
+## Task Statistics
+
+- **Total Tasks**: 76
+- **Setup Tasks (Phase 1)**: 7
+- **Foundational Tasks (Phase 2)**: 6
+- **US1 Registration Tasks (Phase 3)**: 12
+- **US2 Login Tasks (Phase 4)**: 7
+- **US3 Protected Routes Tasks (Phase 5)**: 7
+- **US4 Profile Display Tasks (Phase 6)**: 3
+- **US5 Logout Tasks (Phase 7)**: 4
+- **US6 Password Change Tasks (Phase 8)**: 7
+- **US7 Email Update Tasks (Phase 9)**: 7
+- **Polish Tasks (Phase 10)**: 16
+- **Parallelizable Tasks**: 46 (marked with [P])
+- **Sequential Tasks**: 30
+- **Backend Tasks**: 34
+- **Frontend Tasks**: 39
+- **Shared/Infrastructure Tasks**: 3
+
+### Task Distribution by Story
+
+| User Story | Task Count | Backend | Frontend | Parallelizable |
+|------------|------------|---------|----------|----------------|
+| Setup | 7 | 3 | 3 | 7 |
+| Foundational | 6 | 3 | 3 | 6 |
+| US1: Registration | 12 | 6 | 6 | 2 |
+| US2: Login | 7 | 3 | 4 | 1 |
+| US3: Protected Routes | 7 | 3 | 4 | 1 |
+| US4: Profile Display | 3 | 0 | 3 | 1 |
+| US5: Logout | 4 | 1 | 3 | 1 |
+| US6: Password Change | 7 | 4 | 3 | 1 |
+| US7: Email Update | 7 | 4 | 3 | 1 |
+| Polish | 16 | 3 | 10 | 4 |
+| **TOTAL** | **76** | **36** | **37** | **25** |
+
+---
+
+## Format Validation
+
+### All Tasks Follow Required Format
+
+✅ **Format Checklist**:
+- ✅ All tasks start with `- [ ]` (checkbox)
+- ✅ All tasks have Task ID (T001-T076)
+- ✅ Parallelizable tasks marked with `[P]`
+- ✅ User story tasks marked with `[US1]`, `[US2]`, `[US3]`, `[US4]`, `[US5]`, `[US6]`, `[US7]`
+- ✅ Setup and Foundational tasks have NO story label
+- ✅ Polish tasks have NO story label
+- ✅ All tasks include file paths
+- ✅ All tasks have clear descriptions
+
+### Format Examples Validation
+
+- ✅ `T001 Create project structure per implementation plan` (Setup - correct)
+- ✅ `T005 [P] Create frontend/src directory structure` (Setup with parallel marker - correct)
+- ✅ `T015 [P] [US1] Update User model in backend/src/models/user.py` (US1 with parallel marker - correct)
+- ✅ `T019 [US1] Create signup endpoint in backend/src/api/routes/auth.py` (US1 without parallel marker - correct)
+- ✅ `T068 Verify JWT_SECRET_KEY is required in backend/src/main.py` (Polish - correct)
+
+**Format Validation**: ✅ PASSED - All 76 tasks follow the required checklist format
+
+---
+
+## Next Steps
+
+1. **Execute Phase 1 (Setup)**: Run all parallel setup tasks (T001-T007)
+2. **Execute Phase 2 (Foundational)**: Build blocking infrastructure (T008-T014)
+3. **Execute Phase 3 (US1 MVP)**: Implement user registration (T015-T026)
+4. **Test MVP**: Verify signup flow works end-to-end
+5. **Continue with US2-US7**: Complete remaining user stories in order
+6. **Final Polish**: Execute Phase 10 tasks (T062-T076)
+7. **Integration Testing**: Full flow test (signup → login → password change → email update → view profile → logout)
+8. **Security Validation**: Verify password hashing, JWT validation, CORS configuration
+
+---
+
+**Related Artifacts**:
+- Spec: [spec.md](./spec.md)
+- Plan: [plan.md](./plan.md)
+- Research: [research.md](./research.md)
+- Data Model: [data-model.md](./data-model.md)
+- Quickstart: [quickstart.md](./quickstart.md)
+- Contracts: [contracts/auth.yaml](./contracts/auth.yaml)

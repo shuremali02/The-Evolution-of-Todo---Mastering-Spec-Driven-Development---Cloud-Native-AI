@@ -1,0 +1,205 @@
+openapi: 3.0.0
+info:
+  title: Authentication API
+  version: 1.0.0
+  description: User authentication with username support - registration, login, and logout endpoints
+
+servers:
+  - url: http://localhost:8000/api/v1
+    description: Local development server
+  - url: https://shurem-todo-app.hf.space/api/v1
+    description: Production Hugging Face Spaces
+
+paths:
+  /auth/signup:
+    post:
+      summary: Register new user
+      description: Create a new user account with username, email, and password. Password must be confirmed to prevent typos.
+      operationId: signup
+      tags:
+        - authentication
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+                - username
+                - email
+                - password
+                - confirm_password
+              properties:
+                username:
+                  type: string
+                  minLength: 3
+                  maxLength: 20
+                  pattern: '^[a-zA-Z0-9][a-zA-Z0-9_-]*$'
+                  description: User's display name (3-20 chars, alphanumeric/_/- only, first char letter/number)
+                  example: john_doe
+                email:
+                  type: string
+                  format: email
+                  description: User's email address (valid email format)
+                  example: user@example.com
+                password:
+                  type: string
+                  minLength: 8
+                  maxLength: 128
+                  description: User's password (minimum 8 characters)
+                  example: securepassword123
+                confirm_password:
+                  type: string
+                  minLength: 8
+                  maxLength: 128
+                  description: Password confirmation (must match password)
+                  example: securepassword123
+      responses:
+        '201':
+          description: User successfully created
+          content:
+            application/json:
+              schema:
+                type: object
+                required:
+                  - access_token
+                  - token_type
+                  - user
+                properties:
+                  access_token:
+                    type: string
+                    description: JWT access token (valid for 60 minutes)
+                    example: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIxMjM0NTY3OC1YmQ3NjA4IiwidXNlcm5hbWUiOiJvaG5fZG9lIiwiZXhwIjoxNzM1NDAwMDAsImlhdCI6MTczMTQwMDAwfQ.9-3v4yQ0M2pGK5z6gj4aQ
+                  token_type:
+                    type: string
+                    enum: [bearer]
+                    description: Token type (always 'bearer')
+                  user:
+                    $ref: '#/components/schemas/UserResponse'
+        '400':
+          description: Validation error (password mismatch, invalid format, etc.)
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '409':
+          description: Username or email already exists
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+
+  /auth/login:
+    post:
+      summary: Authenticate user
+      description: Login with either email or username and password. Supports both credential types.
+      operationId: login
+      tags:
+        - authentication
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+                - email_or_username
+                - password
+              properties:
+                email_or_username:
+                  type: string
+                  description: Email address OR username (flexible login)
+                  example: john_doe
+                  # Can be: "user@example.com" or "john_doe"
+                password:
+                  type: string
+                  description: User's password
+                  example: securepassword123
+      responses:
+        '200':
+          description: Authentication successful
+          content:
+            application/json:
+              schema:
+                type: object
+                required:
+                  - access_token
+                  - token_type
+                  - user
+                properties:
+                  access_token:
+                    type: string
+                    description: JWT access token (valid for 60 minutes)
+                  token_type:
+                    type: string
+                    enum: [bearer]
+                  user:
+                    $ref: '#/components/schemas/UserResponse'
+        '401':
+          description: Invalid credentials
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+
+  /auth/logout:
+    post:
+      summary: Logout user
+      description: Logout endpoint (frontend clears token). No server-side token blacklist in Phase-2.
+      operationId: logout
+      tags:
+        - authentication
+      responses:
+        '200':
+          description: Logout successful (frontend should clear token)
+          content:
+            application/json:
+              schema:
+                type: object
+                required:
+                  - message
+                properties:
+                  message:
+                    type: string
+                    example: Logged out successfully
+
+components:
+  schemas:
+    UserResponse:
+      type: object
+      required:
+        - id
+        - username
+        - email
+        - created_at
+      properties:
+        id:
+          type: string
+          format: uuid
+          description: User's unique identifier (UUID v4)
+          example: 550e8400-e29b-41d4-a716-446655440000
+        username:
+          type: string
+          maxLength: 20
+          description: User's username (stored lowercase)
+          example: john_doe
+        email:
+          type: string
+          format: email
+          description: User's email address (stored lowercase)
+          example: user@example.com
+        created_at:
+          type: string
+          format: date-time
+          description: Account creation timestamp (ISO 8601)
+          example: 2025-01-01T00:00:00Z
+
+    ErrorResponse:
+      type: object
+      required:
+        - detail
+      properties:
+        detail:
+          type: string
+          description: Human-readable error message
+          example: Username already taken
