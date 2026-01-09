@@ -7,34 +7,28 @@
 
 import React, { useEffect, useState } from 'react';
 import { useRouter } from 'next/navigation';
-import { apiClient } from '../../../lib/api';
+import { isAuthenticated } from '../../../lib/api';
 
 interface AuthGuardProps {
   children: React.ReactNode;
 }
 
 export const AuthGuard: React.FC<AuthGuardProps> = ({ children }) => {
-  const [isAuthenticated, setIsAuthenticated] = useState<boolean | null>(null);
+  const [authStatus, setAuthStatus] = useState<boolean | null>(null);
   const [loading, setLoading] = useState(true);
   const router = useRouter();
 
   useEffect(() => {
-    const checkAuth = async () => {
-      try {
-        // Try to make a request to a protected endpoint to verify auth
-        await apiClient.request('/auth/protected');
-        setIsAuthenticated(true);
-      } catch (error) {
-        // If request fails with 401, user is not authenticated
-        setIsAuthenticated(false);
-        // Redirect to login
-        router.push('/login');
-      } finally {
-        setLoading(false);
-      }
-    };
+    // Check if user is authenticated using the helper function
+    const status = isAuthenticated();
+    setAuthStatus(status);
 
-    checkAuth();
+    setLoading(false);
+
+    if (!status) {
+      // Redirect to login if not authenticated
+      router.push('/login');
+    }
   }, [router]);
 
   if (loading) {
@@ -45,7 +39,7 @@ export const AuthGuard: React.FC<AuthGuardProps> = ({ children }) => {
     );
   }
 
-  if (isAuthenticated === false) {
+  if (authStatus === false) {
     return null; // Redirect happens in useEffect
   }
 

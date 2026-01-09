@@ -5,10 +5,6 @@
 
 'use client';
 
-import { useState, FormEvent, useEffect } from 'react';
-import { useRouter } from 'next/navigation';
-import Link from 'next/link';
-import { apiClient } from '@/lib/api';
 import { SignupForm } from '@/src/components/auth/SignupForm';
 
 export default function SignupPage() {

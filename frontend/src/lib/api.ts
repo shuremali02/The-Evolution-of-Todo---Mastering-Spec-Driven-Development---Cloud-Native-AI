@@ -3,8 +3,6 @@
 
 import type { SignupRequest, LoginRequest, TokenResponse, UserProfile } from '@/types/auth';
 
-const API_BASE_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8000';
-
 class ApiError extends Error {
   constructor(public status: number, message: string) {
     super(message);
@@ -16,6 +14,9 @@ async function fetchApi<T>(
   endpoint: string,
   options: RequestInit = {}
 ): Promise<T> {
+  // Get API base URL - use environment variable or default
+  const API_BASE_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8000';
+
   // Check if we're in the browser environment before accessing localStorage
   const token = typeof window !== 'undefined' ? localStorage.getItem('access_token') : null;
 
@@ -85,3 +86,98 @@ export function isAuthenticated(): boolean {
   }
   return false;
 }
+
+export async function changePassword(currentPassword: string, newPassword: string, confirmPassword: string): Promise<void> {
+  const response = await fetchApi<void>('/api/v1/auth/change-password', {
+    method: 'POST',
+    body: JSON.stringify({
+      current_password: currentPassword,
+      new_password: newPassword,
+      confirm_password: confirmPassword
+    }),
+  });
+
+  return response;
+}
+
+export async function updateEmail(newEmail: string, password: string): Promise<void> {
+  const response = await fetchApi<void>('/api/v1/auth/update-email', {
+    method: 'POST',
+    body: JSON.stringify({
+      new_email: newEmail,
+      password: password
+    }),
+  });
+
+  return response;
+}
+
+// Task-related API functions
+export async function getTasks(): Promise<any[]> {
+  const response = await fetchApi<any>('/api/v1/tasks', {
+    method: 'GET',
+  });
+
+  // The backend returns a TaskListResponse with tasks property
+  return response.tasks || [];
+}
+
+export async function createTask(taskData: any): Promise<any> {
+  const response = await fetchApi<any>('/api/v1/tasks', {
+    method: 'POST',
+    body: JSON.stringify(taskData),
+  });
+
+  return response;
+}
+
+export async function getTask(taskId: string): Promise<any> {
+  const response = await fetchApi<any>(`/api/v1/tasks/${taskId}`, {
+    method: 'GET',
+  });
+
+  return response;
+}
+
+export async function updateTask(taskId: string, taskData: any): Promise<any> {
+  const response = await fetchApi<any>(`/api/v1/tasks/${taskId}`, {
+    method: 'PUT',
+    body: JSON.stringify(taskData),
+  });
+
+  return response;
+}
+
+export async function completeTask(taskId: string): Promise<any> {
+  const response = await fetchApi<any>(`/api/v1/tasks/${taskId}/complete`, {
+    method: 'PATCH',
+  });
+
+  return response;
+}
+
+export async function deleteTask(taskId: string): Promise<void> {
+  await fetchApi<void>(`/api/v1/tasks/${taskId}`, {
+    method: 'DELETE',
+  });
+}
+
+// Export a client object for backward compatibility with existing code
+export const apiClient = {
+  // Auth functions
+  login: login,
+  signup: signup,
+  getProfile: getProfile,
+  logout: logout,
+  isAuthenticated: isAuthenticated,
+  changePassword: changePassword,
+  updateEmail: updateEmail,
+
+  // Task functions
+  getTasks: getTasks,
+  createTask: createTask,
+  getTask: getTask,
+  updateTask: updateTask,
+  completeTask: completeTask,
+  deleteTask: deleteTask,
+};

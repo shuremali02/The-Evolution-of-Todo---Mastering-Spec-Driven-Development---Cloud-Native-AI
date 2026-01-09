@@ -7,7 +7,7 @@
 
 import { useState, useEffect, useRef, Fragment } from 'react';
 import { Avatar } from '@/src/components/ui/Avatar';
-import { apiClient } from '@/lib/api';
+import { getProfile, logout } from '@/lib/api';
 import toast from 'react-hot-toast';
 import { useRouter } from 'next/navigation';
 
@@ -32,8 +32,8 @@ export function Navbar({ onLogout }: NavbarProps) {
   useEffect(() => {
     const fetchUser = async () => {
       try {
-        const userData = await apiClient.request('/auth/protected');
-        setUser(userData.user);
+        const userData = await getProfile();
+        setUser(userData);
       } catch (error) {
         console.error('Error fetching user data:', error);
       } finally {
@@ -60,7 +60,7 @@ export function Navbar({ onLogout }: NavbarProps) {
 
   const handleLogout = async () => {
     try {
-      await apiClient.logout();
+      logout();
       toast.success('Logged out successfully');
     } catch (error) {
       console.error('Error during logout:', error);
