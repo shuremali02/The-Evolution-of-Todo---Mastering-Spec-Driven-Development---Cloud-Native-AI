@@ -162,8 +162,28 @@ export async function deleteTask(taskId: string): Promise<void> {
   });
 }
 
+// Define the ApiClient interface for type safety
+interface ApiClient {
+  // Auth functions
+  login: (data: LoginRequest) => Promise<TokenResponse>;
+  signup: (data: SignupRequest) => Promise<TokenResponse>;
+  getProfile: () => Promise<UserProfile>;
+  logout: () => void;
+  isAuthenticated: () => boolean;
+  changePassword: (currentPassword: string, newPassword: string, confirmPassword: string) => Promise<void>;
+  updateEmail: (newEmail: string, password: string) => Promise<void>;
+
+  // Task functions
+  getTasks: () => Promise<any[]>;
+  createTask: (taskData: any) => Promise<any>;
+  getTask: (taskId: string) => Promise<any>;
+  updateTask: (taskId: string, taskData: any) => Promise<any>;
+  completeTask: (taskId: string) => Promise<any>;
+  deleteTask: (taskId: string) => Promise<void>;
+}
+
 // Export a client object for backward compatibility with existing code
-export const apiClient = {
+export const apiClient: ApiClient = {
   // Auth functions
   login: login,
   signup: signup,
