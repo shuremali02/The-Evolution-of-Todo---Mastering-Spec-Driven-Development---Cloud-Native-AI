@@ -15,18 +15,16 @@ function getApiUrl(): string {
     return process.env.NEXT_PUBLIC_API_URL
   }
 
-  // Only use window.location in browser environment
+  // For production deployments, use the backend API URL
+  // This should be configured separately from the frontend URL
   if (typeof window !== 'undefined') {
-    if (window.location.hostname.includes('.hf.space')) {
-      return `${window.location.origin}/api/v1`
-    }
-    return `${window.location.origin}/api/v1`
+    // If we're in a browser and no env var is set, default to localhost for dev
+    // In production, NEXT_PUBLIC_API_URL should be set to the actual backend URL
+    return DEFAULT_API_URL
   }
 
-  // For server-side rendering, use environment-based URL or default
-  return process.env.NODE_ENV === 'production'
-    ? DEFAULT_API_URL  // In production, you'd typically set NEXT_PUBLIC_API_URL
-    : DEFAULT_API_URL  // Default for development
+  // For server-side rendering, use environment variable or default
+  return DEFAULT_API_URL
 }
 
 /**
