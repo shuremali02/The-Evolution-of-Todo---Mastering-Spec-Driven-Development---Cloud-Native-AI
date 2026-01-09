@@ -7,12 +7,27 @@
 import type { Task, TaskCreate, TaskUpdate } from '../types/task'
 import type { UserProfile } from '../types/auth'
 
-const API_URL = process.env.NEXT_PUBLIC_API_URL ||
-  (typeof window !== 'undefined' && window.location.hostname.includes('.hf.space')
-    ? `${window.location.origin}/api/v1`
-    : process.env.NODE_ENV === 'production'
-      ? `${window.location.origin}/api/v1`  // Production - use same origin
-      : 'http://localhost:8000/api/v1')  // Development URL
+const DEFAULT_API_URL = 'http://localhost:8000/api/v1'
+
+function getApiUrl(): string {
+  // Use environment variable if available
+  if (process.env.NEXT_PUBLIC_API_URL) {
+    return process.env.NEXT_PUBLIC_API_URL
+  }
+
+  // Only use window.location in browser environment
+  if (typeof window !== 'undefined') {
+    if (window.location.hostname.includes('.hf.space')) {
+      return `${window.location.origin}/api/v1`
+    }
+    return `${window.location.origin}/api/v1`
+  }
+
+  // For server-side rendering, use environment-based URL or default
+  return process.env.NODE_ENV === 'production'
+    ? DEFAULT_API_URL  // In production, you'd typically set NEXT_PUBLIC_API_URL
+    : DEFAULT_API_URL  // Default for development
+}
 
 /**
  * API client for communicating with FastAPI backend.
@@ -21,8 +36,8 @@ const API_URL = process.env.NEXT_PUBLIC_API_URL ||
 class ApiClient {
   private baseURL: string
 
-  constructor(baseURL: string = API_URL) {
-    this.baseURL = baseURL
+  constructor(baseURL?: string) {
+    this.baseURL = baseURL || getApiUrl()
   }
 
   /**
@@ -295,5 +310,15 @@ class ApiClient {
   }
 }
 
-// Export singleton instance
-export const apiClient = new ApiClient()
+// Export singleton instance with lazy initialization to avoid SSR issues
+let _apiClient: ApiClient | null = null
+
+export const getApiClient = (): ApiClient => {
+  if (!_apiClient) {
+    _apiClient = new ApiClient()
+  }
+  return _apiClient
+}
+
+// For backward compatibility, still export as apiClient
+export const apiClient = getApiClient()
