@@ -7,16 +7,10 @@
 
 import { useState, useEffect, useRef, Fragment } from 'react';
 import { Avatar } from '@/src/components/ui/Avatar';
-import { getProfile, logout } from '@/lib/api';
+import { apiClient } from '@/lib/api';
+import type { UserProfile as User } from '@/types/auth';
 import toast from 'react-hot-toast';
 import { useRouter } from 'next/navigation';
-
-interface User {
-  id: string;
-  username: string;
-  email: string;
-  created_at: string;
-}
 
 interface NavbarProps {
   onLogout: () => void;
@@ -32,7 +26,7 @@ export function Navbar({ onLogout }: NavbarProps) {
   useEffect(() => {
     const fetchUser = async () => {
       try {
-        const userData = await getProfile();
+        const userData = await apiClient.getProfile();
         setUser(userData);
       } catch (error) {
         console.error('Error fetching user data:', error);
@@ -60,7 +54,7 @@ export function Navbar({ onLogout }: NavbarProps) {
 
   const handleLogout = async () => {
     try {
-      logout();
+      apiClient.logout();
       toast.success('Logged out successfully');
     } catch (error) {
       console.error('Error during logout:', error);

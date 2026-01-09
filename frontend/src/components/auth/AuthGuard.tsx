@@ -7,7 +7,7 @@
 
 import React, { useEffect, useState } from 'react';
 import { useRouter } from 'next/navigation';
-import { isAuthenticated } from '../../../lib/api';
+import { apiClient } from '../../../lib/api';
 
 interface AuthGuardProps {
   children: React.ReactNode;
@@ -20,7 +20,7 @@ export const AuthGuard: React.FC<AuthGuardProps> = ({ children }) => {
 
   useEffect(() => {
     // Check if user is authenticated using the helper function
-    const status = isAuthenticated();
+    const status = apiClient.isAuthenticated();
     setAuthStatus(status);
 
     setLoading(false);

@@ -6,7 +6,7 @@
 'use client';
 
 import React, { useState } from 'react';
-import { updateEmail } from '@/lib/api';
+import { apiClient } from '@/lib/api';
 import { validateEmail } from '@/lib/validation';
 import toast from 'react-hot-toast';
 
@@ -61,7 +61,7 @@ export const EmailUpdateForm: React.FC = () => {
 
     setLoading(true);
     try {
-      const response = await updateEmail(newEmail, password);
+      const response = await apiClient.updateEmail(newEmail, password);
 
       toast.success('Email updated successfully!');
       setNewEmail('');
