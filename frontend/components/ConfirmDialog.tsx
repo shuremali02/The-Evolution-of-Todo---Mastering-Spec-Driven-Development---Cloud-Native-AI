@@ -106,17 +106,17 @@ export function ConfirmDialog({
       aria-labelledby="dialog-title"
     >
       <div
-        className="bg-white rounded-lg shadow-xl max-w-md w-full mx-4 overflow-hidden"
+        className="bg-white dark:bg-gray-800 rounded-lg shadow-xl max-w-md w-full mx-4 overflow-hidden"
         onClick={(e) => e.stopPropagation()}
       >
         {/* Header with icon */}
         <div className="flex items-start gap-4 p-6">
           <div className="flex-shrink-0 mt-0.5">{icon}</div>
           <div className="flex-1">
-            <h2 id="dialog-title" className="text-lg font-semibold text-gray-900 mb-2">
+            <h2 id="dialog-title" className="text-lg font-semibold text-gray-900 dark:text-white mb-2">
               {title}
             </h2>
-            <p className="text-gray-600 text-sm leading-relaxed">
+            <p className="text-gray-600 dark:text-gray-400 text-sm leading-relaxed">
               {message}
             </p>
           </div>
@@ -127,7 +127,7 @@ export function ConfirmDialog({
           <button
             type="button"
             onClick={onCancel}
-            className="px-5 py-2.5 bg-white border border-gray-300 text-gray-700 rounded-lg font-medium hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-gray-300 transition-colors"
+            className="px-5 py-2.5 bg-white dark:bg-gray-700 border border-gray-300 dark:border-gray-600 text-gray-700 dark:text-gray-200 rounded-lg font-medium hover:bg-gray-50 dark:hover:bg-gray-600 focus:outline-none focus:ring-2 focus:ring-gray-300 transition-colors"
           >
             {cancelLabel}
           </button>

@@ -70,7 +70,7 @@ export function SortDropdown({ value, onChange, className = '' }: SortDropdownPr
       <button
         type="button"
         onClick={() => setIsOpen(!isOpen)}
-        className="inline-flex items-center gap-2 px-4 py-2.5 border border-gray-200 rounded-lg bg-white text-gray-700 font-medium hover:bg-gray-50 hover:border-gray-300 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-colors"
+        className="inline-flex items-center gap-2 px-4 py-2.5 border border-gray-200 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-700 dark:text-gray-200 font-medium hover:bg-gray-50 dark:hover:bg-gray-600 hover:border-gray-300 dark:hover:border-gray-500 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-colors"
         aria-label="Sort tasks"
         aria-expanded={isOpen}
         aria-haspopup="listbox"
@@ -97,7 +97,7 @@ export function SortDropdown({ value, onChange, className = '' }: SortDropdownPr
       </button>
 
       {isOpen && (
-        <div className="absolute left-0 z-10 mt-2 w-56 bg-white border border-gray-200 rounded-lg shadow-lg focus:outline-none">
+        <div className="absolute left-0 z-10 mt-2 w-56 bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-lg shadow-lg focus:outline-none">
           <ul
             role="listbox"
             aria-label="Sort options"
@@ -113,8 +113,8 @@ export function SortDropdown({ value, onChange, className = '' }: SortDropdownPr
                   }}
                   className={`w-full flex items-center gap-3 px-4 py-2.5 text-sm transition-colors ${
                     option.value === value
-                      ? 'bg-blue-50 text-blue-700'
-                      : 'text-gray-700 hover:bg-gray-50'
+                      ? 'bg-blue-50 dark:bg-blue-900/30 text-blue-700 dark:text-blue-300'
+                      : 'text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-700'
                   }`}
                 >
                   <span className="text-lg">{option.icon}</span>

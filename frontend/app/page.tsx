@@ -71,75 +71,78 @@ export default function LandingPage() {
   ];
 
   return (
-    <>
+    <div className="min-h-screen flex flex-col">
       <PublicNavbar />
 
-      {/* Hero Section */}
-      <Hero
-        headline="Transform Your Productivity"
-        subheadline="Manage tasks efficiently, stay organized, and achieve your goals with our modern task management app. Join thousands of productive users today."
-        primaryCTA={{
-          label: 'Sign Up Free',
-          href: '/signup',
-          type: 'primary',
-        }}
-        secondaryCTA={{
-          label: 'Learn More',
-          href: '#features',
-        }}
-      />
+      {/* Main Content */}
+      <main className="flex-grow">
+        {/* Hero Section */}
+        <Hero
+          headline="Transform Your Productivity"
+          subheadline="Manage tasks efficiently, stay organized, and achieve your goals with our modern task management app. Join thousands of productive users today."
+          primaryCTA={{
+            label: 'Sign Up Free',
+            href: '/signup',
+            type: 'primary',
+          }}
+          secondaryCTA={{
+            label: 'Learn More',
+            href: '#features',
+          }}
+        />
 
-      {/* Features Section */}
-      <section
-        id="features"
-        className="py-16 bg-gray-50"
-        aria-labelledby="features-heading"
-      >
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <h2
-            id="features-heading"
-            className="text-3xl sm:text-4xl font-bold text-gray-900 text-center mb-4"
-          >
-            Powerful Features
-          </h2>
-          <p className="text-lg text-gray-600 text-center mb-12 max-w-2xl mx-auto">
-            Everything you need to stay organized and get things done
-          </p>
+        {/* Features Section */}
+        <section
+          id="features"
+          className="py-16 bg-gray-50 dark:bg-gray-800"
+          aria-labelledby="features-heading"
+        >
+          <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <h2
+              id="features-heading"
+              className="text-3xl sm:text-4xl font-bold text-gray-900 dark:text-white text-center mb-4"
+            >
+              Powerful Features
+            </h2>
+            <p className="text-lg text-gray-600 dark:text-gray-300 text-center mb-12 max-w-2xl mx-auto">
+              Everything you need to stay organized and get things done
+            </p>
 
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-            {features.map((feature) => (
-              <FeatureCard
-                key={feature.title}
-                icon={feature.icon}
-                title={feature.title}
-                description={feature.description}
-              />
-            ))}
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+              {features.map((feature) => (
+                <FeatureCard
+                  key={feature.title}
+                  icon={feature.icon}
+                  title={feature.title}
+                  description={feature.description}
+                />
+              ))}
+            </div>
           </div>
-        </div>
-      </section>
+        </section>
 
-      {/* How It Works Section */}
-      <HowItWorks
-        steps={steps}
-        sectionHeading="How It Works"
-      />
+        {/* How It Works Section */}
+        <HowItWorks
+          steps={steps}
+          sectionHeading="How It Works"
+        />
 
-      {/* Testimonials Section */}
-      <Testimonials />
+        {/* Testimonials Section */}
+        <Testimonials />
 
-      {/* CTA Section */}
-      <CTASection
-        headline="Ready to Get Started?"
-        subtext="Join thousands of productive users and transform the way you manage your tasks. It's free to try."
-        ctaButton={{
-          label: 'Start Your Free Trial',
-          href: '/signup',
-        }}
-      />
+        {/* CTA Section */}
+        <CTASection
+          headline="Ready to Get Started?"
+          subtext="Join thousands of productive users and transform the way you manage your tasks. It's free to try."
+          ctaButton={{
+            label: 'Start Your Free Trial',
+            href: '/signup',
+          }}
+        />
+      </main>
 
       {/* Footer */}
       <Footer />
-    </>
+    </div>
   );
 }

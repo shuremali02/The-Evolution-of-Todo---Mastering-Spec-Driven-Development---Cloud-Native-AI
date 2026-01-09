@@ -9,6 +9,7 @@ import { useRouter } from 'next/navigation'
 import { AuthGuard } from '@/components/AuthGuard'
 import { Navbar } from '@/components/Navbar'
 import { apiClient } from '@/lib/api'
+import { Providers } from '@/app/providers'
 
 export default function TasksLayout({ children }: { children: React.ReactNode }) {
   const router = useRouter()
@@ -23,13 +24,15 @@ export default function TasksLayout({ children }: { children: React.ReactNode })
   }
 
   return (
-    <AuthGuard>
-      <div className="min-h-screen bg-gray-50">
-        <Navbar onLogout={handleLogout} />
-        <main className="max-w-7xl mx-auto px-4 py-8">
-          {children}
-        </main>
-      </div>
-    </AuthGuard>
+    <Providers>
+      <AuthGuard>
+        <div className="min-h-screen bg-gray-50 dark:bg-gray-900">
+          <Navbar onLogout={handleLogout} />
+          <main className="max-w-7xl mx-auto px-4 py-8">
+            {children}
+          </main>
+        </div>
+      </AuthGuard>
+    </Providers>
   )
 }

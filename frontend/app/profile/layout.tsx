@@ -4,11 +4,16 @@
  */
 
 import { AuthGuard } from '@/components/AuthGuard';
+import { Providers } from '@/app/providers';
 
 export default function ProfileLayout({
   children,
 }: {
   children: React.ReactNode;
 }) {
-  return <AuthGuard>{children}</AuthGuard>;
+  return (
+    <Providers>
+      <AuthGuard>{children}</AuthGuard>
+    </Providers>
+  );
 }
