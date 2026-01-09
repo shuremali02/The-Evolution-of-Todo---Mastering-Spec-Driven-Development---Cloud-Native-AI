@@ -8,22 +8,16 @@
 import { useState, useEffect, useRef, Fragment } from 'react';
 import { Avatar } from '@/src/components/ui/Avatar';
 import { apiClient } from '@/lib/api';
+import type { UserProfile } from '@/types/auth';
 import toast from 'react-hot-toast';
 import { useRouter } from 'next/navigation';
-
-interface User {
-  id: string;
-  username: string;
-  email: string;
-  created_at: string;
-}
 
 interface NavbarProps {
   onLogout: () => void;
 }
 
 export function Navbar({ onLogout }: NavbarProps) {
-  const [user, setUser] = useState<User | null>(null);
+  const [user, setUser] = useState<UserProfile | null>(null);
   const [loading, setLoading] = useState(true);
   const [isOpen, setIsOpen] = useState(false);
   const dropdownRef = useRef<HTMLDivElement>(null);
