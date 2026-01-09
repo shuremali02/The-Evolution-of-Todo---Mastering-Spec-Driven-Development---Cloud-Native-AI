@@ -9,11 +9,11 @@ import React, { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import { Avatar } from '../ui/Avatar';
 import { apiClient } from '@/lib/api';
-import type { UserProfile } from '@/types/auth';
+import type { UserProfile as User } from '@/types/auth';
 import toast from 'react-hot-toast';
 
 export const UserProfile: React.FC = () => {
-  const [user, setUser] = useState<UserProfile | null>(null);
+  const [user, setUser] = useState<User | null>(null);
   const [loading, setLoading] = useState(true);
   const router = useRouter();
 

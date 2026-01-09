@@ -5,6 +5,7 @@
  */
 
 import type { Task, TaskCreate, TaskUpdate } from '../types/task'
+import type { UserProfile } from '../types/auth'
 
 const API_URL = process.env.NEXT_PUBLIC_API_URL ||
   (typeof window !== 'undefined' && window.location.hostname.includes('.hf.space')
@@ -213,6 +214,15 @@ class ApiClient {
    * Note: This only checks if token exists, not if it's valid.
    * Backend will validate on actual API calls.
    */
+  /**
+   * Get current user profile.
+   *
+   * @returns User profile information
+   */
+  async getProfile(): Promise<UserProfile> {
+    return this.request<UserProfile>('/auth/me')
+  }
+
   isAuthenticated(): boolean {
     return this.getToken() !== null
   }
