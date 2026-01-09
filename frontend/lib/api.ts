@@ -7,7 +7,8 @@
 import type { Task, TaskCreate, TaskUpdate } from '../types/task'
 import type { UserProfile } from '../types/auth'
 
-const DEFAULT_API_URL = 'http://localhost:8000/api/v1'
+const DEFAULT_DEV_API_URL = 'http://localhost:8000/api/v1'
+const DEFAULT_PROD_API_URL = 'https://shurem-todo-app.hf.space/api/v1'  // Your backend URL
 
 function getApiUrl(): string {
   // Use environment variable if available
@@ -15,18 +16,18 @@ function getApiUrl(): string {
     return process.env.NEXT_PUBLIC_API_URL
   }
 
-  // Only use window.location in browser environment
+  // For production deployments, use the backend API URL
+  // This should be configured separately from the frontend URL
   if (typeof window !== 'undefined') {
-    if (window.location.hostname.includes('.hf.space')) {
-      return `${window.location.origin}/api/v1`
-    }
-    return `${window.location.origin}/api/v1`
+    // In production, use your actual backend URL
+    // For development, default to localhost
+    return process.env.NODE_ENV === 'production'
+      ? DEFAULT_PROD_API_URL  // Using your actual backend URL
+      : DEFAULT_DEV_API_URL
   }
 
-  // For server-side rendering, use environment-based URL or default
-  return process.env.NODE_ENV === 'production'
-    ? DEFAULT_API_URL  // In production, you'd typically set NEXT_PUBLIC_API_URL
-    : DEFAULT_API_URL  // Default for development
+  // For server-side rendering, use environment variable or default to dev URL
+  return DEFAULT_DEV_API_URL
 }
 
 /**
