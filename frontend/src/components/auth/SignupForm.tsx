@@ -8,7 +8,7 @@
 import React, { useState } from 'react';
 import { useRouter } from 'next/navigation';
 import Link from 'next/link';
-import { signup } from '@/lib/api';
+import { apiClient } from '@/lib/api';
 import { validateUsername, validateEmail, validatePassword, validatePasswordMatch } from '@/lib/validation';
 import toast from 'react-hot-toast';
 
@@ -114,7 +114,7 @@ export const SignupForm: React.FC = () => {
 
     setLoading(true);
     try {
-      await signup(username, email, password, confirmPassword);
+      await apiClient.signup(username, email, password, confirmPassword);
 
       toast.success('Account created successfully!');
       router.push('/tasks'); // Redirect to tasks page after successful signup

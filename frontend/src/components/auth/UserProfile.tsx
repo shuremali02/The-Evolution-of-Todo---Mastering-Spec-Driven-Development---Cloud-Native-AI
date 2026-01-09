@@ -8,7 +8,7 @@
 import React, { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import { Avatar } from '../ui/Avatar';
-import { getProfile, logout } from '@/lib/api';
+import { apiClient } from '@/lib/api';
 import toast from 'react-hot-toast';
 
 interface User {
@@ -26,7 +26,7 @@ export const UserProfile: React.FC = () => {
   useEffect(() => {
     const fetchUser = async () => {
       try {
-        const userData = await getProfile();
+        const userData = await apiClient.getProfile();
         setUser(userData);
       } catch (error) {
         console.error('Error fetching user data:', error);
@@ -42,7 +42,7 @@ export const UserProfile: React.FC = () => {
 
   const handleLogout = async () => {
     try {
-      logout();
+      apiClient.logout();
       toast.success('Logged out successfully');
       router.push('/login');
     } catch (error) {

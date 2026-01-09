@@ -8,7 +8,7 @@
 import React, { useState } from 'react';
 import { useRouter, useSearchParams } from 'next/navigation';
 import Link from 'next/link';
-import { login } from '@/lib/api';
+import { apiClient } from '@/lib/api';
 import toast from 'react-hot-toast';
 
 export const LoginForm: React.FC = () => {
@@ -49,7 +49,7 @@ export const LoginForm: React.FC = () => {
 
     setLoading(true);
     try {
-      await login(emailOrUsername, password);
+      await apiClient.login(emailOrUsername, password);
 
       toast.success('Login successful!');
       router.push('/tasks'); // Redirect to tasks page after successful login
