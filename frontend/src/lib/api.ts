@@ -3,8 +3,6 @@
 
 import type { SignupRequest, LoginRequest, TokenResponse, UserProfile } from '@/types/auth';
 
-const API_BASE_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8000';
-
 class ApiError extends Error {
   constructor(public status: number, message: string) {
     super(message);
@@ -16,6 +14,9 @@ async function fetchApi<T>(
   endpoint: string,
   options: RequestInit = {}
 ): Promise<T> {
+  // Get API base URL - use environment variable or default
+  const API_BASE_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8000';
+
   // Check if we're in the browser environment before accessing localStorage
   const token = typeof window !== 'undefined' ? localStorage.getItem('access_token') : null;
 
