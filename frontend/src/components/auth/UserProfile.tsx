@@ -24,8 +24,8 @@ export const UserProfile: React.FC = () => {
         setUser(userData);
       } catch (error) {
         console.error('Error fetching user data:', error);
-        // If error occurs, user might not be authenticated
-        // Don't set user to null to avoid flickering
+        // If profile fetch fails, redirect to login or show error
+        // This suggests authentication issues
       } finally {
         setLoading(false);
       }

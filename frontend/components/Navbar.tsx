@@ -30,6 +30,8 @@ export function Navbar({ onLogout }: NavbarProps) {
         setUser(userData);
       } catch (error) {
         console.error('Error fetching user data:', error);
+        // If profile fetch fails, we might still have token in storage
+        // We could try to extract basic info from the token if needed
       } finally {
         setLoading(false);
       }
