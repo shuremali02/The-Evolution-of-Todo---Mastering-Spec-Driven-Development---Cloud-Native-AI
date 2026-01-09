@@ -6,7 +6,7 @@
 'use client';
 
 import React, { useState } from 'react';
-import { apiClient } from '@/lib/api';
+import { changePassword } from '@/lib/api';
 import { validatePassword, validatePasswordMatch } from '@/lib/validation';
 import toast from 'react-hot-toast';
 
@@ -89,7 +89,7 @@ export const PasswordChangeForm: React.FC = () => {
 
     setLoading(true);
     try {
-      await apiClient.changePassword(currentPassword, newPassword, confirmPassword);
+      await changePassword(currentPassword, newPassword, confirmPassword);
 
       toast.success('Password changed successfully!');
 
