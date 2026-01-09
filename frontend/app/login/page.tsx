@@ -18,7 +18,7 @@ function LoginFormWrapper() {
 
 export default function LoginPage() {
   return (
-    <div className="min-h-screen flex">
+    <div className="min-h-screen flex bg-white dark:bg-gray-900">
       {/* Left side - Feature highlights */}
       <div className="hidden lg:flex lg:w-1/2 bg-gradient-to-br from-slate-700 to-slate-900 relative overflow-hidden">
         <div className="absolute inset-0 opacity-5">
@@ -66,14 +66,14 @@ export default function LoginPage() {
       </div>
 
       {/* Right side - Login form */}
-      <div className="flex-1 flex items-center justify-center p-8 bg-gray-50">
+      <div className="flex-1 flex items-center justify-center p-8 bg-gray-50 dark:bg-gray-900">
         <div className="w-full max-w-md">
           <div className="lg:hidden mb-8 text-center">
-            <h1 className="text-2xl font-bold text-gray-900 tracking-tight">Todo App</h1>
+            <h1 className="text-2xl font-bold text-gray-900 dark:text-white tracking-tight">Todo App</h1>
           </div>
-          <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-8">
-            <h2 className="text-2xl font-bold text-gray-900 mb-2">Welcome back</h2>
-            <p className="text-gray-600 mb-6">Enter your credentials to access your account</p>
+          <div className="bg-white dark:bg-gray-800 rounded-lg shadow-sm border border-gray-200 dark:border-gray-700 p-8">
+            <h2 className="text-2xl font-bold text-gray-900 dark:text-white mb-2">Welcome back</h2>
+            <p className="text-gray-600 dark:text-gray-300 mb-6">Enter your credentials to access your account</p>
             <LoginFormWrapper />
           </div>
         </div>

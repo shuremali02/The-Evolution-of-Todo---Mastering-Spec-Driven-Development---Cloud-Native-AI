@@ -141,13 +141,13 @@ export function TaskForm({
 
   return (
     <div
-      className="mb-6 bg-white rounded-lg border border-gray-200"
+      className="mb-6 bg-white dark:bg-gray-800 rounded-lg border border-gray-200 dark:border-gray-700"
       role="form"
       aria-label={isEditMode ? 'Edit task form' : 'Create task form'}
     >
       {/* Form header */}
-      <div className="px-6 py-4 border-b border-gray-100">
-        <h2 className="text-lg font-semibold text-gray-900" id="task-form-title">
+      <div className="px-6 py-4 border-b border-gray-100 dark:border-gray-700">
+        <h2 className="text-lg font-semibold text-gray-900 dark:text-white" id="task-form-title">
           {isEditMode ? 'Edit Task' : 'Create New Task'}
         </h2>
       </div>
@@ -155,7 +155,7 @@ export function TaskForm({
       <form onSubmit={handleSubmit} aria-labelledby="task-form-title" className="p-6">
         {formError && (
           <div
-            className="mb-4 p-3 bg-red-50 border border-red-200 rounded-lg text-red-700 text-sm"
+            className="mb-4 p-3 bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800 rounded-lg text-red-700 dark:text-red-300 text-sm"
             role="alert"
           >
             <div className="flex items-center gap-2">
@@ -171,7 +171,7 @@ export function TaskForm({
         <div className="mb-4">
           <label
             htmlFor="title"
-            className="block text-sm font-medium text-gray-700 mb-1.5"
+            className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1.5"
           >
             Title <span className="text-red-500" aria-hidden="true">*</span>
           </label>
@@ -189,19 +189,19 @@ export function TaskForm({
             aria-required="true"
             aria-invalid={!!titleError}
             aria-describedby={titleError ? 'title-error' : 'title-counter'}
-            className={`w-full px-4 py-2.5 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent disabled:bg-gray-50 disabled:cursor-not-allowed transition-colors ${
-              titleError ? 'border-red-300 bg-red-50' : 'border-gray-200 hover:border-gray-300'
+            className={`w-full px-4 py-2.5 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent disabled:bg-gray-50 dark:disabled:bg-gray-600 disabled:cursor-not-allowed transition-colors bg-white dark:bg-gray-700 text-gray-900 dark:text-white ${
+              titleError ? 'border-red-300 dark:border-red-500 bg-red-50 dark:bg-red-900/20' : 'border-gray-200 dark:border-gray-600 hover:border-gray-300 dark:hover:border-gray-500'
             }`}
           />
           {titleError ? (
-            <p id="title-error" className="mt-1.5 text-sm text-red-600 flex items-center gap-1" role="alert">
+            <p id="title-error" className="mt-1.5 text-sm text-red-600 dark:text-red-400 flex items-center gap-1" role="alert">
               <svg className="w-4 h-4" fill="currentColor" viewBox="0 0 20 20">
                 <path fillRule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7 4a1 1 0 11-2 0 1 1 0 012 0zm-1-9a1 1 0 00-1 1v4a1 1 0 102 0V6a1 1 0 00-1-1z" clipRule="evenodd" />
               </svg>
               {titleError}
             </p>
           ) : (
-            <p id="title-counter" className="mt-1.5 text-xs text-gray-400">
+            <p id="title-counter" className="mt-1.5 text-xs text-gray-400 dark:text-gray-500">
               {title.length}/200 characters
             </p>
           )}
@@ -211,9 +211,9 @@ export function TaskForm({
         <div className="mb-4">
           <label
             htmlFor="description"
-            className="block text-sm font-medium text-gray-700 mb-1.5"
+            className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1.5"
           >
-            Description <span className="text-gray-400 text-xs font-normal">(optional)</span>
+            Description <span className="text-gray-400 dark:text-gray-500 text-xs font-normal">(optional)</span>
           </label>
           <textarea
             id="description"
@@ -226,19 +226,19 @@ export function TaskForm({
             placeholder="Add more details about this task..."
             aria-invalid={!!descriptionError}
             aria-describedby={descriptionError ? 'description-error' : 'description-counter'}
-            className={`w-full px-4 py-2.5 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent resize-none disabled:bg-gray-50 disabled:cursor-not-allowed transition-colors ${
-              descriptionError ? 'border-red-300 bg-red-50' : 'border-gray-200 hover:border-gray-300'
+            className={`w-full px-4 py-2.5 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent resize-none disabled:bg-gray-50 dark:disabled:bg-gray-600 disabled:cursor-not-allowed transition-colors bg-white dark:bg-gray-700 text-gray-900 dark:text-white ${
+              descriptionError ? 'border-red-300 dark:border-red-500 bg-red-50 dark:bg-red-900/20' : 'border-gray-200 dark:border-gray-600 hover:border-gray-300 dark:hover:border-gray-500'
             }`}
           />
           {descriptionError ? (
-            <p id="description-error" className="mt-1.5 text-sm text-red-600 flex items-center gap-1" role="alert">
+            <p id="description-error" className="mt-1.5 text-sm text-red-600 dark:text-red-400 flex items-center gap-1" role="alert">
               <svg className="w-4 h-4" fill="currentColor" viewBox="0 0 20 20">
                 <path fillRule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7 4a1 1 0 11-2 0 1 1 0 012 0zm-1-9a1 1 0 00-1 1v4a1 1 0 102 0V6a1 1 0 00-1-1z" clipRule="evenodd" />
               </svg>
               {descriptionError}
             </p>
           ) : (
-            <p id="description-counter" className="mt-1.5 text-xs text-gray-400">
+            <p id="description-counter" className="mt-1.5 text-xs text-gray-400 dark:text-gray-500">
               {description.length}/1000 characters
             </p>
           )}
@@ -250,7 +250,7 @@ export function TaskForm({
           <div>
             <label
               htmlFor="priority"
-              className="block text-sm font-medium text-gray-700 mb-1.5"
+              className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1.5"
             >
               Priority
             </label>
@@ -259,7 +259,7 @@ export function TaskForm({
               value={priority}
               onChange={(e) => setPriority(e.target.value as TaskPriority)}
               disabled={isLoading}
-              className="w-full px-4 py-2.5 border border-gray-200 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent disabled:bg-gray-50 disabled:cursor-not-allowed transition-colors bg-white"
+              className="w-full px-4 py-2.5 border border-gray-200 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent disabled:bg-gray-50 dark:disabled:bg-gray-600 disabled:cursor-not-allowed transition-colors bg-white dark:bg-gray-700 text-gray-900 dark:text-white"
             >
               {PRIORITIES.map((p) => (
                 <option key={p.value} value={p.value}>
@@ -273,7 +273,7 @@ export function TaskForm({
           <div>
             <label
               htmlFor="due_date"
-              className="block text-sm font-medium text-gray-700 mb-1.5"
+              className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1.5"
             >
               Due Date
             </label>
@@ -283,7 +283,7 @@ export function TaskForm({
               value={dueDate}
               onChange={(e) => setDueDate(e.target.value)}
               disabled={isLoading}
-              className="w-full px-4 py-2.5 border border-gray-200 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent disabled:bg-gray-50 disabled:cursor-not-allowed transition-colors"
+              className="w-full px-4 py-2.5 border border-gray-200 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent disabled:bg-gray-50 dark:disabled:bg-gray-600 disabled:cursor-not-allowed transition-colors bg-white dark:bg-gray-700 text-gray-900 dark:text-white"
             />
           </div>
         </div>
@@ -307,7 +307,7 @@ export function TaskForm({
               type="button"
               onClick={onCancel}
               disabled={isLoading}
-              className="px-5 py-2.5 bg-white border border-gray-300 text-gray-700 rounded-lg font-medium hover:bg-gray-50 disabled:bg-gray-50 disabled:cursor-not-allowed transition-colors"
+              className="px-5 py-2.5 bg-white dark:bg-gray-700 border border-gray-300 dark:border-gray-600 text-gray-700 dark:text-gray-200 rounded-lg font-medium hover:bg-gray-50 dark:hover:bg-gray-600 disabled:bg-gray-50 dark:disabled:bg-gray-700 disabled:cursor-not-allowed transition-colors"
             >
               Cancel
             </button>

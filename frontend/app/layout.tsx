@@ -5,6 +5,7 @@
 
 import type { Metadata } from 'next'
 import './globals.css'
+import { Providers } from './providers'
 
 export const metadata: Metadata = {
   title: 'Hackathon Todo',
@@ -17,8 +18,10 @@ export default function RootLayout({
   children: React.ReactNode
 }) {
   return (
-    <html lang="en">
-      <body>{children}</body>
+    <html lang="en" className="light" suppressHydrationWarning={true}>
+      <body className="min-h-screen bg-white dark:bg-gray-900">
+        <Providers>{children}</Providers>
+      </body>
     </html>
   )
 }

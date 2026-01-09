@@ -11,6 +11,8 @@ import { apiClient } from '@/lib/api';
 import type { UserProfile as User } from '@/types/auth';
 import toast from 'react-hot-toast';
 import { useRouter } from 'next/navigation';
+import { ThemeToggle } from '@/components/ThemeToggle';
+import { useTheme } from '@/context/ThemeContext';
 
 interface NavbarProps {
   onLogout: () => void;
@@ -75,7 +77,7 @@ export function Navbar({ onLogout }: NavbarProps) {
 
   return (
     <header
-      className="sticky top-0 z-40 bg-white/95 backdrop-blur-sm border-b border-gray-200"
+      className="sticky top-0 z-40 bg-white dark:bg-gray-900/95 backdrop-blur-sm border-b border-gray-200 dark:border-gray-700"
       role="navigation"
       aria-label="Main navigation"
     >
@@ -83,26 +85,29 @@ export function Navbar({ onLogout }: NavbarProps) {
         <div className="flex justify-between items-center h-16">
           {/* Logo - Text only, no emoji */}
           <div className="flex items-center">
-            <h1 className="text-xl font-bold text-gray-900 tracking-tight">
+            <h1 className="text-xl font-bold text-gray-900 dark:text-white tracking-tight">
               Todo App
             </h1>
           </div>
 
           {/* User Actions */}
           <div className="flex items-center gap-4" ref={dropdownRef}>
+            {/* Theme Toggle */}
+            <ThemeToggle />
+
             {/* User Info with Avatar as Dropdown Trigger */}
             {!loading && user && (
               <div className="relative">
                 <button
                   type="button"
                   onClick={() => setIsOpen(!isOpen)}
-                  className="flex items-center gap-2 p-1 rounded-full hover:bg-gray-100 transition-colors focus:outline-none focus:ring-2 focus:ring-blue-500"
+                  className="flex items-center gap-2 p-1 rounded-full hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors focus:outline-none focus:ring-2 focus:ring-blue-500"
                   aria-expanded={isOpen}
                   aria-haspopup="true"
                 >
                   <Avatar username={user.username} size="md" />
                   <svg
-                    className={`w-4 h-4 text-gray-500 transition-transform ${isOpen ? 'rotate-180' : ''}`}
+                    className={`w-4 h-4 text-gray-500 dark:text-gray-400 transition-transform ${isOpen ? 'rotate-180' : ''}`}
                     fill="none"
                     stroke="currentColor"
                     viewBox="0 0 24 24"
@@ -123,22 +128,22 @@ export function Navbar({ onLogout }: NavbarProps) {
 
                     {/* Dropdown */}
                     <div
-                      className="absolute right-0 mt-2 w-56 origin-top-right rounded-md bg-white shadow-lg ring-1 ring-black ring-opacity-5 focus:outline-none z-20 border border-gray-200"
+                      className="absolute right-0 mt-2 w-56 origin-top-right rounded-md bg-white dark:bg-gray-800 shadow-lg ring-1 ring-black ring-opacity-5 focus:outline-none z-20 border border-gray-200 dark:border-gray-700"
                       role="menu"
                       aria-orientation="vertical"
                       aria-labelledby="user-menu"
                     >
                       <div className="py-1" role="none">
                         {/* User Info in Dropdown */}
-                        <div className="px-4 py-3 border-b border-gray-100">
-                          <p className="text-sm font-medium text-gray-900">{user.username}</p>
-                          <p className="text-xs text-gray-500 truncate">{user.email}</p>
+                        <div className="px-4 py-3 border-b border-gray-100 dark:border-gray-700">
+                          <p className="text-sm font-medium text-gray-900 dark:text-white">{user.username}</p>
+                          <p className="text-xs text-gray-500 dark:text-gray-400 truncate">{user.email}</p>
                         </div>
 
                         {/* Navigation Options */}
                         <button
                           onClick={handleAvatarClick}
-                          className="block w-full text-left px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 hover:text-gray-900 transition-colors"
+                          className="block w-full text-left px-4 py-2 text-sm text-gray-700 dark:text-gray-200 hover:bg-gray-100 dark:hover:bg-gray-700 hover:text-gray-900 dark:hover:text-white transition-colors"
                           role="menuitem"
                         >
                           Your Profile
@@ -150,7 +155,7 @@ export function Navbar({ onLogout }: NavbarProps) {
                             router.push('/profile/change-password');
                             setIsOpen(false);
                           }}
-                          className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 hover:text-gray-900 transition-colors"
+                          className="block px-4 py-2 text-sm text-gray-700 dark:text-gray-200 hover:bg-gray-100 dark:hover:bg-gray-700 hover:text-gray-900 dark:hover:text-white transition-colors"
                           role="menuitem"
                         >
                           Change Password
@@ -162,14 +167,14 @@ export function Navbar({ onLogout }: NavbarProps) {
                             router.push('/profile/update-email');
                             setIsOpen(false);
                           }}
-                          className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 hover:text-gray-900 transition-colors"
+                          className="block px-4 py-2 text-sm text-gray-700 dark:text-gray-200 hover:bg-gray-100 dark:hover:bg-gray-700 hover:text-gray-900 dark:hover:text-white transition-colors"
                           role="menuitem"
                         >
                           Update Email
                         </a>
                         <button
                           onClick={handleLogout}
-                          className="block w-full text-left px-4 py-2 text-sm text-left text-red-600 hover:bg-red-50 hover:text-red-700 transition-colors border-t border-gray-100"
+                          className="block w-full text-left px-4 py-2 text-sm text-left text-red-600 dark:text-red-400 hover:bg-red-50 dark:hover:bg-red-900/20 hover:text-red-700 dark:hover:text-red-300 transition-colors border-t border-gray-100 dark:border-gray-700"
                           role="menuitem"
                         >
                           Sign out

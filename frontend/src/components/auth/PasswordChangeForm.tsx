@@ -107,11 +107,11 @@ export const PasswordChangeForm: React.FC = () => {
   };
 
   return (
-    <div className="max-w-md w-full mx-auto p-8 bg-white rounded-lg shadow-md">
-      <h2 className="text-2xl font-bold mb-6 text-center">Change Password</h2>
+    <div className="max-w-md w-full mx-auto p-8 bg-white dark:bg-gray-800 rounded-lg shadow-md">
+      <h2 className="text-2xl font-bold mb-6 text-center text-gray-900 dark:text-white">Change Password</h2>
       <form onSubmit={handleSubmit}>
         <div className="mb-4">
-          <label htmlFor="currentPassword" className="block text-sm font-medium text-gray-700 mb-1">
+          <label htmlFor="currentPassword" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
             Current Password
           </label>
           <div className="relative">
@@ -121,15 +121,15 @@ export const PasswordChangeForm: React.FC = () => {
               type={showCurrentPassword ? "text" : "password"}
               value={currentPassword}
               onChange={handleChange}
-              className={`w-full px-3 py-2 pr-10 border rounded-md ${
-                errors.currentPassword ? 'border-red-500' : 'border-gray-300'
+              className={`w-full px-3 py-2 pr-10 border rounded-md bg-white dark:bg-gray-700 text-gray-900 dark:text-white ${
+                errors.currentPassword ? 'border-red-500' : 'border-gray-300 dark:border-gray-600'
               }`}
               placeholder="Enter current password"
             />
             <button
               type="button"
               onClick={() => setShowCurrentPassword(!showCurrentPassword)}
-              className="absolute inset-y-0 right-0 pr-3 flex items-center text-gray-500 hover:text-gray-700"
+              className="absolute inset-y-0 right-0 pr-3 flex items-center text-gray-500 dark:text-gray-400 hover:text-gray-700 dark:hover:text-gray-200"
             >
               {showCurrentPassword ? (
                 // Eye icon for showing password
@@ -152,7 +152,7 @@ export const PasswordChangeForm: React.FC = () => {
         </div>
 
         <div className="mb-4">
-          <label htmlFor="newPassword" className="block text-sm font-medium text-gray-700 mb-1">
+          <label htmlFor="newPassword" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
             New Password
           </label>
           <div className="relative">
@@ -163,15 +163,15 @@ export const PasswordChangeForm: React.FC = () => {
               value={newPassword}
               onChange={handleChange}
               onBlur={() => validateField('newPassword', newPassword)}
-              className={`w-full px-3 py-2 pr-10 border rounded-md ${
-                errors.newPassword ? 'border-red-500' : 'border-gray-300'
+              className={`w-full px-3 py-2 pr-10 border rounded-md bg-white dark:bg-gray-700 text-gray-900 dark:text-white ${
+                errors.newPassword ? 'border-red-500' : 'border-gray-300 dark:border-gray-600'
               }`}
               placeholder="Enter new password (min 8 characters)"
             />
             <button
               type="button"
               onClick={() => setShowNewPassword(!showNewPassword)}
-              className="absolute inset-y-0 right-0 pr-3 flex items-center text-gray-500 hover:text-gray-700"
+              className="absolute inset-y-0 right-0 pr-3 flex items-center text-gray-500 dark:text-gray-400 hover:text-gray-700 dark:hover:text-gray-200"
             >
               {showNewPassword ? (
                 // Eye icon for showing password
@@ -194,7 +194,7 @@ export const PasswordChangeForm: React.FC = () => {
         </div>
 
         <div className="mb-6">
-          <label htmlFor="confirmPassword" className="block text-sm font-medium text-gray-700 mb-1">
+          <label htmlFor="confirmPassword" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
             Confirm New Password
           </label>
           <div className="relative">
@@ -205,15 +205,15 @@ export const PasswordChangeForm: React.FC = () => {
               value={confirmPassword}
               onChange={handleChange}
               onBlur={() => validateField('confirmPassword', confirmPassword)}
-              className={`w-full px-3 py-2 pr-10 border rounded-md ${
-                errors.confirmPassword ? 'border-red-500' : 'border-gray-300'
+              className={`w-full px-3 py-2 pr-10 border rounded-md bg-white dark:bg-gray-700 text-gray-900 dark:text-white ${
+                errors.confirmPassword ? 'border-red-500' : 'border-gray-300 dark:border-gray-600'
               }`}
               placeholder="Confirm new password"
             />
             <button
               type="button"
               onClick={() => setShowConfirmPassword(!showConfirmPassword)}
-              className="absolute inset-y-0 right-0 pr-3 flex items-center text-gray-500 hover:text-gray-700"
+              className="absolute inset-y-0 right-0 pr-3 flex items-center text-gray-500 dark:text-gray-400 hover:text-gray-700 dark:hover:text-gray-200"
             >
               {showConfirmPassword ? (
                 // Eye icon for showing password
@@ -236,7 +236,7 @@ export const PasswordChangeForm: React.FC = () => {
         </div>
 
         {errors.general && (
-          <div className="mb-4 p-3 bg-red-100 text-red-700 rounded-md">
+          <div className="mb-4 p-3 bg-red-100 dark:bg-red-900/30 text-red-700 dark:text-red-300 rounded-md">
             {errors.general}
           </div>
         )}

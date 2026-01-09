@@ -79,11 +79,11 @@ export const EmailUpdateForm: React.FC = () => {
   };
 
   return (
-    <div className="max-w-md w-full mx-auto p-8 bg-white rounded-lg shadow-md">
-      <h2 className="text-2xl font-bold mb-6 text-center">Update Email</h2>
+    <div className="max-w-md w-full mx-auto p-8 bg-white dark:bg-gray-800 rounded-lg shadow-md">
+      <h2 className="text-2xl font-bold mb-6 text-center text-gray-900 dark:text-white">Update Email</h2>
       <form onSubmit={handleSubmit}>
         <div className="mb-4">
-          <label htmlFor="newEmail" className="block text-sm font-medium text-gray-700 mb-1">
+          <label htmlFor="newEmail" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
             New Email
           </label>
           <input
@@ -93,8 +93,8 @@ export const EmailUpdateForm: React.FC = () => {
             value={newEmail}
             onChange={handleChange}
             onBlur={() => validateField('newEmail', newEmail)}
-            className={`w-full px-3 py-2 border rounded-md ${
-              errors.newEmail ? 'border-red-500' : 'border-gray-300'
+            className={`w-full px-3 py-2 border rounded-md bg-white dark:bg-gray-700 text-gray-900 dark:text-white ${
+              errors.newEmail ? 'border-red-500' : 'border-gray-300 dark:border-gray-600'
             }`}
             placeholder="Enter new email address"
           />
@@ -104,7 +104,7 @@ export const EmailUpdateForm: React.FC = () => {
         </div>
 
         <div className="mb-6">
-          <label htmlFor="password" className="block text-sm font-medium text-gray-700 mb-1">
+          <label htmlFor="password" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
             Current Password
           </label>
           <input
@@ -113,8 +113,8 @@ export const EmailUpdateForm: React.FC = () => {
             type="password"
             value={password}
             onChange={handleChange}
-            className={`w-full px-3 py-2 border rounded-md ${
-              errors.password ? 'border-red-500' : 'border-gray-300'
+            className={`w-full px-3 py-2 border rounded-md bg-white dark:bg-gray-700 text-gray-900 dark:text-white ${
+              errors.password ? 'border-red-500' : 'border-gray-300 dark:border-gray-600'
             }`}
             placeholder="Enter current password for verification"
           />
@@ -124,7 +124,7 @@ export const EmailUpdateForm: React.FC = () => {
         </div>
 
         {errors.general && (
-          <div className="mb-4 p-3 bg-red-100 text-red-700 rounded-md">
+          <div className="mb-4 p-3 bg-red-100 dark:bg-red-900/30 text-red-700 dark:text-red-300 rounded-md">
             {errors.general}
           </div>
         )}

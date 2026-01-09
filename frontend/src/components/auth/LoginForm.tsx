@@ -63,11 +63,11 @@ export const LoginForm: React.FC = () => {
   };
 
   return (
-    <div className="max-w-md w-full mx-auto p-8 bg-white rounded-lg shadow-md">
-      <h2 className="text-2xl font-bold mb-6 text-center">Sign In</h2>
+    <div className="max-w-md w-full mx-auto p-8 bg-white dark:bg-gray-800 rounded-lg shadow-md">
+      <h2 className="text-2xl font-bold mb-6 text-center text-gray-900 dark:text-white">Sign In</h2>
       <form onSubmit={handleSubmit}>
         <div className="mb-4">
-          <label htmlFor="emailOrUsername" className="block text-sm font-medium text-gray-700 mb-1">
+          <label htmlFor="emailOrUsername" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
             Email or Username
           </label>
           <input
@@ -76,8 +76,8 @@ export const LoginForm: React.FC = () => {
             type="text"
             value={emailOrUsername}
             onChange={(e) => setEmailOrUsername(e.target.value)}
-            className={`w-full px-3 py-2 border rounded-md ${
-              errors.emailOrUsername ? 'border-red-500' : 'border-gray-300'
+            className={`w-full px-3 py-2 border rounded-md bg-white dark:bg-gray-700 text-gray-900 dark:text-white ${
+              errors.emailOrUsername ? 'border-red-500' : 'border-gray-300 dark:border-gray-600'
             }`}
             placeholder="Enter email or username"
           />
@@ -87,7 +87,7 @@ export const LoginForm: React.FC = () => {
         </div>
 
         <div className="mb-6">
-          <label htmlFor="password" className="block text-sm font-medium text-gray-700 mb-1">
+          <label htmlFor="password" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
             Password
           </label>
           <div className="relative">
@@ -97,15 +97,15 @@ export const LoginForm: React.FC = () => {
               type={showPassword ? "text" : "password"}
               value={password}
               onChange={(e) => setPassword(e.target.value)}
-              className={`w-full px-3 py-2 pr-10 border rounded-md ${
-                errors.password ? 'border-red-500' : 'border-gray-300'
+              className={`w-full px-3 py-2 pr-10 border rounded-md bg-white dark:bg-gray-700 text-gray-900 dark:text-white ${
+                errors.password ? 'border-red-500' : 'border-gray-300 dark:border-gray-600'
               }`}
               placeholder="Enter password"
             />
             <button
               type="button"
               onClick={() => setShowPassword(!showPassword)}
-              className="absolute inset-y-0 right-0 pr-3 flex items-center text-gray-500 hover:text-gray-700"
+              className="absolute inset-y-0 right-0 pr-3 flex items-center text-gray-500 dark:text-gray-400 hover:text-gray-700 dark:hover:text-gray-200"
             >
               {showPassword ? (
                 // Eye icon for showing password
@@ -128,7 +128,7 @@ export const LoginForm: React.FC = () => {
         </div>
 
         {errors.general && (
-          <div className="mb-4 p-3 bg-red-100 text-red-700 rounded-md">
+          <div className="mb-4 p-3 bg-red-100 dark:bg-red-900/30 text-red-700 dark:text-red-300 rounded-md">
             {errors.general}
           </div>
         )}
@@ -143,9 +143,9 @@ export const LoginForm: React.FC = () => {
       </form>
 
       <div className="mt-4 text-center">
-        <p className="text-sm text-gray-600">
+        <p className="text-sm text-gray-600 dark:text-gray-400">
           Don't have an account?{' '}
-          <Link href="/signup" className="text-blue-600 hover:underline">
+          <Link href="/signup" className="text-blue-600 hover:underline dark:text-blue-400 dark:hover:text-blue-300">
             Sign up
           </Link>
         </p>
