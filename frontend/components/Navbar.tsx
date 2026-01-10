@@ -70,8 +70,18 @@ export function Navbar({ onLogout }: NavbarProps) {
     }
   };
 
-  const handleAvatarClick = () => {
-    router.push('/profile');
+  const handleProfileClick = () => {
+    router.push('/profile?section=profile');
+    setIsOpen(false);
+  };
+
+  const handlePasswordClick = () => {
+    router.push('/profile?section=password');
+    setIsOpen(false);
+  };
+
+  const handleEmailClick = () => {
+    router.push('/profile?section=email');
     setIsOpen(false);
   };
 
@@ -142,36 +152,26 @@ export function Navbar({ onLogout }: NavbarProps) {
 
                         {/* Navigation Options */}
                         <button
-                          onClick={handleAvatarClick}
+                          onClick={handleProfileClick}
                           className="block w-full text-left px-4 py-2 text-sm text-gray-700 dark:text-gray-200 hover:bg-gray-100 dark:hover:bg-gray-700 hover:text-gray-900 dark:hover:text-white transition-colors"
                           role="menuitem"
                         >
                           Your Profile
                         </button>
-                        <a
-                          href="/profile/change-password"
-                          onClick={(e) => {
-                            e.preventDefault();
-                            router.push('/profile/change-password');
-                            setIsOpen(false);
-                          }}
-                          className="block px-4 py-2 text-sm text-gray-700 dark:text-gray-200 hover:bg-gray-100 dark:hover:bg-gray-700 hover:text-gray-900 dark:hover:text-white transition-colors"
+                        <button
+                          onClick={handlePasswordClick}
+                          className="block w-full text-left px-4 py-2 text-sm text-gray-700 dark:text-gray-200 hover:bg-gray-100 dark:hover:bg-gray-700 hover:text-gray-900 dark:hover:text-white transition-colors"
                           role="menuitem"
                         >
                           Change Password
-                        </a>
-                        <a
-                          href="/profile/update-email"
-                          onClick={(e) => {
-                            e.preventDefault();
-                            router.push('/profile/update-email');
-                            setIsOpen(false);
-                          }}
-                          className="block px-4 py-2 text-sm text-gray-700 dark:text-gray-200 hover:bg-gray-100 dark:hover:bg-gray-700 hover:text-gray-900 dark:hover:text-white transition-colors"
+                        </button>
+                        <button
+                          onClick={handleEmailClick}
+                          className="block w-full text-left px-4 py-2 text-sm text-gray-700 dark:text-gray-200 hover:bg-gray-100 dark:hover:bg-gray-700 hover:text-gray-900 dark:hover:text-white transition-colors"
                           role="menuitem"
                         >
                           Update Email
-                        </a>
+                        </button>
                         <button
                           onClick={handleLogout}
                           className="block w-full text-left px-4 py-2 text-sm text-left text-red-600 dark:text-red-400 hover:bg-red-50 dark:hover:bg-red-900/20 hover:text-red-700 dark:hover:text-red-300 transition-colors border-t border-gray-100 dark:border-gray-700"

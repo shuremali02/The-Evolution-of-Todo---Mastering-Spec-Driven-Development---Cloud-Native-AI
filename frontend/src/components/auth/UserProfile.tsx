@@ -12,27 +12,32 @@ import { apiClient } from '@/lib/api';
 import type { UserProfile as User } from '@/types/auth';
 import toast from 'react-hot-toast';
 
-export const UserProfile: React.FC = () => {
-  const [user, setUser] = useState<User | null>(null);
-  const [loading, setLoading] = useState(true);
+interface UserProfileProps {
+  user?: User;
+}
+
+export const UserProfile: React.FC<UserProfileProps> = ({ user }) => {
+  const [loading, setLoading] = useState(false); // No initial loading since data is passed in
   const router = useRouter();
 
+  // If user data is not provided, we can still fetch it as fallback
   useEffect(() => {
-    const fetchUser = async () => {
-      try {
-        const userData = await apiClient.getProfile();
-        setUser(userData);
-      } catch (error) {
-        console.error('Error fetching user data:', error);
-        // If profile fetch fails, redirect to login or show error
-        // This suggests authentication issues
-      } finally {
-        setLoading(false);
-      }
-    };
+    if (!user) {
+      const fetchUser = async () => {
+        try {
+          setLoading(true);
+          const userData = await apiClient.getProfile();
+          // Note: In the tabbed layout, parent component will handle this
+        } catch (error) {
+          console.error('Error fetching user data:', error);
+        } finally {
+          setLoading(false);
+        }
+      };
 
-    fetchUser();
-  }, []);
+      fetchUser();
+    }
+  }, [user]);
 
   const handleLogout = async () => {
     try {
@@ -45,16 +50,16 @@ export const UserProfile: React.FC = () => {
     }
   };
 
-  if (loading) {
-    return (
-      <div className="flex flex-col items-center justify-center p-6">
-        <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600 mb-4"></div>
-        <p className="text-gray-600 dark:text-gray-400">Loading profile...</p>
-      </div>
-    );
-  }
-
   if (!user) {
+    if (loading) {
+      return (
+        <div className="flex flex-col items-center justify-center p-6">
+          <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600 mb-4"></div>
+          <p className="text-gray-600 dark:text-gray-400">Loading profile...</p>
+        </div>
+      );
+    }
+
     return (
       <div className="text-center p-6">
         <p className="text-red-600 dark:text-red-400">Not authenticated</p>

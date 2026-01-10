@@ -10,7 +10,11 @@ import { apiClient } from '@/lib/api';
 import { validatePassword, validatePasswordMatch } from '@/lib/validation';
 import toast from 'react-hot-toast';
 
-export const PasswordChangeForm: React.FC = () => {
+interface PasswordChangeFormProps {
+  onSuccess?: () => void;
+}
+
+export const PasswordChangeForm: React.FC<PasswordChangeFormProps> = ({ onSuccess }) => {
   const [currentPassword, setCurrentPassword] = useState('');
   const [newPassword, setNewPassword] = useState('');
   const [confirmPassword, setConfirmPassword] = useState('');
@@ -97,6 +101,11 @@ export const PasswordChangeForm: React.FC = () => {
       setCurrentPassword('');
       setNewPassword('');
       setConfirmPassword('');
+
+      // Call success callback if provided
+      if (onSuccess) {
+        onSuccess();
+      }
     } catch (error: any) {
       console.error('Password change error:', error);
       toast.error(error.message || 'Failed to change password');

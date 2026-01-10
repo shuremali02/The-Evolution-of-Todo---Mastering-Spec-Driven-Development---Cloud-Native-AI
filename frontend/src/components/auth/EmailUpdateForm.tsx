@@ -10,7 +10,11 @@ import { apiClient } from '@/lib/api';
 import { validateEmail } from '@/lib/validation';
 import toast from 'react-hot-toast';
 
-export const EmailUpdateForm: React.FC = () => {
+interface EmailUpdateFormProps {
+  onSuccess?: () => void;
+}
+
+export const EmailUpdateForm: React.FC<EmailUpdateFormProps> = ({ onSuccess }) => {
   const [newEmail, setNewEmail] = useState('');
   const [password, setPassword] = useState('');
   const [errors, setErrors] = useState<Record<string, string>>({});
@@ -69,6 +73,11 @@ export const EmailUpdateForm: React.FC = () => {
 
       // Update any display with the new email if needed
       console.log('Email update response:', response);
+
+      // Call success callback if provided
+      if (onSuccess) {
+        onSuccess();
+      }
     } catch (error: any) {
       console.error('Email update error:', error);
       toast.error(error.message || 'Failed to update email');
