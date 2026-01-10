@@ -1,186 +1,104 @@
-# Implementation Plan: Task Management UI Enhancements
+# Implementation Plan: [FEATURE]
 
-**Branch**: `005-task-management-ui` | **Date**: 2026-01-02 | **Spec**: [task-ui/spec.md](./task-ui/spec.md)
-**Input**: Feature specification from `/specs/005-task-management-ui/task-ui/spec.md`
+**Branch**: `[###-feature-name]` | **Date**: [DATE] | **Spec**: [link]
+**Input**: Feature specification from `/specs/[###-feature-name]/spec.md`
+
+**Note**: This template is filled in by the `/sp.plan` command. See `.specify/templates/commands/plan.md` for the execution workflow.
 
 ## Summary
 
-Enhance the tasks page with 10 professional features: search, sorting, priority levels, due dates, toast notifications, keyboard shortcuts, animations (Framer Motion), skeleton loading, bulk actions, and drag-and-drop reordering (@dnd-kit/core). This is a frontend-only enhancement that extends existing Task model with priority, due_date, and position fields.
+[Extract from feature spec: primary requirement + technical approach from research]
 
 ## Technical Context
 
-**Language/Version**: TypeScript 5.x, Next.js 14+ (App Router), React 18+
-**Primary Dependencies**:
-- `framer-motion` - Animations (Clarified: Framer Motion)
-- `@dnd-kit/core` - Drag & Drop (Clarified: @dnd-kit/core)
-- `react-hot-toast` - Toast Notifications (Clarified: react-hot-toast)
-**Storage**: Frontend state + existing REST API endpoints (Neon PostgreSQL backend)
-**Testing**: Jest + React Testing Library
-**Target Platform**: Web browser (responsive)
-**Project Type**: Web application (Next.js + FastAPI)
-**Performance Goals**: <100ms search filtering, smooth 60fps animations
-**Constraints**: Mobile-responsive, accessible (WCAG 2.1), dark mode ready
-**Scale/Scope**: Single-user task management (<1000 tasks typical)
+<!--
+  ACTION REQUIRED: Replace the content in this section with the technical details
+  for the project. The structure here is presented in advisory capacity to guide
+  the iteration process.
+-->
+
+**Language/Version**: [e.g., Python 3.11, Swift 5.9, Rust 1.75 or NEEDS CLARIFICATION]  
+**Primary Dependencies**: [e.g., FastAPI, UIKit, LLVM or NEEDS CLARIFICATION]  
+**Storage**: [if applicable, e.g., PostgreSQL, CoreData, files or N/A]  
+**Testing**: [e.g., pytest, XCTest, cargo test or NEEDS CLARIFICATION]  
+**Target Platform**: [e.g., Linux server, iOS 15+, WASM or NEEDS CLARIFICATION]
+**Project Type**: [single/web/mobile - determines source structure]  
+**Performance Goals**: [domain-specific, e.g., 1000 req/s, 10k lines/sec, 60 fps or NEEDS CLARIFICATION]  
+**Constraints**: [domain-specific, e.g., <200ms p95, <100MB memory, offline-capable or NEEDS CLARIFICATION]  
+**Scale/Scope**: [domain-specific, e.g., 10k users, 1M LOC, 50 screens or NEEDS CLARIFICATION]
 
 ## Constitution Check
 
 *GATE: Must pass before Phase 0 research. Re-check after Phase 1 design.*
 
-| Gate | Status | Notes |
-|------|--------|-------|
-| Spec exists | ✅ PASS | spec.md in task-ui/ |
-| No implementation before spec | ✅ PASS | Spec created first |
-| Task IDs required | ✅ PASS | Will be generated in tasks.md |
-| Code attribution required | ✅ PASS | Will follow CLAUDE.md rules |
-| Frontend-only changes | ✅ PASS | No backend schema changes needed yet |
+[Gates determined based on constitution file]
 
 ## Project Structure
 
 ### Documentation (this feature)
 
 ```text
-specs/005-task-management-ui/
+specs/[###-feature]/
 ├── plan.md              # This file (/sp.plan command output)
-├── research.md          # Phase 0 output
-├── task-ui/
-│   ├── spec.md          # Feature specification
-│   ├── data-model.md    # Phase 1 output
-│   ├── quickstart.md    # Phase 1 output
-│   ├── contracts/       # Phase 1 output
-│   └── checklists/
-│       └── requirements.md
-└── tasks.md             # Phase 2 output (/sp.tasks command)
+├── research.md          # Phase 0 output (/sp.plan command)
+├── data-model.md        # Phase 1 output (/sp.plan command)
+├── quickstart.md        # Phase 1 output (/sp.plan command)
+├── contracts/           # Phase 1 output (/sp.plan command)
+└── tasks.md             # Phase 2 output (/sp.tasks command - NOT created by /sp.plan)
 ```
 
 ### Source Code (repository root)
+<!--
+  ACTION REQUIRED: Replace the placeholder tree below with the concrete layout
+  for this feature. Delete unused options and expand the chosen structure with
+  real paths (e.g., apps/admin, packages/something). The delivered plan must
+  not include Option labels.
+-->
 
 ```text
+# [REMOVE IF UNUSED] Option 1: Single project (DEFAULT)
+src/
+├── models/
+├── services/
+├── cli/
+└── lib/
+
+tests/
+├── contract/
+├── integration/
+└── unit/
+
+# [REMOVE IF UNUSED] Option 2: Web application (when "frontend" + "backend" detected)
+backend/
+├── src/
+│   ├── models/
+│   ├── services/
+│   └── api/
+└── tests/
+
 frontend/
 ├── src/
 │   ├── components/
-│   │   ├── toast/
-│   │   │   ├── ToastContainer.tsx
-│   │   │   └── Toast.tsx
-│   │   ├── task/
-│   │   │   ├── TaskCard.tsx       # Updated with priority, due_date, drag handle
-│   │   │   ├── TaskForm.tsx       # Updated with priority, due_date fields
-│   │   │   ├── TaskSkeleton.tsx   # New skeleton loader
-│   │   │   ├── SearchBar.tsx      # New search input
-│   │   │   ├── SortDropdown.tsx   # New sort options
-│   │   │   ├── PriorityBadge.tsx  # New priority indicator
-│   │   │   ├── DueDateBadge.tsx   # New due date display
-│   │   │   └── BulkActionsBar.tsx # New bulk actions
-│   │   ├── layout/
-│   │   │   └── KeyboardShortcuts.tsx  # New shortcuts tooltip
-│   │   └── ui/                   # Shared UI components
-│   ├── app/
-│   │   └── tasks/
-│   │       ├── page.tsx          # Updated with all features
-│   │       └── layout.tsx
-│   ├── lib/
-│   │   ├── api.ts                # Updated API methods
-│   │   └── hooks/
-│   │       └── useKeyboardShortcuts.ts
-│   └── types/
-│       └── task.ts               # Updated Task interface
+│   ├── pages/
+│   └── services/
 └── tests/
-    ├── components/
-    │   ├── TaskCard.test.tsx
-    │   └── TaskForm.test.tsx
-    └── e2e/
-        └── tasks.spec.ts
 
-backend/
-├── app/
-│   ├── models/
-│   │   └── task.py               # Database model update
-│   ├── schemas/
-│   │   └── task.py               # Pydantic schema update
-│   └── api/
-│       └── tasks.py              # Updated endpoints
-└── migrations/
-    └── versions/                 # Alembic migration
+# [REMOVE IF UNUSED] Option 3: Mobile + API (when "iOS/Android" detected)
+api/
+└── [same as backend above]
+
+ios/ or android/
+└── [platform-specific structure: feature modules, UI flows, platform tests]
 ```
 
-**Structure Decision**: This is a Phase-2 web application with Next.js frontend and FastAPI backend. The feature is primarily frontend-focused, adding new UI capabilities to the existing tasks page while extending the Task model for priority and due_date support.
-
-## Phase 0: Research Required
-
-### Technologies to Research
-
-1. **Framer Motion in Next.js App Router**
-   - SSR compatibility patterns
-   - AnimatePresence for exit animations
-   - Gesture support integration
-
-2. **@dnd-kit Core Patterns**
-   - Sortable items with keyboard support
-   - Integration with React state
-   - Touch/pointer events handling
-
-3. **react-hot-toast Best Practices**
-   - Custom toast components
-   - Promise-based notifications
-   - Positioning and stacking
-
-### Unknowns Resolved
-
-| Topic | Resolution |
-|-------|------------|
-| Animations library | Framer Motion - professional animations with gesture support |
-| Drag & Drop library | @dnd-kit/core - modern, accessible drag and drop |
-| Toast library | react-hot-toast - lightweight, beautiful toasts |
-
-## Phase 1: Design & Contracts
-
-### Entities (from spec)
-
-1. **Task** - Extended with priority, due_date, position
-2. **Toast** - Notification states (success, error, info)
-3. **FilterState** - Search query, sort option, filter type
-4. **SelectionState** - Set of selected task IDs
-
-### API Contracts (Backend Updates Needed)
-
-```
-GET /tasks
-  Query params: search?, sort?, filter?, page?, limit?
-  Response: Task[] with new fields
-
-POST /tasks
-  Body: { title, description?, priority?, due_date? }
-  Response: Task
-
-PUT /tasks/:id
-  Body: { title?, description?, priority?, due_date? }
-  Response: Task
-
-PATCH /tasks/reorder
-  Body: { task_ids: string[] }
-  Response: { success: true }
-```
-
-### Quickstart Notes
-
-1. Install: `npm install framer-motion @dnd-kit/core react-hot-toast date-fns`
-2. Update Task interface in `types/task.ts`
-3. Add database migration for priority, due_date, position fields
-4. Update API endpoints to accept new fields
-5. Build components in this order:
-   - PriorityBadge, DueDateBadge
-   - SearchBar, SortDropdown
-   - TaskForm (with new fields)
-   - TaskCard (with new fields + checkbox + drag handle)
-   - ToastContainer with react-hot-toast
-   - KeyboardShortcuts help modal
-   - BulkActionsBar
-   - TaskSkeleton
-   - Update TasksPage to integrate all
+**Structure Decision**: [Document the selected structure and reference the real
+directories captured above]
 
 ## Complexity Tracking
 
-> **No violations - all requirements within scope**
+> **Fill ONLY if Constitution Check has violations that must be justified**
 
 | Violation | Why Needed | Simpler Alternative Rejected Because |
 |-----------|------------|-------------------------------------|
-| N/A | This is a straightforward UI enhancement | N/A |
+| [e.g., 4th project] | [current need] | [why 3 projects insufficient] |
+| [e.g., Repository pattern] | [specific problem] | [why direct DB access insufficient] |
