@@ -20,7 +20,7 @@ import { TaskForm } from '@/components/TaskForm'
 import { ConfirmDialog } from '@/components/ConfirmDialog'
 import { EmptyState } from '@/components/EmptyState'
 import { ErrorBanner } from '@/components/ErrorState'
-import { SearchBar } from '@/components/SearchBar'
+import { SearchInput } from '@/components/SearchInput'
 import { SortDropdown, type SortOption } from '@/components/SortDropdown'
 import { Toaster, toast } from 'react-hot-toast'
 import { useKeyboardShortcuts } from '@/hooks/useKeyboardShortcuts'
@@ -86,11 +86,16 @@ export default function TasksPage() {
     fetchTasks()
   }, [])
 
+  // Fetch tasks when search, filter, or sort changes
+  useEffect(() => {
+    fetchTasks();
+  }, [search, filter, sort]);
+
   async function fetchTasks() {
     try {
       setLoading(true)
       setError(null)
-      const data = await apiClient.getTasks()
+      const data = await apiClient.getTasks(search, filter, sort)
       // Ensure data is an array
       setTasks(Array.isArray(data) ? data : [])
     } catch (err) {
@@ -197,11 +202,7 @@ export default function TasksPage() {
   // Filter and sort tasks
   const filteredTasks = (tasks || [])
     .filter((task) => {
-      // Status filter
-      if (filter === 'active') return !task.completed
-      if (filter === 'completed') return task.completed
-
-      // Search filter
+      // Search filter only (status filter is handled by the API)
       if (search) {
         const searchLower = search.toLowerCase()
         const titleMatch = task.title.toLowerCase().includes(searchLower)
@@ -234,7 +235,7 @@ export default function TasksPage() {
           if (!b.due_date) return -1
           return new Date(a.due_date).getTime() - new Date(b.due_date).getTime()
         case 'completed':
-          return (a.completed === b.completed) ? 0 : a.completed ? 1 : -1
+          return (a.completed === b.completed) ? 0 : a.completed ? -1 : 1
         default:
           return 0
       }
@@ -379,12 +380,14 @@ export default function TasksPage() {
           )}
 
           {/* Search */}
-          <SearchBar
-            value={search}
-            onChange={setSearch}
-            placeholder="Search tasks..."
-            className="w-full sm:w-64"
-          />
+          <div className="w-full sm:w-64">
+            <SearchInput
+              value={search}
+              onChange={setSearch}
+              placeholder="Search tasks..."
+              loading={loading}
+            />
+          </div>
         </div>
 
         <div className="flex items-center gap-3">

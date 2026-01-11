@@ -13,9 +13,11 @@
 
 'use client'
 
-import { useState, useEffect, useRef } from 'react'
+import { useState, useEffect, useRef, useMemo } from 'react'
 import { validateTitle, validateDescription } from '@/lib/validation'
 import type { TaskPriority } from '@/types/task'
+import { LoadingSpinner } from './LoadingSpinner'
+import { useFormValidation } from '@/hooks/useFormValidation'
 
 interface TaskFormProps {
   /** Optional initial data for edit mode */
@@ -48,96 +50,62 @@ export function TaskForm({
   submitLabel = 'Submit',
   loading = false,
 }: TaskFormProps) {
-  const [title, setTitle] = useState(initialData?.title || '')
-  const [description, setDescription] = useState(initialData?.description || '')
-  const [priority, setPriority] = useState<TaskPriority>(initialData?.priority || 'medium')
-  const [dueDate, setDueDate] = useState(initialData?.due_date?.split('T')[0] || '')
-  const [titleError, setTitleError] = useState<string | null>(null)
-  const [descriptionError, setDescriptionError] = useState<string | null>(null)
-  const [formError, setFormError] = useState<string | null>(null)
-  const [isSubmitting, setIsSubmitting] = useState(false)
+  // Use local state for form values
+  const [title, setTitle] = useState(initialData?.title || '');
+  const [description, setDescription] = useState(initialData?.description || '');
+  const [priority, setPriority] = useState<TaskPriority>(initialData?.priority || 'medium');
+  const [dueDate, setDueDate] = useState(initialData?.due_date?.split('T')[0] || '');
+  const [formError, setFormError] = useState<string | null>(null);
+  const [isSubmitting, setIsSubmitting] = useState(false);
 
-  const titleInputRef = useRef<HTMLInputElement>(null)
-  const isEditMode = !!initialData
+  const titleInputRef = useRef<HTMLInputElement>(null);
+  const isEditMode = !!initialData;
 
   // Auto-focus title field when form appears
   useEffect(() => {
-    titleInputRef.current?.focus()
-  }, [])
+    titleInputRef.current?.focus();
+  }, []);
 
-  // Sync form with initialData changes (for edit mode)
+  // Reset form when switching to create mode (when initialData is null/undefined)
   useEffect(() => {
-    if (initialData) {
-      setTitle(initialData.title)
-      setDescription(initialData.description || '')
-      setPriority(initialData.priority || 'medium')
-      setDueDate(initialData.due_date?.split('T')[0] || '')
-    } else {
-      setTitle('')
-      setDescription('')
-      setPriority('medium')
-      setDueDate('')
+    if (!initialData) {
+      // Creating new task - reset to empty values
+      setTitle('');
+      setDescription('');
+      setPriority('medium');
+      setDueDate('');
     }
-  }, [initialData])
-
-  // Clear errors when user types
-  const handleTitleChange = (value: string) => {
-    setTitle(value)
-    setTitleError(null)
-    setFormError(null)
-  }
-
-  const handleDescriptionChange = (value: string) => {
-    setDescription(value)
-    setDescriptionError(null)
-    setFormError(null)
-  }
-
-  // Validate on blur
-  const handleTitleBlur = () => {
-    const result = validateTitle(title)
-    setTitleError(result.error ?? null)
-  }
-
-  const handleDescriptionBlur = () => {
-    const result = validateDescription(description)
-    setDescriptionError(result.error ?? null)
-  }
+  }, [initialData]);
 
   const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault()
+    e.preventDefault();
 
-    // Validate all fields
-    const titleResult = validateTitle(title)
-    const descResult = validateDescription(description)
-
-    setTitleError(titleResult.error ?? null)
-    setDescriptionError(descResult.error ?? null)
-
-    if (!titleResult.isValid) {
-      titleInputRef.current?.focus()
-      return
+    // Simple validation
+    if (!title.trim()) {
+      setFormError('Title is required');
+      titleInputRef.current?.focus();
+      return;
     }
 
     try {
-      setIsSubmitting(true)
-      setFormError(null)
+      setIsSubmitting(true);
+      setFormError(null);
       const data = {
         title: title.trim(),
         description: description.trim() || null,
         priority,
         due_date: dueDate ? new Date(dueDate).toISOString() : null,
-      }
-      await onSubmit(data)
+      };
+      await onSubmit(data);
     } catch (err) {
-      setFormError(err instanceof Error ? err.message : 'Submission failed')
-      setIsSubmitting(false)
+      setFormError(err instanceof Error ? err.message : 'Submission failed');
+      setIsSubmitting(false);
     }
-  }
+  };
 
   // Combined loading state (prop + local)
-  const isLoading = loading || isSubmitting
-  const isFormValid = title.trim().length > 0 && !titleError && !descriptionError
+  const isLoading = loading || isSubmitting;
+  const isFormValid = title.trim().length > 0;
 
   return (
     <div
@@ -180,31 +148,19 @@ export function TaskForm({
             type="text"
             id="title"
             value={title}
-            onChange={(e) => handleTitleChange(e.target.value)}
-            onBlur={handleTitleBlur}
+            onChange={(e) => setTitle(e.target.value)}
             maxLength={200}
             required
             disabled={isLoading}
             placeholder="What needs to be done?"
             aria-required="true"
-            aria-invalid={!!titleError}
-            aria-describedby={titleError ? 'title-error' : 'title-counter'}
             className={`w-full px-4 py-2.5 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent disabled:bg-gray-50 dark:disabled:bg-gray-600 disabled:cursor-not-allowed transition-colors bg-white dark:bg-gray-700 text-gray-900 dark:text-white ${
-              titleError ? 'border-red-300 dark:border-red-500 bg-red-50 dark:bg-red-900/20' : 'border-gray-200 dark:border-gray-600 hover:border-gray-300 dark:hover:border-gray-500'
+              title && title.trim() === '' ? 'border-red-300 dark:border-red-500 bg-red-50 dark:bg-red-900/20' : 'border-gray-200 dark:border-gray-600 hover:border-gray-300 dark:hover:border-gray-500'
             }`}
           />
-          {titleError ? (
-            <p id="title-error" className="mt-1.5 text-sm text-red-600 dark:text-red-400 flex items-center gap-1" role="alert">
-              <svg className="w-4 h-4" fill="currentColor" viewBox="0 0 20 20">
-                <path fillRule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7 4a1 1 0 11-2 0 1 1 0 012 0zm-1-9a1 1 0 00-1 1v4a1 1 0 102 0V6a1 1 0 00-1-1z" clipRule="evenodd" />
-              </svg>
-              {titleError}
-            </p>
-          ) : (
-            <p id="title-counter" className="mt-1.5 text-xs text-gray-400 dark:text-gray-500">
-              {title.length}/200 characters
-            </p>
-          )}
+          <p id="title-counter" className="mt-1.5 text-xs text-gray-400 dark:text-gray-500">
+            {title.length}/200 characters
+          </p>
         </div>
 
         {/* Description Field */}
@@ -218,30 +174,16 @@ export function TaskForm({
           <textarea
             id="description"
             value={description}
-            onChange={(e) => handleDescriptionChange(e.target.value)}
-            onBlur={handleDescriptionBlur}
+            onChange={(e) => setDescription(e.target.value)}
             maxLength={1000}
             rows={3}
             disabled={isLoading}
             placeholder="Add more details about this task..."
-            aria-invalid={!!descriptionError}
-            aria-describedby={descriptionError ? 'description-error' : 'description-counter'}
-            className={`w-full px-4 py-2.5 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent resize-none disabled:bg-gray-50 dark:disabled:bg-gray-600 disabled:cursor-not-allowed transition-colors bg-white dark:bg-gray-700 text-gray-900 dark:text-white ${
-              descriptionError ? 'border-red-300 dark:border-red-500 bg-red-50 dark:bg-red-900/20' : 'border-gray-200 dark:border-gray-600 hover:border-gray-300 dark:hover:border-gray-500'
-            }`}
+            className="w-full px-4 py-2.5 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent resize-none disabled:bg-gray-50 dark:disabled:bg-gray-600 disabled:cursor-not-allowed transition-colors bg-white dark:bg-gray-700 text-gray-900 dark:text-white border-gray-200 dark:border-gray-600 hover:border-gray-300 dark:hover:border-gray-500"
           />
-          {descriptionError ? (
-            <p id="description-error" className="mt-1.5 text-sm text-red-600 dark:text-red-400 flex items-center gap-1" role="alert">
-              <svg className="w-4 h-4" fill="currentColor" viewBox="0 0 20 20">
-                <path fillRule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7 4a1 1 0 11-2 0 1 1 0 012 0zm-1-9a1 1 0 00-1 1v4a1 1 0 102 0V6a1 1 0 00-1-1z" clipRule="evenodd" />
-              </svg>
-              {descriptionError}
-            </p>
-          ) : (
-            <p id="description-counter" className="mt-1.5 text-xs text-gray-400 dark:text-gray-500">
-              {description.length}/1000 characters
-            </p>
-          )}
+          <p id="description-counter" className="mt-1.5 text-xs text-gray-400 dark:text-gray-500">
+            {description.length}/1000 characters
+          </p>
         </div>
 
         {/* Priority and Due Date Row */}
@@ -296,9 +238,7 @@ export function TaskForm({
             className="inline-flex items-center gap-2 px-5 py-2.5 bg-blue-600 text-white rounded-lg font-medium hover:bg-blue-700 disabled:bg-blue-400 disabled:cursor-not-allowed transition-colors"
             aria-busy={isLoading}
           >
-            {isLoading && (
-              <span className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin" aria-hidden="true" />
-            )}
+            {isLoading && <LoadingSpinner size="sm" label="" />}
             {isLoading ? 'Saving...' : submitLabel}
           </button>
 

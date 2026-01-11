@@ -1,0 +1,192 @@
+openapi: 3.0.0
+info:
+  title: Search API for Task Management
+  version: 1.0.0
+  description: API contracts for search functionality in the task management application
+
+paths:
+  /api/v1/tasks/search:
+    get:
+      summary: Search tasks with various filters
+      parameters:
+        - name: q
+          in: query
+          required: true
+          schema:
+            type: string
+          description: Search query string
+        - name: status
+          in: query
+          required: false
+          schema:
+            type: string
+          description: Filter by task status (active, completed)
+        - name: priority
+          in: query
+          required: false
+          schema:
+            type: string
+          description: Filter by task priority (low, medium, high)
+        - name: limit
+          in: query
+          required: false
+          schema:
+            type: integer
+            default: 20
+          description: Maximum number of results to return
+        - name: offset
+          in: query
+          required: false
+          schema:
+            type: integer
+            default: 0
+          description: Offset for pagination
+      responses:
+        '200':
+          description: Search results returned successfully
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  data:
+                    type: array
+                    items:
+                      $ref: '#/components/schemas/Task'
+                  meta:
+                    type: object
+                    properties:
+                      total:
+                        type: integer
+                      page:
+                        type: integer
+                      per_page:
+                        type: integer
+                      total_pages:
+                        type: integer
+                  took_ms:
+                    type: integer
+                    description: Time taken for search in milliseconds
+                  query:
+                    type: string
+                    description: The query that was executed
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+
+  /api/v1/tasks/validate:
+    post:
+      summary: Validate task data before submission
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                title:
+                  type: string
+                description:
+                  type: string
+                status:
+                  type: string
+      responses:
+        '200':
+          description: Validation results
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ValidationResponse'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+
+components:
+  schemas:
+    Task:
+      type: object
+      properties:
+        id:
+          type: string
+          description: Task identifier
+        title:
+          type: string
+          description: Task title
+        description:
+          type: string
+          description: Task description
+        status:
+          type: string
+          description: Task status (active, completed)
+        priority:
+          type: string
+          description: Task priority (low, medium, high)
+        created_at:
+          type: string
+          format: date-time
+          description: Creation timestamp
+        updated_at:
+          type: string
+          format: date-time
+          description: Last update timestamp
+      required:
+        - id
+        - title
+        - status
+        - created_at
+        - updated_at
+
+    ValidationResponse:
+      type: object
+      properties:
+        valid:
+          type: boolean
+        errors:
+          type: array
+          items:
+            type: object
+            properties:
+              field:
+                type: string
+              message:
+                type: string
+              code:
+                type: string
+      required:
+        - valid
+        - errors
+
+    Error:
+      type: object
+      properties:
+        error:
+          type: string
+        message:
+          type: string
+
+    ValidationError:
+      type: object
+      properties:
+        field:
+          type: string
+        message:
+          type: string
+        severity:
+          type: string
+          enum: [error, warning]
+
+  responses:
+    Unauthorized:
+      description: Authentication required
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/Error'
+    BadRequest:
+      description: Invalid request data
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/Error'

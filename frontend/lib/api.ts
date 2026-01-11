@@ -250,8 +250,19 @@ class ApiClient {
    * Task: T022
    * Spec: US-1 View All Tasks
    */
-  async getTasks(): Promise<Task[]> {
-    const response = await this.request<{ tasks: Task[] }>('/tasks')
+  async getTasks(search?: string, filterStatus?: string, sort?: string, limit?: number, offset?: number): Promise<Task[]> {
+    // Build query parameters
+    const params = new URLSearchParams();
+    if (search) params.append('search', search);
+    if (filterStatus) params.append('filter_status', filterStatus);
+    if (sort) params.append('sort', sort);
+    if (limit) params.append('limit', limit.toString());
+    if (offset) params.append('offset', offset.toString());
+
+    const queryString = params.toString();
+    const endpoint = queryString ? `/tasks?${queryString}` : '/tasks';
+
+    const response = await this.request<{ tasks: Task[] }>(endpoint)
     return response.tasks || []
   }
 

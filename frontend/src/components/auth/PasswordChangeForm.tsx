@@ -9,6 +9,7 @@ import React, { useState } from 'react';
 import { apiClient } from '@/lib/api';
 import { validatePassword, validatePasswordMatch } from '@/lib/validation';
 import toast from 'react-hot-toast';
+import { LoadingSpinner } from '@/components/LoadingSpinner';
 
 interface PasswordChangeFormProps {
   onSuccess?: () => void;
@@ -253,8 +254,9 @@ export const PasswordChangeForm: React.FC<PasswordChangeFormProps> = ({ onSucces
         <button
           type="submit"
           disabled={loading}
-          className="w-full bg-blue-600 text-white py-2 px-4 rounded-md hover:bg-blue-700 disabled:opacity-50 transition-colors"
+          className="w-full bg-blue-600 text-white py-2 px-4 rounded-md hover:bg-blue-700 disabled:opacity-50 transition-colors flex items-center justify-center"
         >
+          {loading && <LoadingSpinner size="sm" label="" />}
           {loading ? 'Changing Password...' : 'Change Password'}
         </button>
       </form>

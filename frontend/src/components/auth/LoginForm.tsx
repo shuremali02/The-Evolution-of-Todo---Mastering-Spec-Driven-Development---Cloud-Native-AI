@@ -10,6 +10,7 @@ import { useRouter, useSearchParams } from 'next/navigation';
 import Link from 'next/link';
 import { apiClient } from '@/lib/api';
 import toast from 'react-hot-toast';
+import { LoadingSpinner } from '@/components/LoadingSpinner';
 
 export const LoginForm: React.FC = () => {
   const [emailOrUsername, setEmailOrUsername] = useState('');
@@ -136,8 +137,9 @@ export const LoginForm: React.FC = () => {
         <button
           type="submit"
           disabled={loading}
-          className="w-full bg-blue-600 text-white py-2 px-4 rounded-md hover:bg-blue-700 disabled:opacity-50 transition-colors"
+          className="w-full bg-blue-600 text-white py-2 px-4 rounded-md hover:bg-blue-700 disabled:opacity-50 transition-colors flex items-center justify-center"
         >
+          {loading && <LoadingSpinner size="sm" label="" />}
           {loading ? 'Signing In...' : 'Sign In'}
         </button>
       </form>
