@@ -12,6 +12,7 @@ import { PasswordChangeForm } from '@/src/components/auth/PasswordChangeForm';
 import { EmailUpdateForm } from '@/src/components/auth/EmailUpdateForm';
 import { apiClient } from '@/lib/api';
 import type { UserProfile as User } from '@/types/auth';
+import { LoadingSpinner } from './LoadingSpinner';
 
 interface ProfileTabLayoutProps {
   initialSection?: 'profile' | 'password' | 'email';
@@ -63,7 +64,7 @@ export function ProfileTabLayout({ initialSection = 'profile' }: ProfileTabLayou
   if (loading) {
     return (
       <div className="min-h-64 flex items-center justify-center">
-        <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600"></div>
+        <LoadingSpinner size="lg" label="Loading profile..." />
       </div>
     );
   }

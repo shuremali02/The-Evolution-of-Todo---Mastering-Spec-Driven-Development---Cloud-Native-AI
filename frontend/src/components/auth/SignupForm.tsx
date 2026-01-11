@@ -11,80 +11,74 @@ import Link from 'next/link';
 import { apiClient } from '@/lib/api';
 import { validateUsername, validateEmail, validatePassword, validatePasswordMatch } from '@/lib/validation';
 import toast from 'react-hot-toast';
+import { LoadingSpinner } from '@/components/LoadingSpinner';
+import { useFormValidation } from '@/hooks/useFormValidation';
 
 export const SignupForm: React.FC = () => {
-  const [username, setUsername] = useState('');
-  const [email, setEmail] = useState('');
-  const [password, setPassword] = useState('');
-  const [confirmPassword, setConfirmPassword] = useState('');
+  const initialValues = {
+    username: '',
+    email: '',
+    password: '',
+    confirmPassword: '',
+  };
+
+  const validationRules = {
+    username: {
+      required: true,
+      validate: (value: string) => {
+        const result = validateUsername(value);
+        return typeof result === 'string' ? result : null;
+      },
+    },
+    email: {
+      required: true,
+      validate: (value: string) => {
+        const result = validateEmail(value);
+        return typeof result === 'string' ? result : null;
+      },
+    },
+    password: {
+      required: true,
+      validate: (value: string) => {
+        const result = validatePassword(value);
+        return typeof result === 'string' ? result : null;
+      },
+    },
+    confirmPassword: {
+      required: true,
+    },
+  };
+
+  const { values, errors, touched, handleChange, handleBlur, validateAll } = useFormValidation(
+    initialValues,
+    validationRules
+  );
+
   const [showPassword, setShowPassword] = useState(false);
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
-  const [errors, setErrors] = useState<Record<string, string>>({});
   const [loading, setLoading] = useState(false);
+  const [generalError, setGeneralError] = useState<string | null>(null);
+  const [passwordMatchError, setPasswordMatchError] = useState<string | null>(null);
 
   const router = useRouter();
 
-  const validateField = (fieldName: string, value: string) => {
-    switch (fieldName) {
-      case 'username':
-        const usernameValidation = validateUsername(value);
-        setErrors(prev => ({
-          ...prev,
-          username: typeof usernameValidation === 'string' ? usernameValidation : ''
-        }));
-        break;
-      case 'email':
-        const emailValidation = validateEmail(value);
-        setErrors(prev => ({
-          ...prev,
-          email: typeof emailValidation === 'string' ? emailValidation : ''
-        }));
-        break;
-      case 'password':
-        const passwordValidation = validatePassword(value);
-        setErrors(prev => ({
-          ...prev,
-          password: typeof passwordValidation === 'string' ? passwordValidation : ''
-        }));
-        // Also validate password match when password changes
-        if (confirmPassword) {
-          const matchValidation = validatePasswordMatch(value, confirmPassword);
-          setErrors(prev => ({
-            ...prev,
-            confirmPassword: typeof matchValidation === 'string' ? matchValidation : ''
-          }));
-        }
-        break;
-      case 'confirmPassword':
-        const matchValidation = validatePasswordMatch(password, value);
-        setErrors(prev => ({
-          ...prev,
-          confirmPassword: typeof matchValidation === 'string' ? matchValidation : ''
-        }));
-        break;
-    }
-  };
-
-  const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+  const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { name, value } = e.target;
+    handleChange(name, value);
 
-    switch (name) {
-      case 'username':
-        setUsername(value);
-        validateField('username', value);
-        break;
-      case 'email':
-        setEmail(value);
-        validateField('email', value);
-        break;
-      case 'password':
-        setPassword(value);
-        validateField('password', value);
-        break;
-      case 'confirmPassword':
-        setConfirmPassword(value);
-        validateField('confirmPassword', value);
-        break;
+    // Check password match if either password field changes
+    if (name === 'password' || name === 'confirmPassword') {
+      if (name === 'password' || values.confirmPassword) {
+        // Only validate if confirmPassword field has been touched
+        if (name === 'confirmPassword' || values.confirmPassword) {
+          const matchValidation = validatePasswordMatch(values.password, values.confirmPassword);
+          if (typeof matchValidation === 'string') {
+            setPasswordMatchError(matchValidation);
+          } else {
+            setPasswordMatchError(null);
+          }
+        }
+      }
     }
   };
 
@@ -92,35 +86,32 @@ export const SignupForm: React.FC = () => {
     e.preventDefault();
 
     // Validate all fields
-    const validations = {
-      username: validateUsername(username),
-      email: validateEmail(email),
-      password: validatePassword(password),
-      confirmPassword: validatePasswordMatch(password, confirmPassword)
-    };
+    const isValid = validateAll();
 
-    const newErrors: Record<string, string> = {};
-    Object.entries(validations).forEach(([key, value]) => {
-      if (typeof value === 'string') {
-        newErrors[key] = value;
+    // Additional validation for password match
+    const passwordMatchValidation = validatePasswordMatch(values.password, values.confirmPassword);
+    const hasPasswordMatchError = typeof passwordMatchValidation === 'string';
+
+    if (!isValid || hasPasswordMatchError) {
+      if (hasPasswordMatchError) {
+        // Show password match error as a general error
+        setGeneralError(passwordMatchValidation);
       }
-    });
-
-    setErrors(newErrors);
-
-    if (Object.keys(newErrors).length > 0) {
       return;
     }
 
     setLoading(true);
+    setGeneralError(null); // Clear any previous general errors
     try {
-      await apiClient.signup(username, email, password, confirmPassword);
+      await apiClient.signup(values.username, values.email, values.password, values.confirmPassword);
 
       toast.success('Account created successfully!');
       router.push('/tasks'); // Redirect to tasks page after successful signup
     } catch (error: any) {
       console.error('Signup error:', error);
-      toast.error(error.message || 'Failed to create account');
+      const errorMessage = error.message || 'Failed to create account';
+      setGeneralError(errorMessage);
+      toast.error(errorMessage);
     } finally {
       setLoading(false);
     }
@@ -138,16 +129,16 @@ export const SignupForm: React.FC = () => {
             id="username"
             name="username"
             type="text"
-            value={username}
-            onChange={handleChange}
-            onBlur={() => validateField('username', username)}
+            value={values.username}
+            onChange={handleInputChange}
+            onBlur={() => handleBlur('username')}
             className={`w-full px-3 py-2 border rounded-md bg-white dark:bg-gray-700 text-gray-900 dark:text-white ${
               errors.username ? 'border-red-500' : 'border-gray-300 dark:border-gray-600'
             }`}
             placeholder="Enter username"
           />
           {errors.username && (
-            <p className="mt-1 text-sm text-red-600">{errors.username}</p>
+            <p className="mt-1 text-sm text-red-600">{errors.username[0]?.message}</p>
           )}
         </div>
 
@@ -159,16 +150,16 @@ export const SignupForm: React.FC = () => {
             id="email"
             name="email"
             type="email"
-            value={email}
-            onChange={handleChange}
-            onBlur={() => validateField('email', email)}
+            value={values.email}
+            onChange={handleInputChange}
+            onBlur={() => handleBlur('email')}
             className={`w-full px-3 py-2 border rounded-md bg-white dark:bg-gray-700 text-gray-900 dark:text-white ${
               errors.email ? 'border-red-500' : 'border-gray-300 dark:border-gray-600'
             }`}
             placeholder="Enter email"
           />
           {errors.email && (
-            <p className="mt-1 text-sm text-red-600">{errors.email}</p>
+            <p className="mt-1 text-sm text-red-600">{errors.email[0]?.message}</p>
           )}
         </div>
 
@@ -181,9 +172,9 @@ export const SignupForm: React.FC = () => {
               id="password"
               name="password"
               type={showPassword ? "text" : "password"}
-              value={password}
-              onChange={handleChange}
-              onBlur={() => validateField('password', password)}
+              value={values.password}
+              onChange={handleInputChange}
+              onBlur={() => handleBlur('password')}
               className={`w-full px-3 py-2 pr-10 border rounded-md bg-white dark:bg-gray-700 text-gray-900 dark:text-white ${
                 errors.password ? 'border-red-500' : 'border-gray-300 dark:border-gray-600'
               }`}
@@ -210,7 +201,7 @@ export const SignupForm: React.FC = () => {
             </button>
           </div>
           {errors.password && (
-            <p className="mt-1 text-sm text-red-600">{errors.password}</p>
+            <p className="mt-1 text-sm text-red-600">{errors.password[0]?.message}</p>
           )}
         </div>
 
@@ -223,9 +214,9 @@ export const SignupForm: React.FC = () => {
               id="confirmPassword"
               name="confirmPassword"
               type={showConfirmPassword ? "text" : "password"}
-              value={confirmPassword}
-              onChange={handleChange}
-              onBlur={() => validateField('confirmPassword', confirmPassword)}
+              value={values.confirmPassword}
+              onChange={handleInputChange}
+              onBlur={() => handleBlur('confirmPassword')}
               className={`w-full px-3 py-2 pr-10 border rounded-md bg-white dark:bg-gray-700 text-gray-900 dark:text-white ${
                 errors.confirmPassword ? 'border-red-500' : 'border-gray-300 dark:border-gray-600'
               }`}
@@ -252,15 +243,25 @@ export const SignupForm: React.FC = () => {
             </button>
           </div>
           {errors.confirmPassword && (
-            <p className="mt-1 text-sm text-red-600">{errors.confirmPassword}</p>
+            <p className="mt-1 text-sm text-red-600">{errors.confirmPassword[0]?.message}</p>
+          )}
+        {passwordMatchError && (
+            <p className="mt-1 text-sm text-red-600">{passwordMatchError}</p>
           )}
         </div>
+
+        {generalError && (
+          <div className="mb-4 p-3 bg-red-100 dark:bg-red-900/30 text-red-700 dark:text-red-300 rounded-md">
+            {generalError}
+          </div>
+        )}
 
         <button
           type="submit"
           disabled={loading}
-          className="w-full bg-blue-600 text-white py-2 px-4 rounded-md hover:bg-blue-700 disabled:opacity-50 transition-colors"
+          className="w-full bg-blue-600 text-white py-2 px-4 rounded-md hover:bg-blue-700 disabled:opacity-50 transition-colors flex items-center justify-center"
         >
+          {loading && <LoadingSpinner size="sm" label="" />}
           {loading ? 'Creating Account...' : 'Sign Up'}
         </button>
       </form>
