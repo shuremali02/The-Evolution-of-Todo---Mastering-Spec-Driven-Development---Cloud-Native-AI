@@ -100,6 +100,51 @@ export function Navbar({ onLogout }: NavbarProps) {
             </h1>
           </div>
 
+          {/* Navigation Links - Show only when authenticated */}
+          {!loading && user && (
+            <>
+              {/* Desktop Navigation */}
+              <div className="hidden md:flex items-center gap-2 mr-4">
+                <a
+                  href="/dashboard"
+                  className="px-3 py-2 text-sm font-medium text-gray-700 dark:text-gray-200 hover:bg-gray-100 dark:hover:bg-gray-700 rounded-md transition-colors"
+                >
+                  Dashboard
+                </a>
+                <a
+                  href="/tasks"
+                  className="px-3 py-2 text-sm font-medium text-gray-700 dark:text-gray-200 hover:bg-gray-100 dark:hover:bg-gray-700 rounded-md transition-colors"
+                >
+                  Tasks
+                </a>
+                <a
+                  href="/profile"
+                  className="px-3 py-2 text-sm font-medium text-gray-700 dark:text-gray-200 hover:bg-gray-100 dark:hover:bg-gray-700 rounded-md transition-colors"
+                >
+                  Profile
+                </a>
+              </div>
+
+              {/* Mobile Navigation - Dropdown */}
+              <div className="md:hidden mr-4">
+                <select
+                  onChange={(e) => {
+                    if (e.target.value) {
+                      window.location.href = e.target.value;
+                    }
+                  }}
+                  value=""
+                  className="px-3 py-2 text-sm font-medium text-gray-700 dark:text-gray-200 bg-white dark:bg-gray-800 border border-gray-300 dark:border-gray-600 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                >
+                  <option value="" disabled>Select a page</option>
+                  <option value="/dashboard">Dashboard</option>
+                  <option value="/tasks">Tasks</option>
+                  <option value="/profile">Profile</option>
+                </select>
+              </div>
+            </>
+          )}
+
           {/* User Actions */}
           <div className="flex items-center gap-4" ref={dropdownRef}>
             {/* Theme Toggle */}
@@ -151,6 +196,20 @@ export function Navbar({ onLogout }: NavbarProps) {
                         </div>
 
                         {/* Navigation Options */}
+                        <a
+                          href="/dashboard"
+                          className="block px-4 py-2 text-sm text-gray-700 dark:text-gray-200 hover:bg-gray-100 dark:hover:bg-gray-700 hover:text-gray-900 dark:hover:text-white transition-colors"
+                          role="menuitem"
+                        >
+                          Dashboard
+                        </a>
+                        <a
+                          href="/tasks"
+                          className="block px-4 py-2 text-sm text-gray-700 dark:text-gray-200 hover:bg-gray-100 dark:hover:bg-gray-700 hover:text-gray-900 dark:hover:text-white transition-colors"
+                          role="menuitem"
+                        >
+                          My Tasks
+                        </a>
                         <button
                           onClick={handleProfileClick}
                           className="block w-full text-left px-4 py-2 text-sm text-gray-700 dark:text-gray-200 hover:bg-gray-100 dark:hover:bg-gray-700 hover:text-gray-900 dark:hover:text-white transition-colors"
