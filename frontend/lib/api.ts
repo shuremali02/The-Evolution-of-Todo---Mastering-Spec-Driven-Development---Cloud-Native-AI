@@ -6,6 +6,7 @@
 
 import type { Task, TaskCreate, TaskUpdate } from '../types/task'
 import type { UserProfile } from '../types/auth'
+import type { DashboardStats, RecentActivityItem, UpcomingDeadlineItem, DashboardResponse } from '../types/dashboard'
 
 const DEFAULT_DEV_API_URL = 'http://localhost:8000/api/v1'
 const DEFAULT_PROD_API_URL = 'https://shurem-todo-app.hf.space/api/v1'  // Your backend URL
@@ -319,6 +320,35 @@ class ApiClient {
     await this.request(`/tasks/${taskId}`, {
       method: 'DELETE',
     })
+  }
+
+  // ========== Dashboard API Methods ==========
+
+  /**
+   * Get dashboard statistics for authenticated user.
+   * Task: T033
+   * Spec: 006 Dashboard - Statistics endpoint
+   */
+  async getTaskStats(): Promise<DashboardStats> {
+    return this.request<DashboardStats>('/tasks/stats')
+  }
+
+  /**
+   * Get recent activity for authenticated user.
+   * Task: T036
+   * Spec: 006 Dashboard - Recent activity endpoint
+   */
+  async getRecentActivity(): Promise<RecentActivityItem[]> {
+    return this.request<RecentActivityItem[]>('/tasks/recent')
+  }
+
+  /**
+   * Get upcoming deadlines for authenticated user.
+   * Task: T037
+   * Spec: 006 Dashboard - Upcoming deadlines endpoint
+   */
+  async getUpcomingDeadlines(): Promise<UpcomingDeadlineItem[]> {
+    return this.request<UpcomingDeadlineItem[]>('/tasks/upcoming')
   }
 }
 

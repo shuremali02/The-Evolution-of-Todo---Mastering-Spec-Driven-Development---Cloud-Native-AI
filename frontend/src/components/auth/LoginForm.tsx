@@ -53,7 +53,7 @@ export const LoginForm: React.FC = () => {
       await apiClient.login(emailOrUsername, password);
 
       toast.success('Login successful!');
-      router.push('/tasks'); // Redirect to tasks page after successful login
+      router.push('/dashboard'); // Redirect to dashboard after successful login
     } catch (error: any) {
       console.error('Login error:', error);
       toast.error(error.message || 'Invalid email/username or password');

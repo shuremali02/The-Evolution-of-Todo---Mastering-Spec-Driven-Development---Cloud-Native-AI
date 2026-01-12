@@ -106,7 +106,7 @@ export const SignupForm: React.FC = () => {
       await apiClient.signup(values.username, values.email, values.password, values.confirmPassword);
 
       toast.success('Account created successfully!');
-      router.push('/tasks'); // Redirect to tasks page after successful signup
+      router.push('/dashboard'); // Redirect to dashboard after successful signup
     } catch (error: any) {
       console.error('Signup error:', error);
       const errorMessage = error.message || 'Failed to create account';
