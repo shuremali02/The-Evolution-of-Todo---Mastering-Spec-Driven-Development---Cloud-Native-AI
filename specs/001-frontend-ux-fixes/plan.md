@@ -1,46 +1,44 @@
-# Implementation Plan: Frontend UX Issues Fix
+# Implementation Plan: [FEATURE]
 
-**Branch**: `001-frontend-ux-fixes` | **Date**: 2026-01-11 | **Spec**: [specs/001-frontend-ux-fixes/spec.md](specs/001-frontend-ux-fixes/spec.md)
-**Input**: Feature specification from `/specs/001-frontend-ux-fixes/spec.md`
+**Branch**: `[###-feature-name]` | **Date**: [DATE] | **Spec**: [link]
+**Input**: Feature specification from `/specs/[###-feature-name]/spec.md`
 
 **Note**: This template is filled in by the `/sp.plan` command. See `.specify/templates/commands/plan.md` for the execution workflow.
 
 ## Summary
 
-This feature addresses critical frontend user experience issues including loading states, form validation, search functionality, mobile responsiveness, and accessibility. The implementation will enhance the existing Next.js frontend application by adding proper loading indicators, real-time form validation, search capabilities, responsive design improvements, and accessibility features to meet WCAG 2.1 AA standards.
+[Extract from feature spec: primary requirement + technical approach from research]
 
 ## Technical Context
 
-**Language/Version**: TypeScript 5.x, Next.js 14+
-**Primary Dependencies**: React 18+, Tailwind CSS 3.4+, Next.js App Router
-**Storage**: N/A (client-side only improvements)
-**Testing**: Jest, React Testing Library (existing project setup)
-**Target Platform**: Web browser (frontend application)
-**Project Type**: Web application (determined by existing frontend structure)
-**Performance Goals**: Loading indicators appear within 300ms, form validation responds in under 100ms, search returns results in under 500ms
-**Constraints**: Must maintain backward compatibility with existing functionality, accessibility must meet WCAG 2.1 AA standards, mobile touch targets minimum 44px
-**Scale/Scope**: Single user application with multiple task management screens
+<!--
+  ACTION REQUIRED: Replace the content in this section with the technical details
+  for the project. The structure here is presented in advisory capacity to guide
+  the iteration process.
+-->
+
+**Language/Version**: [e.g., Python 3.11, Swift 5.9, Rust 1.75 or NEEDS CLARIFICATION]  
+**Primary Dependencies**: [e.g., FastAPI, UIKit, LLVM or NEEDS CLARIFICATION]  
+**Storage**: [if applicable, e.g., PostgreSQL, CoreData, files or N/A]  
+**Testing**: [e.g., pytest, XCTest, cargo test or NEEDS CLARIFICATION]  
+**Target Platform**: [e.g., Linux server, iOS 15+, WASM or NEEDS CLARIFICATION]
+**Project Type**: [single/web/mobile - determines source structure]  
+**Performance Goals**: [domain-specific, e.g., 1000 req/s, 10k lines/sec, 60 fps or NEEDS CLARIFICATION]  
+**Constraints**: [domain-specific, e.g., <200ms p95, <100MB memory, offline-capable or NEEDS CLARIFICATION]  
+**Scale/Scope**: [domain-specific, e.g., 10k users, 1M LOC, 50 screens or NEEDS CLARIFICATION]
 
 ## Constitution Check
 
 *GATE: Must pass before Phase 0 research. Re-check after Phase 1 design.*
 
-Constitution compliance verified:
-- This is a frontend enhancement that follows the existing technology stack (Next.js, TypeScript, Tailwind)
-- No forbidden technologies (Kubernetes, Docker, databases, etc.) are being introduced
-- The change enhances user experience within the existing architecture
-- All work originates from a specification (specs/001-frontend-ux-fixes/spec.md)
-- Post-design review: All planned components fit within the existing web application architecture
-- No violation of single-process constraint as this is a frontend enhancement only
-- No new backend services or infrastructure required
-- All changes are frontend-focused and align with the existing architecture
+[Gates determined based on constitution file]
 
 ## Project Structure
 
 ### Documentation (this feature)
 
 ```text
-specs/001-frontend-ux-fixes/
+specs/[###-feature]/
 ├── plan.md              # This file (/sp.plan command output)
 ├── research.md          # Phase 0 output (/sp.plan command)
 ├── data-model.md        # Phase 1 output (/sp.plan command)
@@ -50,31 +48,51 @@ specs/001-frontend-ux-fixes/
 ```
 
 ### Source Code (repository root)
+<!--
+  ACTION REQUIRED: Replace the placeholder tree below with the concrete layout
+  for this feature. Delete unused options and expand the chosen structure with
+  real paths (e.g., apps/admin, packages/something). The delivered plan must
+  not include Option labels.
+-->
 
 ```text
+# [REMOVE IF UNUSED] Option 1: Single project (DEFAULT)
+src/
+├── models/
+├── services/
+├── cli/
+└── lib/
+
+tests/
+├── contract/
+├── integration/
+└── unit/
+
+# [REMOVE IF UNUSED] Option 2: Web application (when "frontend" + "backend" detected)
+backend/
+├── src/
+│   ├── models/
+│   ├── services/
+│   └── api/
+└── tests/
+
 frontend/
-├── app/
-│   ├── layout.tsx
-│   ├── page.tsx
-│   ├── login/
-│   ├── signup/
-│   ├── profile/
-│   └── tasks/
-├── components/
-│   ├── TaskCard.tsx
-│   ├── TaskForm.tsx
-│   ├── Navbar.tsx
-│   ├── AuthGuard.tsx
-│   └── [New components for UX enhancements]
-├── lib/
-│   └── api.ts
-├── hooks/
-│   └── [New hooks for loading states, validation, etc.]
-└── types/
-    └── [New types for enhanced functionality]
+├── src/
+│   ├── components/
+│   ├── pages/
+│   └── services/
+└── tests/
+
+# [REMOVE IF UNUSED] Option 3: Mobile + API (when "iOS/Android" detected)
+api/
+└── [same as backend above]
+
+ios/ or android/
+└── [platform-specific structure: feature modules, UI flows, platform tests]
 ```
 
-**Structure Decision**: The existing frontend structure is maintained with additions to enhance user experience. New components will be created for loading states, search functionality, and accessibility features. Hooks will be added to manage loading states and validation logic. The existing architecture remains unchanged while adding the required UX improvements.
+**Structure Decision**: [Document the selected structure and reference the real
+directories captured above]
 
 ## Complexity Tracking
 
@@ -82,4 +100,5 @@ frontend/
 
 | Violation | Why Needed | Simpler Alternative Rejected Because |
 |-----------|------------|-------------------------------------|
-| N/A | N/A | N/A |
+| [e.g., 4th project] | [current need] | [why 3 projects insufficient] |
+| [e.g., Repository pattern] | [specific problem] | [why direct DB access insufficient] |

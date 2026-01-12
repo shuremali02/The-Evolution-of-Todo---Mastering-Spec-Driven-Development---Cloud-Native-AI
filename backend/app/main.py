@@ -50,8 +50,9 @@ async def root():
 
 
 # Register API routers here
-from app.api import auth_router
+from app.api import auth_router, dashboard_router
 from app.api.tasks import router as tasks_router  # Task: T019
 
 app.include_router(auth_router)
 app.include_router(tasks_router)  # Task: T019
+app.include_router(dashboard_router, prefix="/api/v1")  # Dashboard endpoints

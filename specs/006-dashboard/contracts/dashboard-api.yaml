@@ -1,0 +1,95 @@
+# API Contract: Dashboard Endpoints
+
+## GET /api/v1/tasks/stats
+
+### Description
+Get dashboard statistics for the authenticated user
+
+### Request
+- Method: GET
+- Endpoint: `/api/v1/tasks/stats`
+- Authentication: Required (JWT token in Authorization header)
+
+### Query Parameters
+None
+
+### Response
+- Status: 200 OK
+- Content-Type: application/json
+
+```json
+{
+  "total_tasks": 15,
+  "completed_tasks": 8,
+  "pending_tasks": 7,
+  "overdue_tasks": 2,
+  "tasks_due_today": 3,
+  "tasks_completed_today": 1,
+  "tasks_completed_week": 5,
+  "tasks_completed_last_week": 8,
+  "streak_days": 3,
+  "average_completion_time": 2.5
+}
+```
+
+## GET /api/v1/tasks/recent
+
+### Description
+Get recent activity for the authenticated user
+
+### Request
+- Method: GET
+- Endpoint: `/api/v1/tasks/recent`
+- Authentication: Required (JWT token in Authorization header)
+
+### Query Parameters
+- `limit`: Optional, number of items to return (default: 10)
+
+### Response
+- Status: 200 OK
+- Content-Type: application/json
+
+```json
+[
+  {
+    "id": "task-123",
+    "type": "task_completed",
+    "task_id": "task-123",
+    "task_title": "Implement dashboard",
+    "priority": "high",
+    "timestamp": "2026-01-12T10:30:00Z",
+    "description": "Completed dashboard implementation"
+  }
+]
+```
+
+## GET /api/v1/tasks/upcoming
+
+### Description
+Get upcoming deadlines for the authenticated user
+
+### Request
+- Method: GET
+- Endpoint: `/api/v1/tasks/upcoming`
+- Authentication: Required (JWT token in Authorization header)
+
+### Query Parameters
+- `days`: Optional, number of days to look ahead (default: 7)
+
+### Response
+- Status: 200 OK
+- Content-Type: application/json
+
+```json
+[
+  {
+    "id": "task-456",
+    "task_id": "task-456",
+    "title": "Review dashboard designs",
+    "priority": "medium",
+    "due_date": "2026-01-15T09:00:00Z",
+    "days_until_due": 3,
+    "is_overdue": false
+  }
+]
+```
