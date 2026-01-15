@@ -7,7 +7,7 @@ from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy import select
 from typing import List
 from datetime import datetime, timedelta
-from ..models.task import Task
+from ..models.task import Task, TaskPriority
 from ..models.user import User
 from ..models.dashboard import DashboardStats, RecentActivityItem, UpcomingDeadlineItem
 from fastapi import HTTPException
@@ -60,9 +60,9 @@ async def get_dashboard_stats(db: AsyncSession, user_id: str) -> DashboardStats:
     avg_completion_time = await calculate_avg_completion_time(db, user_id)
 
     # Calculate priority distribution
-    high_priority_tasks = len([t for t in all_tasks if t.priority == 'high'])
-    medium_priority_tasks = len([t for t in all_tasks if t.priority == 'medium'])
-    low_priority_tasks = len([t for t in all_tasks if t.priority == 'low'])
+    high_priority_tasks = len([t for t in all_tasks if t.priority == TaskPriority.HIGH])
+    medium_priority_tasks = len([t for t in all_tasks if t.priority == TaskPriority.MEDIUM])
+    low_priority_tasks = len([t for t in all_tasks if t.priority == TaskPriority.LOW])
 
     return DashboardStats(
         total_tasks=total_tasks,

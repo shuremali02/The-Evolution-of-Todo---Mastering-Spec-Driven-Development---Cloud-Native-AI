@@ -13,6 +13,7 @@ import { validateUsername, validateEmail, validatePassword, validatePasswordMatc
 import toast from 'react-hot-toast';
 import { LoadingSpinner } from '@/components/LoadingSpinner';
 import { useFormValidation } from '@/hooks/useFormValidation';
+import { ErrorMessage } from '@/components/ErrorMessage'; // Import the ErrorMessage component
 
 export const SignupForm: React.FC = () => {
   const initialValues = {
@@ -46,10 +47,15 @@ export const SignupForm: React.FC = () => {
     },
     confirmPassword: {
       required: true,
+      validate: (value: string, allValues?: Record<string, any>) => {
+        const passwordValue = allValues?.password || '';
+        const result = validatePasswordMatch(passwordValue, value);
+        return typeof result === 'string' ? result : null;
+      },
     },
   };
 
-  const { values, errors, touched, handleChange, handleBlur, validateAll } = useFormValidation(
+  const { values, errors, touched, valid, handleChange, handleBlur, validateAll } = useFormValidation(
     initialValues,
     validationRules
   );
@@ -58,28 +64,13 @@ export const SignupForm: React.FC = () => {
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
   const [loading, setLoading] = useState(false);
   const [generalError, setGeneralError] = useState<string | null>(null);
-  const [passwordMatchError, setPasswordMatchError] = useState<string | null>(null);
+  const [isNetworkError, setIsNetworkError] = useState(false); // Track network error state
 
   const router = useRouter();
 
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { name, value } = e.target;
     handleChange(name, value);
-
-    // Check password match if either password field changes
-    if (name === 'password' || name === 'confirmPassword') {
-      if (name === 'password' || values.confirmPassword) {
-        // Only validate if confirmPassword field has been touched
-        if (name === 'confirmPassword' || values.confirmPassword) {
-          const matchValidation = validatePasswordMatch(values.password, values.confirmPassword);
-          if (typeof matchValidation === 'string') {
-            setPasswordMatchError(matchValidation);
-          } else {
-            setPasswordMatchError(null);
-          }
-        }
-      }
-    }
   };
 
   const handleSubmit = async (e: React.FormEvent) => {
@@ -88,20 +79,14 @@ export const SignupForm: React.FC = () => {
     // Validate all fields
     const isValid = validateAll();
 
-    // Additional validation for password match
-    const passwordMatchValidation = validatePasswordMatch(values.password, values.confirmPassword);
-    const hasPasswordMatchError = typeof passwordMatchValidation === 'string';
-
-    if (!isValid || hasPasswordMatchError) {
-      if (hasPasswordMatchError) {
-        // Show password match error as a general error
-        setGeneralError(passwordMatchValidation);
-      }
+    if (!isValid) {
       return;
     }
 
     setLoading(true);
     setGeneralError(null); // Clear any previous general errors
+    setIsNetworkError(false); // Reset network error state
+
     try {
       await apiClient.signup(values.username, values.email, values.password, values.confirmPassword);
 
@@ -109,9 +94,24 @@ export const SignupForm: React.FC = () => {
       router.push('/dashboard'); // Redirect to dashboard after successful signup
     } catch (error: any) {
       console.error('Signup error:', error);
+
+      // Check if it's a network error
       const errorMessage = error.message || 'Failed to create account';
+      const isNetworkErr =
+        errorMessage.toLowerCase().includes('network') ||
+        errorMessage.toLowerCase().includes('fetch') ||
+        errorMessage.toLowerCase().includes('failed to fetch') ||
+        errorMessage.toLowerCase().includes('connection') ||
+        errorMessage.toLowerCase().includes('timeout');
+
+      setIsNetworkError(isNetworkErr);
       setGeneralError(errorMessage);
-      toast.error(errorMessage);
+
+      if (isNetworkErr) {
+        toast.error('Please check your internet connection and try again.');
+      } else {
+        toast.error(errorMessage);
+      }
     } finally {
       setLoading(false);
     }
@@ -133,11 +133,13 @@ export const SignupForm: React.FC = () => {
             onChange={handleInputChange}
             onBlur={() => handleBlur('username')}
             className={`w-full px-3 py-2 border rounded-md bg-white dark:bg-gray-700 text-gray-900 dark:text-white ${
-              errors.username ? 'border-red-500' : 'border-gray-300 dark:border-gray-600'
+              errors.username && errors.username.length > 0 && touched.username ? 'border-red-500' :
+              valid.username && touched.username ? 'border-green-500' :
+              'border-gray-300 dark:border-gray-600'
             }`}
             placeholder="Enter username"
           />
-          {errors.username && (
+          {errors.username && errors.username.length > 0 && (
             <p className="mt-1 text-sm text-red-600">{errors.username[0]?.message}</p>
           )}
         </div>
@@ -154,11 +156,13 @@ export const SignupForm: React.FC = () => {
             onChange={handleInputChange}
             onBlur={() => handleBlur('email')}
             className={`w-full px-3 py-2 border rounded-md bg-white dark:bg-gray-700 text-gray-900 dark:text-white ${
-              errors.email ? 'border-red-500' : 'border-gray-300 dark:border-gray-600'
+              errors.email && errors.email.length > 0 && touched.email ? 'border-red-500' :
+              valid.email && touched.email ? 'border-green-500' :
+              'border-gray-300 dark:border-gray-600'
             }`}
             placeholder="Enter email"
           />
-          {errors.email && (
+          {errors.email && errors.email.length > 0 && (
             <p className="mt-1 text-sm text-red-600">{errors.email[0]?.message}</p>
           )}
         </div>
@@ -176,7 +180,9 @@ export const SignupForm: React.FC = () => {
               onChange={handleInputChange}
               onBlur={() => handleBlur('password')}
               className={`w-full px-3 py-2 pr-10 border rounded-md bg-white dark:bg-gray-700 text-gray-900 dark:text-white ${
-                errors.password ? 'border-red-500' : 'border-gray-300 dark:border-gray-600'
+                errors.password && errors.password.length > 0 && touched.password ? 'border-red-500' :
+                valid.password && touched.password ? 'border-green-500' :
+                'border-gray-300 dark:border-gray-600'
               }`}
               placeholder="Enter password"
             />
@@ -200,7 +206,7 @@ export const SignupForm: React.FC = () => {
               )}
             </button>
           </div>
-          {errors.password && (
+          {errors.password && errors.password.length > 0 && (
             <p className="mt-1 text-sm text-red-600">{errors.password[0]?.message}</p>
           )}
         </div>
@@ -218,7 +224,9 @@ export const SignupForm: React.FC = () => {
               onChange={handleInputChange}
               onBlur={() => handleBlur('confirmPassword')}
               className={`w-full px-3 py-2 pr-10 border rounded-md bg-white dark:bg-gray-700 text-gray-900 dark:text-white ${
-                errors.confirmPassword ? 'border-red-500' : 'border-gray-300 dark:border-gray-600'
+                errors.confirmPassword && errors.confirmPassword.length > 0 && touched.confirmPassword ? 'border-red-500' :
+                valid.confirmPassword && touched.confirmPassword ? 'border-green-500' :
+                'border-gray-300 dark:border-gray-600'
               }`}
               placeholder="Confirm password"
             />
@@ -242,17 +250,26 @@ export const SignupForm: React.FC = () => {
               )}
             </button>
           </div>
-          {errors.confirmPassword && (
+          {errors.confirmPassword && errors.confirmPassword.length > 0 && (
             <p className="mt-1 text-sm text-red-600">{errors.confirmPassword[0]?.message}</p>
-          )}
-        {passwordMatchError && (
-            <p className="mt-1 text-sm text-red-600">{passwordMatchError}</p>
           )}
         </div>
 
         {generalError && (
-          <div className="mb-4 p-3 bg-red-100 dark:bg-red-900/30 text-red-700 dark:text-red-300 rounded-md">
-            {generalError}
+          <div className="mb-4">
+            {isNetworkError ? (
+              <ErrorMessage
+                message={generalError}
+                onRetry={() => {
+                  // Attempt to retry the signup with current form values
+                  handleSubmit(new Event('submit') as unknown as React.FormEvent);
+                }}
+              />
+            ) : (
+              <div className="p-3 bg-red-100 dark:bg-red-900/30 text-red-700 dark:text-red-300 rounded-md">
+                {generalError}
+              </div>
+            )}
           </div>
         )}
 

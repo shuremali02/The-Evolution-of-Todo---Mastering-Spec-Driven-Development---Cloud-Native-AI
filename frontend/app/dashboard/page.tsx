@@ -14,6 +14,8 @@ import { useDashboardData } from '@/hooks/useDashboardData';
 import { LoadingSpinner } from '@/components/LoadingSpinner';
 import { ErrorState } from '@/components/ErrorState';
 import { format } from 'date-fns';
+import { WelcomeMessage } from '@/components/Dashboard/WelcomeMessage';
+import { QuickTaskForm } from '@/components/QuickTaskForm';
 
 export default function DashboardPage() {
   const { data, loading, error, refetch } = useDashboardData();
@@ -61,7 +63,7 @@ export default function DashboardPage() {
           {/* Header Section */}
           <header className="mb-8">
             <h1 className="text-3xl font-bold text-gray-900 dark:text-white mb-2">
-              Welcome back! Here's your overview
+              <WelcomeMessage />
             </h1>
             <p className="text-gray-600 dark:text-gray-400">
               {format(new Date(), 'EEEE, MMMM d, yyyy')}
@@ -106,6 +108,19 @@ export default function DashboardPage() {
 
             {/* Right Column (40% width on larger screens) */}
             <div className="space-y-8">
+              {/* Quick Task Form */}
+              <div className="bg-white dark:bg-gray-800 rounded-lg shadow">
+                <div className="p-6">
+                  <h3 className="text-lg font-medium text-gray-900 dark:text-white mb-4">Create New Task</h3>
+                  <QuickTaskForm
+                    onSuccess={() => {
+                      // Refetch dashboard data to update stats after task creation
+                      refetch();
+                    }}
+                  />
+                </div>
+              </div>
+
               {/* Quick Actions Panel */}
               <div className="bg-white dark:bg-gray-800 rounded-lg shadow">
                 <QuickActions />

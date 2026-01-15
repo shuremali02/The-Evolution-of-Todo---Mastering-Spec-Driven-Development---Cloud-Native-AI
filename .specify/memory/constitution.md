@@ -3,8 +3,8 @@ Sync Impact Report:
 Version change: [INITIAL] → 1.0.0
 Modified principles: N/A (initial constitution)
 Added sections:
-  - Phase-1 Purpose & Scope
-  - Hard Technical Constraints
+  - Phase-2 Purpose & Scope
+  - Permitted Technologies
   - Architecture Rules
   - Spec-Driven Law
   - Traceability Requirements
@@ -20,121 +20,130 @@ Templates requiring updates:
 Follow-up TODOs: None
 -->
 
-# Phase-1 Todo CLI Application Constitution
+# Phase-2 Full-Stack Web Application Constitution
 
 ## Preamble
 
-This Constitution establishes the non-negotiable laws governing all development, specification, planning, and implementation activities during Phase-1 of the Agentic Engineering Hackathon. All agents, developers, and contributors MUST comply with every provision herein. This Constitution supersedes all other guidance, preferences, or conventions.
+This Constitution establishes the non-negotiable laws governing all development, specification, planning, and implementation activities during Phase-2 of the Agentic Engineering Hackathon. All agents, developers, and contributors MUST comply with every provision herein. This Constitution supersedes all other guidance, preferences, or conventions.
 
-## Article I: Phase-1 Purpose & Scope
+## Article I: Phase-2 Purpose & Scope
 
 ### Section 1.1 - Purpose
 
-Phase-1 exists solely to prove and validate the Spec-Driven Development (SDD) methodology. The purpose is NOT to build advanced infrastructure, distributed systems, or production-grade software. The purpose IS to:
+Phase-2 exists to build a full-stack web application with multi-user support, authentication, and rich UI interactions. The purpose is to:
 
-- **Establish Spec Discipline**: Enforce that all work originates from written specifications
-- **Validate Task Traceability**: Prove every code artifact traces to a task, plan, and spec
-- **Train Agent Control**: Demonstrate that AI agents can be constrained and directed through formal specification
+- **Build Full-Stack Application**: Create a modern web application with both frontend and backend
+- **Implement Authentication**: Add JWT-based authentication and user management
+- **Develop Rich UI**: Create an intuitive user interface with React/Next.js
+- **Establish Data Persistence**: Implement database-backed data storage with proper user isolation
 
-Phase-1 is a foundational training phase. Success is measured by adherence to process, not by feature sophistication.
+Phase-2 delivers a production-ready multi-user application. Success is measured by functionality, security, and user experience.
 
 ### Section 1.2 - Scope
 
-The deliverable for Phase-1 is a simple CLI-based Todo application with optional chat capabilities. This application:
+The deliverable for Phase-2 is a full-stack web application with:
 
-- Runs locally on a single machine
-- Accepts commands via command-line interface
-- Stores state in local files or in-memory structures
-- Requires no network services, containers, or external infrastructure
+- Frontend: Next.js 14+ with App Router, TypeScript, Tailwind CSS
+- Backend: FastAPI with JWT authentication, SQLModel ORM
+- Database: PostgreSQL with user data isolation
+- Authentication: Better Auth with JWT tokens
+- UI: Modern React components with responsive design
 
-## Article II: Hard Technical Constraints
+## Article II: Technology Stack Requirements
 
-### Section 2.1 - Forbidden Technologies (MUST NOT)
+### Section 2.1 - Permitted Technologies (MUST USE)
 
-The following technologies, patterns, and architectures are EXPLICITLY FORBIDDEN in Phase-1:
+Phase-2 development MUST use these technologies:
 
-**Infrastructure & Orchestration**:
-- Kubernetes
-- Docker or any containerization
-- Cloud services (AWS, Azure, GCP, etc.)
-- Virtual machines or hypervisors
+**Frontend**:
+- Next.js 14+ with App Router (NOT Pages Router)
+- TypeScript 5.x with strict mode
+- React 18+ with Server Components
+- Tailwind CSS 3.4+ for styling
+- Client-side state management as needed
 
-**Messaging & Event Systems**:
-- Kafka
-- RabbitMQ, NATS, or any message broker
-- Dapr or service mesh technologies
-- Event streaming platforms
-- Async event buses
+**Backend**:
+- Python 3.11+ with FastAPI framework
+- SQLModel ORM for database operations
+- Pydantic v2 for data validation
+- python-jose for JWT handling
+- bcrypt for password hashing
 
-**Network & Web**:
-- HTTP APIs or REST endpoints
-- Web servers (Flask, FastAPI, Django, Express, etc.)
-- Web frontends (React, Vue, Angular, HTML/CSS/JS)
-- GraphQL endpoints
-- WebSocket servers
+**Database**:
+- PostgreSQL (Neon Serverless recommended)
+- Alembic for database migrations
+- Connection pooling for performance
 
-**Data Layer**:
-- Databases (PostgreSQL, MySQL, MongoDB, Redis, etc.)
-- ORMs (SQLAlchemy, Mongoose, etc.)
-- Data lakes or warehouses
-- Caching layers
+**Authentication**:
+- Better Auth for authentication management
+- JWT tokens for stateless authentication
+- Secure token storage (httpOnly cookies preferred)
 
-**Architecture Patterns**:
-- Microservices
-- Service-oriented architecture
-- Distributed systems
-- Background worker processes
-- Daemon processes
+**API**:
+- REST API under `/api/v1/` prefix
+- JSON request/response bodies
+- Standard HTTP methods (GET, POST, PUT, PATCH, DELETE)
+- Proper HTTP status codes
 
-**External APIs**:
-- Third-party API integrations (EXCEPT OpenAI ChatKit if required for chat feature)
-- Webhooks
-- External authentication services
+### Section 2.2 - Forbidden Technologies (MUST NOT)
 
-### Section 2.2 - Permitted Technologies (MUST USE ONLY)
+The following technologies are EXPLICITLY FORBIDDEN in Phase-2:
 
-Phase-1 development MUST be constrained to:
+**Legacy Tech**:
+- CLI applications (Phase-1 technology)
+- File-based storage (Phase-1 technology)
+- Synchronous database operations (when async available)
+- Plain JavaScript (TypeScript required)
 
-- **Runtime**: Python 3.8+ only
-- **Interface**: Command-line interface (CLI) using stdin/stdout/stderr
-- **State**: Local filesystem (JSON, YAML, text files) or in-memory data structures
-- **Libraries**: Python standard library and minimal third-party packages (e.g., Click for CLI, PyYAML for config)
-- **AI Integration**: OpenAI ChatKit or similar ONLY if chat functionality is specified
+**Architecture**:
+- Direct database connections from frontend
+- Shared secrets in client-side code
+- User data without proper isolation
+- Endpoints without JWT validation
+
+**Security**:
+- Storing passwords in plain text
+- JWT tokens without proper validation
+- Exposing sensitive data in error messages
+- Skipping input validation
 
 ## Article III: Architecture Rules
 
-### Section 3.1 - Single-Process Constraint
+### Section 3.1 - Frontend-Backend Separation
 
 The application MUST:
-- Execute as a single Python process per invocation
-- Complete all work within the process lifecycle
-- Exit cleanly with appropriate status codes
+- Separate frontend and backend as distinct systems
+- Communicate only via documented REST API
+- Frontend NEVER connect directly to database
+- Allow independent deployment of frontend and backend
 
 The application MUST NOT:
-- Fork background processes
-- Maintain long-running services
-- Use threading for concurrency (unless absolutely necessary and justified in spec)
-- Use async/await patterns for event handling
+- Share code between frontend and backend (except DTOs)
+- Bypass API for direct database access from frontend
+- Mix frontend and backend concerns in same files
 
-### Section 3.2 - State Management
+### Section 3.2 - Authentication & Authorization
 
-State persistence MUST:
-- Use local filesystem (JSON or YAML files)
-- Store files in a clearly defined directory (e.g., `~/.todo-cli/` or `./data/`)
-- Implement simple read/write operations (no transactions, no locking beyond OS-level file locking)
+All protected endpoints MUST:
+- Require valid JWT token for access
+- Validate JWT signature and expiration
+- Extract user ID from JWT (not request body)
+- Attach JWT via `Authorization: Bearer <token>`
 
-State persistence MUST NOT:
-- Use databases or database engines
-- Implement distributed state or replication
-- Use remote storage or cloud file systems
+User data MUST:
+- Be isolated by authenticated `user_id`
+- Filter all queries by authenticated user ID
+- Prevent access to other users' data
+- Default to deny access (principle of least privilege)
 
-### Section 3.3 - Determinism
+### Section 3.3 - API-First Architecture
 
-All application behavior MUST be deterministic:
-- Same inputs produce same outputs
-- No hidden state or side effects
-- No randomness unless explicitly required and seeded
-- Timestamps and UUIDs acceptable for IDs but must be testable
+All endpoints MUST:
+- Be under `/api/v1/` prefix
+- Use standard HTTP methods
+- Return JSON request/response bodies
+- Use proper HTTP status codes
+- Be documented via OpenAPI
 
 ## Article IV: Spec-Driven Law
 
@@ -263,67 +272,53 @@ Agents MUST enforce the SDD pipeline:
 
 The following technologies and patterns are DEFERRED to future phases:
 
-- **Phase-2+**: Web APIs, HTTP servers, REST endpoints
-- **Phase-3+**: Microservices, service mesh, Dapr
-- **Phase-4+**: Kafka, event streaming, message brokers
-- **Phase-5+**: Kubernetes, container orchestration, cloud deployment
-- **Phase-6+**: MCP (Model Context Protocol) integrations, agent-to-agent communication
-- **Phase-7+**: Distributed systems, multi-region deployments, production hardening
+- **Phase-3+**: AI chatbot integration, conversational UI
+- **Phase-4+**: Microservices, service mesh, Dapr
+- **Phase-5+**: Kafka, event streaming, message brokers
+- **Phase-6+**: Kubernetes, container orchestration, cloud deployment
+- **Phase-7+**: MCP (Model Context Protocol) integrations, agent-to-agent communication
+- **Phase-8+**: Distributed systems, multi-region deployments, production hardening
 
 ### Section 7.2 - Scope Rejection
 
 Any request to implement technologies or patterns from future phases MUST be rejected with:
 - Clear citation of this Article (VII)
-- Explanation that Phase-1 is intentionally minimal
+- Explanation that Phase-2 is focused on full-stack web application
 - Guidance that the feature belongs to a later phase
 
 Agents MUST NOT implement "simple versions" or "prototypes" of future-phase technologies.
 
 ## Article VIII: Quality Standards
 
-### Section 8.1 - Deterministic Behavior
+### Section 8.1 - Code Quality
+- Follow existing code patterns and conventions
+- Maintain TypeScript strict mode compliance
+- Ensure proper component prop typing
+- Add appropriate error boundaries
 
-All code MUST exhibit deterministic behavior:
-- Unit tests MUST pass consistently
-- Same inputs MUST produce same outputs
-- No flaky tests, no race conditions, no non-deterministic failures
+### Section 8.2 - User Experience
+- Consistent with existing application design
+- Accessible to users with disabilities (WCAG 2.1 AA)
+- Responsive across different devices
+- Fast loading and interaction times (<200ms page load)
 
-### Section 8.2 - Readability
+### Section 8.3 - Performance
+- Optimize data fetching and component rendering
+- Efficient API calls with proper caching
+- Minimize bundle sizes
+- Lazy-load non-critical components
 
-Code MUST be:
-- Self-explanatory with clear variable and function names
-- Commented where logic is non-obvious
-- Structured with appropriate separation of concerns
-- Formatted consistently (PEP 8 for Python)
-
-Code MUST NOT:
-- Use obscure one-liners or "clever" tricks
-- Rely on implicit behavior or side effects
-- Use magic numbers or undocumented constants
-
-### Section 8.3 - No Magic
-
-The application MUST NOT:
-- Use metaprogramming or reflection unless explicitly justified in the Spec
-- Implement auto-discovery or plugin systems
-- Use dynamic code generation or eval()
-- Hide behavior behind abstractions that obscure control flow
-
-### Section 8.4 - No Hidden Automation
-
-All automation MUST be:
-- Explicitly specified in the Spec
-- Documented in the Plan
-- Implemented in traceable Tasks
-- Visible and understandable to users
-
-Scripts, hooks, or background automation that "just work" without user knowledge are FORBIDDEN.
+### Section 8.4 - Testing
+- API endpoints: integration tests
+- Critical logic: unit tests
+- Auth flows: security tests
+- All tests traceable to Task IDs
 
 ## Article IX: Governance
 
 ### Section 9.1 - Constitutional Supremacy
 
-This Constitution is the supreme governing document for Phase-1. In the event of conflict:
+This Constitution is the supreme governing document for Phase-2. In the event of conflict:
 
 - Constitution > Spec > Plan > Tasks > Code
 - Constitution > User preferences or requests
@@ -366,23 +361,24 @@ All versions MUST be tracked with ratification and amendment dates.
 ---
 
 **Version**: 1.0.0
-**Ratified**: 2025-12-29
-**Last Amended**: 2025-12-29
+**Ratified**: 2026-01-14
+**Last Amended**: 2026-01-14
 
 ---
 
 ## Appendix A: Quick Reference
 
-**Forbidden**: Kafka, Dapr, Kubernetes, Docker, Cloud, Web, HTTP, Databases, Microservices, Message Queues, External APIs (except OpenAI if needed)
+**Permitted**: Next.js, TypeScript, React, Tailwind, FastAPI, SQLModel, PostgreSQL, JWT, Better Auth, REST API
+**Forbidden**: CLI apps, file-based storage, direct DB access from frontend, unauthenticated endpoints
 
-**Allowed**: Python CLI, Local files, In-memory state, stdin/stdout/stderr
-
-**Pipeline**: Specify → Plan → Tasks → Implement → Validate (MANDATORY, NO EXCEPTIONS)
+**Pipeline**: Specify → Plan → Tasks → Implement (Backend) → Implement (Frontend) → Test & Iterate (MANDATORY, NO EXCEPTIONS)
 
 **Traceability**: Every file and function MUST reference Task ID and Spec section
+
+**Security**: JWT validation on all protected endpoints, user data isolation by user_id
 
 **Agent Behavior**: Refuse to proceed without Spec. Clarify, never guess. Never invent requirements.
 
 ---
 
-*This Constitution is binding on all agents, developers, and contributors during Phase-1. Compliance is mandatory.*
+*This Constitution is binding on all agents, developers, and contributors during Phase-2. Compliance is mandatory.*

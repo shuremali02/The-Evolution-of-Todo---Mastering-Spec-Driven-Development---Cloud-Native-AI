@@ -120,7 +120,7 @@ async def create_task(
     Spec: US-3 Priority Levels, US-4 Due Dates
 
     Args:
-        task_data: Task creation data with optional priority and due_date
+        task_data: Task creation data with optional priority, due_date, and reminder
 
     Returns:
         Created task with auto-generated ID and timestamps
@@ -189,7 +189,7 @@ async def update_task(
 
     Args:
         task_id: Task UUID
-        task_data: Fields to update (all optional including priority and due_date)
+        task_data: Fields to update (all optional including priority, due_date, and reminder)
 
     Returns:
         Updated task with refreshed updated_at timestamp
@@ -216,7 +216,7 @@ async def update_task(
     for key, value in update_data.items():
         setattr(task, key, value)
 
-    task.updated_at = datetime.utcnow()
+    task.updated_at = datetime.now(timezone.utc).replace(tzinfo=None)
     await session.commit()
     await session.refresh(task)
     return task
@@ -258,7 +258,7 @@ async def complete_task(
         )
 
     task.completed = True
-    task.updated_at = datetime.utcnow()
+    task.updated_at = datetime.now(timezone.utc).replace(tzinfo=None)
     await session.commit()
     await session.refresh(task)
     return task
@@ -346,7 +346,7 @@ async def reorder_tasks(
         for task in tasks:
             if task.id == task_id:
                 task.position = index
-                task.updated_at = datetime.utcnow()
+                task.updated_at = datetime.now(timezone.utc).replace(tzinfo=None)
                 break
 
     await session.commit()

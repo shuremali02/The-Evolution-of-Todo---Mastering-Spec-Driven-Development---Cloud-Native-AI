@@ -26,9 +26,10 @@ interface TaskFormProps {
     description: string | null
     priority?: TaskPriority
     due_date?: string | null
+    reminder?: string | null
   }
   /** Callback when form is submitted */
-  onSubmit: (data: { title: string; description: string | null; priority?: TaskPriority; due_date?: string | null }) => Promise<void>
+  onSubmit: (data: { title: string; description: string | null; priority?: TaskPriority; due_date?: string | null; reminder?: string | null }) => Promise<void>
   /** Callback when form is cancelled */
   onCancel: () => void
   /** Label for the submit button */
@@ -55,6 +56,7 @@ export function TaskForm({
   const [description, setDescription] = useState(initialData?.description || '');
   const [priority, setPriority] = useState<TaskPriority>(initialData?.priority || 'medium');
   const [dueDate, setDueDate] = useState(initialData?.due_date?.split('T')[0] || '');
+  const [reminder, setReminder] = useState(initialData?.reminder || '');
   const [formError, setFormError] = useState<string | null>(null);
   const [isSubmitting, setIsSubmitting] = useState(false);
 
@@ -74,6 +76,7 @@ export function TaskForm({
       setDescription('');
       setPriority('medium');
       setDueDate('');
+      setReminder('');
     }
   }, [initialData]);
 
@@ -95,6 +98,7 @@ export function TaskForm({
         description: description.trim() || null,
         priority,
         due_date: dueDate ? new Date(dueDate).toISOString() : null,
+        reminder: reminder ? new Date(reminder).toISOString() : null,
       };
       await onSubmit(data);
     } catch (err) {
@@ -228,6 +232,24 @@ export function TaskForm({
               className="w-full px-4 py-2.5 border border-gray-200 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent disabled:bg-gray-50 dark:disabled:bg-gray-600 disabled:cursor-not-allowed transition-colors bg-white dark:bg-gray-700 text-gray-900 dark:text-white"
             />
           </div>
+        </div>
+
+        {/* Reminder Field */}
+        <div className="mb-5">
+          <label
+            htmlFor="reminder"
+            className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1.5"
+          >
+            Reminder
+          </label>
+          <input
+            type="datetime-local"
+            id="reminder"
+            value={reminder}
+            onChange={(e) => setReminder(e.target.value)}
+            disabled={isLoading}
+            className="w-full px-4 py-2.5 border border-gray-200 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent disabled:bg-gray-50 dark:disabled:bg-gray-600 disabled:cursor-not-allowed transition-colors bg-white dark:bg-gray-700 text-gray-900 dark:text-white"
+          />
         </div>
 
         {/* Action Buttons */}

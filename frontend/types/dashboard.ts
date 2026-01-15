@@ -35,6 +35,7 @@ export interface UpcomingDeadlineItem {
   title: string;
   priority: 'low' | 'medium' | 'high';
   due_date: string; // ISO date string
+  reminder: string | null; // ISO date string
   days_until_due: number;
   is_overdue: boolean;
 }

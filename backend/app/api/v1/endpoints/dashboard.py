@@ -50,7 +50,7 @@ async def get_recent_activities(
 
 
 @router.get("/tasks/upcoming", response_model=List[UpcomingDeadlineItem])
-async def get_upcoming_deadlines(
+async def get_upcoming_deadlines_endpoint(
     user_id: str = Depends(get_current_user_id),
     db: AsyncSession = Depends(get_session)
 ):

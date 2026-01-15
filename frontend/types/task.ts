@@ -13,6 +13,7 @@ export interface Task {
   user_id: string;
   priority: TaskPriority;
   due_date: string | null; // ISO 8601 timestamp
+  reminder: string | null; // ISO 8601 timestamp
   position: number;
   created_at: string; // ISO 8601 timestamp
   updated_at: string; // ISO 8601 timestamp
@@ -23,6 +24,7 @@ export interface TaskCreate {
   description?: string | null;
   priority?: TaskPriority;
   due_date?: string | null;
+  reminder?: string | null;
 }
 
 export interface TaskUpdate {
@@ -30,6 +32,7 @@ export interface TaskUpdate {
   description?: string | null;
   priority?: TaskPriority;
   due_date?: string | null;
+  reminder?: string | null;
   completed?: boolean;
 }
 

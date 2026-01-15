@@ -1,0 +1,334 @@
+openapi: 3.0.0
+info:
+  title: Dashboard API for Todo Application
+  version: 1.0.0
+  description: API endpoints for dashboard functionality including statistics, activity, and reminders
+
+paths:
+  /api/v1/tasks/stats:
+    get:
+      summary: Get dashboard statistics for authenticated user
+      description: Retrieve statistical information about user's tasks for dashboard display
+      tags:
+        - Dashboard
+      security:
+        - BearerAuth: []
+      responses:
+        '200':
+          description: Dashboard statistics retrieved successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/DashboardStats'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '500':
+          $ref: '#/components/responses/ServerError'
+
+  /api/v1/tasks/recent:
+    get:
+      summary: Get recent activity for authenticated user
+      description: Retrieve recent activity items for the user's dashboard
+      tags:
+        - Dashboard
+      security:
+        - BearerAuth: []
+      responses:
+        '200':
+          description: Recent activity retrieved successfully
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/RecentActivityItem'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '500':
+          $ref: '#/components/responses/ServerError'
+
+  /api/v1/tasks/upcoming:
+    get:
+      summary: Get upcoming deadlines for authenticated user
+      description: Retrieve upcoming task deadlines for the user's dashboard
+      tags:
+        - Dashboard
+      security:
+        - BearerAuth: []
+      responses:
+        '200':
+          description: Upcoming deadlines retrieved successfully
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/UpcomingDeadlineItem'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '500':
+          $ref: '#/components/responses/ServerError'
+
+  /api/v1/tasks:
+    post:
+      summary: Create a new task
+      description: Create a new task, optionally with reminder functionality
+      tags:
+        - Tasks
+      security:
+        - BearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/TaskCreate'
+      responses:
+        '201':
+          description: Task created successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Task'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '500':
+          $ref: '#/components/responses/ServerError'
+
+components:
+  securitySchemes:
+    BearerAuth:
+      type: http
+      scheme: bearer
+      bearerFormat: JWT
+
+  schemas:
+    DashboardStats:
+      type: object
+      properties:
+        total_tasks:
+          type: integer
+          description: Total number of tasks
+        completed_tasks:
+          type: integer
+          description: Number of completed tasks
+        pending_tasks:
+          type: integer
+          description: Number of pending tasks
+        overdue_tasks:
+          type: integer
+          description: Number of overdue tasks
+        tasks_due_today:
+          type: integer
+          description: Number of tasks due today
+        tasks_completed_today:
+          type: integer
+          description: Number of tasks completed today
+        tasks_completed_week:
+          type: integer
+          description: Number of tasks completed this week
+        tasks_completed_last_week:
+          type: integer
+          description: Number of tasks completed last week
+        streak_days:
+          type: integer
+          description: Current completion streak in days
+        average_completion_time:
+          type: number
+          description: Average time to complete tasks in hours
+        high_priority_tasks:
+          type: integer
+          description: Number of high priority tasks
+        medium_priority_tasks:
+          type: integer
+          description: Number of medium priority tasks
+        low_priority_tasks:
+          type: integer
+          description: Number of low priority tasks
+      required:
+        - total_tasks
+        - completed_tasks
+        - pending_tasks
+
+    RecentActivityItem:
+      type: object
+      properties:
+        id:
+          type: string
+          description: Unique identifier for the activity item
+        type:
+          type: string
+          description: Type of activity (task_created, task_completed, task_updated)
+          enum: [task_created, task_completed, task_updated]
+        task_id:
+          type: string
+          description: ID of the associated task
+        task_title:
+          type: string
+          description: Title of the associated task
+        priority:
+          type: string
+          description: Priority level of the task
+          enum: [low, medium, high]
+        timestamp:
+          type: string
+          format: date-time
+          description: ISO date string of when activity occurred
+        description:
+          type: string
+          description: Human-readable description of the activity
+      required:
+        - id
+        - type
+        - task_id
+        - task_title
+        - priority
+        - timestamp
+        - description
+
+    UpcomingDeadlineItem:
+      type: object
+      properties:
+        id:
+          type: string
+          description: Unique identifier for the deadline item
+        task_id:
+          type: string
+          description: ID of the associated task
+        title:
+          type: string
+          description: Title of the task
+        priority:
+          type: string
+          description: Priority level of the task
+          enum: [low, medium, high]
+        due_date:
+          type: string
+          format: date-time
+          description: ISO date string of when task is due
+        days_until_due:
+          type: integer
+          description: Number of days until the deadline
+        is_overdue:
+          type: boolean
+          description: Whether the task is currently overdue
+      required:
+        - id
+        - task_id
+        - title
+        - priority
+        - due_date
+        - days_until_due
+        - is_overdue
+
+    Task:
+      type: object
+      properties:
+        id:
+          type: string
+          description: Unique identifier for the task
+        title:
+          type: string
+          description: Task title
+          maxLength: 200
+        description:
+          type: string
+          description: Optional task description
+          maxLength: 1000
+        completed:
+          type: boolean
+          description: Whether the task is completed
+        user_id:
+          type: string
+          description: ID of the user who owns the task
+        priority:
+          type: string
+          description: Task priority level
+          enum: [low, medium, high]
+        due_date:
+          type: string
+          format: date-time
+          description: Optional due date for the task
+        reminder:
+          type: string
+          format: date-time
+          description: Optional reminder time for the task
+        position:
+          type: integer
+          description: Position for drag-and-drop ordering
+        created_at:
+          type: string
+          format: date-time
+          description: Timestamp when task was created
+        updated_at:
+          type: string
+          format: date-time
+          description: Timestamp when task was last updated
+      required:
+        - id
+        - title
+        - completed
+        - user_id
+        - created_at
+        - updated_at
+
+    TaskCreate:
+      type: object
+      properties:
+        title:
+          type: string
+          description: Task title
+          minLength: 1
+          maxLength: 200
+        description:
+          type: string
+          description: Optional task description
+          maxLength: 1000
+        priority:
+          type: string
+          description: Task priority level
+          enum: [low, medium, high]
+          default: medium
+        due_date:
+          type: string
+          format: date-time
+          description: Optional due date for the task
+        reminder:
+          type: string
+          format: date-time
+          description: Optional reminder time for the task
+      required:
+        - title
+
+    Error:
+      type: object
+      properties:
+        detail:
+          type: string
+          description: Human-readable error message
+      required:
+        - detail
+
+  responses:
+    BadRequest:
+      description: Bad request - validation error
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/Error'
+
+    Unauthorized:
+      description: Unauthorized - invalid or missing token
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/Error'
+
+    ServerError:
+      description: Internal server error
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/Error'

@@ -365,6 +365,54 @@ async def update_email(
     }
 
 
+@router.get("/me", response_model=UserResponse)
+async def get_current_user(
+    user_id: str = Depends(get_current_user_id),
+    session: AsyncSession = Depends(get_session)
+):
+    """
+    Get current authenticated user's information.
+
+    **User Story**: US-4 (Get User Profile)
+
+    **Process**:
+    1. Extract JWT from Authorization header
+    2. Validate token and extract user_id from sub claim
+    3. Fetch user details from database
+    4. Return user information
+
+    **Headers Required**:
+    - Authorization: Bearer <jwt-token>
+
+    **Responses**:
+    - 200: User information returned successfully
+    - 401: Token missing, invalid, or expired
+    - 404: User not found in database
+
+    **Security**:
+    - Enforces JWT validation via get_current_user_id dependency
+    - Only returns information for authenticated user
+    - No sensitive information (like hashed passwords) returned
+    """
+    # Fetch user info from database
+    statement = select(User).where(User.id == user_id)
+    result = await session.execute(statement)
+    user = result.scalar_one_or_none()
+
+    if not user:
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND,
+            detail="User not found"
+        )
+
+    return UserResponse(
+        id=user.id,
+        username=user.username,
+        email=user.email,
+        created_at=user.created_at
+    )
+
+
 @router.post("/logout")
 async def logout():
     """

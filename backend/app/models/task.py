@@ -67,6 +67,10 @@ class Task(SQLModel, table=True):
         default=None,
         description="Optional due date for task deadline"
     )
+    reminder: Optional[datetime] = Field(
+        default=None,
+        description="Optional reminder datetime for task notification"
+    )
     position: int = Field(
         default=0,
         description="Position for drag-and-drop ordering"
