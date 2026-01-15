@@ -124,7 +124,7 @@ export const useFormValidation = (initialValues: Record<string, any>, validation
     // we should re-validate those fields too
     if (fieldName === 'password') {
       // Create updated values object to include the new password value
-      const updatedValues = { ...values, [fieldName]: value };
+      const updatedValues: Record<string, any> = { ...values, [fieldName]: value };
 
       // Re-validate confirmPassword if it exists and has been touched
       if (validationRules['confirmPassword']) {
