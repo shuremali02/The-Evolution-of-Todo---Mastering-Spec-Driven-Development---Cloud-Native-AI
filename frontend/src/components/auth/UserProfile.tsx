@@ -99,7 +99,7 @@ export const UserProfile: React.FC<UserProfileProps> = ({ user }) => {
 
             <div className="bg-white dark:bg-gray-700 p-4 rounded-lg shadow-sm border border-gray-100 dark:border-gray-600">
               <label className="block text-sm font-medium text-gray-500 dark:text-gray-400 mb-1">Status</label>
-              <span className="inline-flex items-center px-3 py-1 rounded-full text-sm font-medium bg-green-100 dark:bg-green-900/30 text-green-800 dark:text-green-300">
+              <span className="inline-flex items-center px-3 py-1 rounded-full text-sm font-medium bg-green-500 dark:bg-emerald-900 text-green-400 dark:text-white">
                 Active
               </span>
             </div>

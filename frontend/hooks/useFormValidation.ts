@@ -11,13 +11,14 @@ interface ValidationRule {
   minLength?: number;
   maxLength?: number;
   pattern?: RegExp;
-  validate?: (value: any) => string | null;
+  validate?: (value: any, values?: Record<string, any>) => string | null;
 }
 
 export const useFormValidation = (initialValues: Record<string, any>, validationRules: Record<string, ValidationRule>) => {
   const [values, setValues] = useState<Record<string, any>>(initialValues);
   const [errors, setErrors] = useState<Record<string, ValidationError[]>>({});
   const [touched, setTouched] = useState<Record<string, boolean>>({});
+  const [valid, setValid] = useState<Record<string, boolean>>({});
 
   const validateField = (fieldName: string, value: any) => {
     if (!validationRules[fieldName]) return [];
@@ -63,7 +64,7 @@ export const useFormValidation = (initialValues: Record<string, any>, validation
 
     // Custom validation
     if (rules.validate) {
-      const customError = rules.validate(value);
+      const customError = rules.validate(value, values);
       if (customError) {
         fieldErrors.push({
           field: fieldName,
@@ -73,35 +74,74 @@ export const useFormValidation = (initialValues: Record<string, any>, validation
       }
     }
 
+    // Update validity status
+    setValid(prev => ({
+      ...prev,
+      [fieldName]: fieldErrors.length === 0
+    }));
+
     return fieldErrors;
   };
 
   const validateAll = () => {
     const allErrors: Record<string, ValidationError[]> = {};
+    const allValid: Record<string, boolean> = {};
     let isValid = true;
 
     Object.keys(validationRules).forEach(field => {
       const fieldErrors = validateField(field, values[field]);
       if (fieldErrors.length > 0) {
         allErrors[field] = fieldErrors;
+        allValid[field] = false;
         isValid = false;
+      } else {
+        allValid[field] = true;
       }
     });
 
     setErrors(allErrors);
+    setValid(allValid);
     return isValid;
   };
 
   const handleChange = (fieldName: string, value: any) => {
     setValues(prev => ({ ...prev, [fieldName]: value }));
 
-    // Validate as user types if the field has been touched
-    if (touched[fieldName]) {
-      const fieldErrors = validateField(fieldName, value);
-      setErrors(prev => ({
-        ...prev,
-        [fieldName]: fieldErrors
-      }));
+    // Always validate as user types to provide real-time feedback
+    const fieldErrors = validateField(fieldName, value);
+    setErrors(prev => ({
+      ...prev,
+      [fieldName]: fieldErrors
+    }));
+
+    // Update the valid state based on whether there are errors
+    setValid(prev => ({
+      ...prev,
+      [fieldName]: fieldErrors.length === 0
+    }));
+
+    // If the changed field affects other fields' validation (like password affecting confirmPassword)
+    // we should re-validate those fields too
+    if (fieldName === 'password') {
+      // Create updated values object to include the new password value
+      const updatedValues = { ...values, [fieldName]: value };
+
+      // Re-validate confirmPassword if it exists and has been touched
+      if (validationRules['confirmPassword']) {
+        const existingConfirmErrors = errors['confirmPassword'] || [];
+        if (touched['confirmPassword'] || existingConfirmErrors.length > 0) {
+          const confirmFieldErrors = validateField('confirmPassword', updatedValues['confirmPassword'] || '');
+          setErrors(prev => ({
+            ...prev,
+            confirmPassword: confirmFieldErrors
+          }));
+
+          setValid(prev => ({
+            ...prev,
+            confirmPassword: confirmFieldErrors.length === 0
+          }));
+        }
+      }
     }
   };
 
@@ -113,18 +153,26 @@ export const useFormValidation = (initialValues: Record<string, any>, validation
       ...prev,
       [fieldName]: fieldErrors
     }));
+
+    // Update the valid state based on whether there are errors
+    setValid(prev => ({
+      ...prev,
+      [fieldName]: fieldErrors.length === 0
+    }));
   };
 
   const reset = () => {
     setValues(initialValues);
     setErrors({});
     setTouched({});
+    setValid({});
   };
 
   return {
     values,
     errors,
     touched,
+    valid,
     handleChange,
     handleBlur,
     validateAll,

@@ -18,11 +18,17 @@ class TaskPriority(str, Enum):
     HIGH = "high"
 
 
-def strip_timezone(dt: datetime) -> datetime:
-    """Remove timezone info from datetime for database compatibility."""
-    if dt.tzinfo is not None:
-        return dt.replace(tzinfo=None)
-    return dt
+def convert_to_utc(dt: datetime) -> datetime:
+    """Convert datetime to UTC timezone-aware datetime, then remove tzinfo for database compatibility."""
+    if dt.tzinfo is None:
+        # Assume naive datetime is in UTC
+        utc_dt = dt.replace(tzinfo=timezone.utc)
+    else:
+        # Convert to UTC
+        utc_dt = dt.astimezone(timezone.utc)
+
+    # Remove timezone info for database compatibility (stored as naive UTC)
+    return utc_dt.replace(tzinfo=None)
 
 
 class TaskCreate(BaseModel):
@@ -54,12 +60,18 @@ class TaskCreate(BaseModel):
         None,
         description="Task due date (optional)"
     )
+    reminder: Optional[datetime] = Field(
+        None,
+        description="Task reminder datetime (optional)"
+    )
 
     @model_validator(mode='after')
-    def strip_timezone_from_dates(self):
-        """Strip timezone info for database compatibility."""
-        if self.due_date is not None and self.due_date.tzinfo is not None:
-            self.due_date = self.due_date.replace(tzinfo=None)
+    def convert_timezones_to_utc(self):
+        """Convert all datetime fields to UTC for consistent storage."""
+        if self.due_date is not None:
+            self.due_date = convert_to_utc(self.due_date)
+        if self.reminder is not None:
+            self.reminder = convert_to_utc(self.reminder)
         return self
 
 
@@ -99,12 +111,18 @@ class TaskUpdate(BaseModel):
         None,
         description="Task due date (optional)"
     )
+    reminder: Optional[datetime] = Field(
+        None,
+        description="Task reminder datetime (optional)"
+    )
 
     @model_validator(mode='after')
-    def strip_timezone_from_dates(self):
-        """Strip timezone info for database compatibility."""
-        if self.due_date is not None and self.due_date.tzinfo is not None:
-            self.due_date = self.due_date.replace(tzinfo=None)
+    def convert_timezones_to_utc(self):
+        """Convert all datetime fields to UTC for consistent storage."""
+        if self.due_date is not None:
+            self.due_date = convert_to_utc(self.due_date)
+        if self.reminder is not None:
+            self.reminder = convert_to_utc(self.reminder)
         return self
 
 
@@ -135,6 +153,7 @@ class TaskResponse(BaseModel):
         user_id: Owner user UUID
         priority: Task priority level
         due_date: Task due date (may be null)
+        reminder: Task reminder datetime (may be null)
         position: Position for ordering
         created_at: Creation timestamp (UTC)
         updated_at: Last update timestamp (UTC)
@@ -146,6 +165,7 @@ class TaskResponse(BaseModel):
     user_id: str
     priority: TaskPriority
     due_date: Optional[datetime]
+    reminder: Optional[datetime]
     position: int
     created_at: datetime
     updated_at: datetime

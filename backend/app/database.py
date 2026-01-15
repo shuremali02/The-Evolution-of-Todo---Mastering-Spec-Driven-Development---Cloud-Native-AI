@@ -31,7 +31,7 @@ if not DATABASE_URL:
 # Create async engine for Neon PostgreSQL
 # echo=True enables SQL query logging (set to False in production)
 engine = create_async_engine(
-    DATABASE_URL,
+    f"{DATABASE_URL}?timezone=UTC",
     echo=False,
     future=True,
     pool_size=5,

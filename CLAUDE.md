@@ -271,7 +271,7 @@ When requirements are unclear:
 The complete Phase-2 constitution is at `.specify/memory/constitution.md`.
 
 **Key Articles**:
-- Article II: Mandatory Technology Stack
+- Article II: Technology Stack Requirements
 - Article III: Architecture Rules (separation, API-first, isolation, JWT)
 - Article IV: Spec-Driven Law (pipeline, reading mandate)
 - Article V: Traceability Requirements

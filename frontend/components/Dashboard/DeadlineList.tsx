@@ -7,16 +7,7 @@
 
 import React from 'react';
 import { format, isToday, isTomorrow } from 'date-fns';
-
-interface UpcomingDeadlineItem {
-  id: string;
-  task_id: string;
-  title: string;
-  priority: 'low' | 'medium' | 'high';
-  due_date: string; // ISO date string
-  days_until_due: number;
-  is_overdue: boolean;
-}
+import { UpcomingDeadlineItem } from '@/types/dashboard';
 
 interface DeadlineListProps {
   deadlines: UpcomingDeadlineItem[];
@@ -82,7 +73,7 @@ export const DeadlineList: React.FC<DeadlineListProps> = ({ deadlines }) => {
               <div className="flex justify-between items-start">
                 <div>
                   <h3 className="font-medium text-gray-900 dark:text-white">{deadline.title}</h3>
-                  <div className="mt-1 flex items-center space-x-4">
+                  <div className="mt-1 flex items-center space-x-4 flex-wrap">
                     <span className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${
                       deadline.is_overdue
                         ? 'bg-red-100 text-red-800 dark:bg-red-900/30 dark:text-red-400'
@@ -97,6 +88,14 @@ export const DeadlineList: React.FC<DeadlineListProps> = ({ deadlines }) => {
                     <span className="text-sm text-gray-500 dark:text-gray-400">
                       {formatDate(deadline.due_date)}
                     </span>
+                    {deadline.reminder && (
+                      <span className="inline-flex items-center px-2 py-0.5 rounded-full text-xs font-medium bg-purple-100 text-purple-800 dark:bg-purple-900/30 dark:text-purple-300">
+                        <svg className="mr-1 w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
+                        </svg>
+                        Reminder
+                      </span>
+                    )}
                   </div>
                 </div>
                 <span className={`text-sm font-medium ${

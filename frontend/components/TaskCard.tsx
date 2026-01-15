@@ -12,7 +12,7 @@
 
 import { useState, useEffect } from 'react'
 import type { Task } from '@/types/task'
-import { formatRelativeTime } from '@/lib/format'
+import { formatRelativeTime, formatDateTime } from '@/lib/format'
 import { PriorityBadge } from '@/components/PriorityBadge'
 import { DueDateBadge } from '@/components/DueDateBadge'
 
@@ -140,6 +140,14 @@ export function TaskCard({
               </span>
               <PriorityBadge priority={task.priority} />
               <DueDateBadge dueDate={task.due_date} />
+              {task.reminder && (
+                <span className="inline-flex items-center px-2 py-0.5 rounded-full text-xs font-medium bg-purple-100 text-purple-800">
+                  <svg className="mr-1 w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
+                  </svg>
+                  Reminder
+                </span>
+              )}
             </div>
             <h3
               id={`task-title-${task.id}`}
@@ -156,7 +164,7 @@ export function TaskCard({
                 {task.description}
               </p>
             )}
-            <p className="mt-2 text-xs text-gray-400">
+            <p className="mt-2 text-xs text-gray-400" title={formatDateTime(task.created_at)}>
               {formatRelativeTime(task.created_at)}
             </p>
           </div>

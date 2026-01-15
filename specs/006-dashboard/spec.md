@@ -38,7 +38,7 @@ keywords: [dashboard, analytics, productivity, task management, overview]
 ## Layout Structure
 
 ### Header Section
-- Welcome message with user's name
+- Welcome message with user's name (differentiated: "Welcome" for first-time users, "Welcome back" for returning users)
 - Quick stats summary (total tasks, completed today, overdue tasks)
 - Date display with current date
 
@@ -187,6 +187,11 @@ keywords: [dashboard, analytics, productivity, task management, overview]
 - Existing API client for data fetching
 - Tailwind CSS for styling
 - React components from existing codebase
+
+## Clarifications
+
+### Session 2026-01-14
+- Q: Should the welcome message differentiate between new and returning users? → A: Yes, show "Welcome" for first-time users and "Welcome back" for returning users
 
 ## Acceptance Criteria
 - [ ] Dashboard loads without errors

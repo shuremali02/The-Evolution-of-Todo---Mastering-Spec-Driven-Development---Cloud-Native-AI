@@ -12,6 +12,10 @@ import type { Task } from '@/types/task'
  */
 export function formatDate(dateString: string): string {
   const date = new Date(dateString)
+  // Check if date is valid
+  if (isNaN(date.getTime())) {
+    return 'Invalid date'
+  }
   return date.toLocaleDateString('en-US', {
     year: 'numeric',
     month: 'short',
@@ -26,9 +30,14 @@ export function formatDate(dateString: string): string {
  */
 export function formatTime(dateString: string): string {
   const date = new Date(dateString)
+  // Check if date is valid
+  if (isNaN(date.getTime())) {
+    return 'Invalid time'
+  }
   return date.toLocaleTimeString('en-US', {
     hour: '2-digit',
     minute: '2-digit',
+    timeZoneName: 'short'
   })
 }
 
@@ -39,12 +48,17 @@ export function formatTime(dateString: string): string {
  */
 export function formatDateTime(dateString: string): string {
   const date = new Date(dateString)
-  return date.toLocaleDateString('en-US', {
+  // Check if date is valid
+  if (isNaN(date.getTime())) {
+    return 'Invalid date/time'
+  }
+  return date.toLocaleString('en-US', {
     year: 'numeric',
     month: 'short',
     day: 'numeric',
     hour: '2-digit',
     minute: '2-digit',
+    timeZoneName: 'short'
   })
 }
 
@@ -55,8 +69,33 @@ export function formatDateTime(dateString: string): string {
  */
 export function formatRelativeTime(dateString: string): string {
   const date = new Date(dateString)
+  // Check if date is valid
+  if (isNaN(date.getTime())) {
+    return 'Invalid date'
+  }
+
   const now = new Date()
   const diffInSeconds = Math.floor((now.getTime() - date.getTime()) / 1000)
+
+  if (diffInSeconds < 0) {
+    // Handle future dates
+    const absDiffInSeconds = Math.abs(diffInSeconds);
+    if (absDiffInSeconds < 60) {
+      return 'just now'
+    }
+
+    const diffInMinutes = Math.floor(absDiffInSeconds / 60)
+    if (diffInMinutes < 60) {
+      return diffInMinutes === 1 ? 'in 1 minute' : `in ${diffInMinutes} minutes`
+    }
+
+    const diffInHours = Math.floor(diffInMinutes / 60)
+    if (diffInHours < 24) {
+      return diffInHours === 1 ? 'in 1 hour' : `in ${diffInHours} hours`
+    }
+
+    return formatDate(dateString)
+  }
 
   if (diffInSeconds < 60) {
     return 'just now'

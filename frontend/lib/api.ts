@@ -101,7 +101,35 @@ class ApiClient {
     // Handle other errors
     if (!response.ok) {
       const error = await response.json().catch(() => ({ detail: 'Request failed' }))
-      throw new Error(error.detail || `HTTP ${response.status}: ${response.statusText}`)
+
+      // Map technical error messages to user-friendly messages
+      const getUserFriendlyMessage = (errorMessage: string): string => {
+        const errorMap: Record<string, string> = {
+          // Authentication errors
+          'Could not validate credentials': 'Session expired. Please log in again.',
+          'Unauthorized': 'Access denied. Please log in to continue.',
+          'Expired signature': 'Your session has expired. Please log in again.',
+
+          // Common validation errors
+          'Task not found': 'The task you are looking for does not exist.',
+          'Task does not belong to user': 'You do not have permission to access this task.',
+          'Invalid input': 'The information provided is not valid. Please check and try again.',
+          'Validation Error': 'Please check the information you entered and try again.',
+        };
+
+        // Check if the error message contains any of the keys as substrings
+        for (const [technical, userFriendly] of Object.entries(errorMap)) {
+          if (errorMessage.toLowerCase().includes(technical.toLowerCase())) {
+            return userFriendly;
+          }
+        }
+
+        // Default fallback message
+        return error.detail || `HTTP ${response.status}: ${response.statusText}`;
+      };
+
+      const userFriendlyMessage = getUserFriendlyMessage(error.detail || `HTTP ${response.status}: ${response.statusText}`);
+      throw new Error(userFriendlyMessage);
     }
 
     // Check if response has body content before parsing JSON
@@ -321,6 +349,7 @@ class ApiClient {
       method: 'DELETE',
     })
   }
+
 
   // ========== Dashboard API Methods ==========
 
