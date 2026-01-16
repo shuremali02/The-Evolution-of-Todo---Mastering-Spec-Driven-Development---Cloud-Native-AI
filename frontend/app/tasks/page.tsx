@@ -13,19 +13,21 @@
 
 import { useState, useEffect } from 'react'
 import { useRouter } from 'next/navigation'
+import { motion, AnimatePresence } from 'framer-motion'
 import { apiClient } from '@/lib/api'
 import type { Task, TaskCreate, TaskUpdate } from '@/types/task'
-import { TaskCard } from '@/components/TaskCard'
+import { TaskCardDnD } from '@/components/TaskCardDnD'
 import { TaskForm } from '@/components/TaskForm'
 import { ConfirmDialog } from '@/components/ConfirmDialog'
 import { EmptyState } from '@/components/EmptyState'
 import { ErrorBanner } from '@/components/ErrorState'
 import { SearchInput } from '@/components/SearchInput'
 import { SortDropdown, type SortOption } from '@/components/SortDropdown'
+import { CalendarView } from '@/components/CalendarView'
 import { Toaster, toast } from 'react-hot-toast'
 import { useKeyboardShortcuts } from '@/hooks/useKeyboardShortcuts'
 import { SkeletonTaskList } from '@/components/SkeletonTaskCard'
-import { AnimatePresence, motion } from 'framer-motion'
+import { FadeInWhenVisible, StaggerContainer, StaggerChild } from '@/components/ScrollAnimations'
 
 type FilterType = 'all' | 'active' | 'completed'
 
@@ -42,6 +44,7 @@ export default function TasksPage() {
   const [filter, setFilter] = useState<FilterType>('all')
   const [search, setSearch] = useState('')
   const [sort, setSort] = useState<SortOption>('newest')
+  const [viewMode, setViewMode] = useState<'list' | 'calendar'>('list') // Added for calendar view
 
   // Keyboard shortcuts
   useKeyboardShortcuts([
@@ -172,6 +175,40 @@ export default function TasksPage() {
     }
   }
 
+  async function handleReorderTasks(reorderedTasks: Task[]) {
+    try {
+      // Update positions based on new order
+      const taskIds = reorderedTasks.map(task => task.id);
+
+      // Update positions locally for immediate UI feedback
+      const tasksWithNewPositions = reorderedTasks.map((task, index) => ({
+        ...task,
+        position: index
+      }));
+
+      setTasks(tasksWithNewPositions);
+
+      // Send reorder request to backend
+      const response = await apiClient.reorderTasks(taskIds);
+      toast.success(response.message || 'Tasks reordered successfully!');
+    } catch (err) {
+      console.error('Failed to reorder tasks:', err);
+
+      // Show more specific error message if available
+      const errorMessage = err instanceof Error ? err.message : 'Failed to reorder tasks. Please try again.';
+      setError(errorMessage);
+      toast.error(errorMessage);
+
+      // If reorder fails, revert to original order
+      fetchTasks();
+
+      // Log error for debugging
+      if (typeof err === 'object' && err !== null) {
+        console.error('Reorder error details:', err);
+      }
+    }
+  }
+
   function startEdit(task: Task) {
     setEditingTask(task)
     setShowForm(false)
@@ -277,7 +314,12 @@ export default function TasksPage() {
   }
 
   return (
-    <div>
+    <motion.div
+      initial={{ opacity: 0, y: 20 }}
+      animate={{ opacity: 1, y: 0 }}
+      exit={{ opacity: 0, y: -20 }}
+      transition={{ duration: 0.3, ease: [0.21, 0.47, 0.32, 0.98] }}
+    >
       {/* Toast Notifications */}
       <Toaster
         position="top-right"
@@ -306,38 +348,44 @@ export default function TasksPage() {
       />
 
       {/* Header */}
-      <header className="mb-6">
-        <div className="flex items-center justify-between">
-          <div>
-            <h1 className="text-2xl font-bold text-gray-900">My Tasks</h1>
-            <div className="flex items-center gap-4 mt-2">
-              <p className="text-sm text-gray-500">
-                <span className="text-blue-600 font-medium">{activeCount}</span> active
-              </p>
-              <p className="text-sm text-gray-500">
-                <span className="text-green-600 font-medium">{completedCount}</span> completed
-              </p>
-            </div>
-          </div>
-
-          {/* Progress bar */}
-          {tasks.length > 0 && (
-            <div className="hidden sm:flex items-center gap-3">
-              <div className="flex gap-1">
-                <div className="w-12 h-2 bg-blue-500 rounded-full overflow-hidden" title="Active">
-                  <div className="h-full bg-blue-500 rounded-full transition-all duration-300" style={{ width: '100%' }} />
-                </div>
-                <div className="w-12 h-2 bg-green-500 rounded-full overflow-hidden" title="Completed">
-                  <div className="h-full bg-green-500 rounded-full transition-all duration-300" style={{ width: `${(completedCount / tasks.length) * 100}%` }} />
-                </div>
+      <FadeInWhenVisible className="mb-6" distance={30}>
+        <header>
+          <div className="flex items-center justify-between">
+            <div>
+              <h1 className="text-2xl font-bold text-gray-900">My Tasks</h1>
+              <div className="flex items-center gap-4 mt-2">
+                <p className="text-sm text-gray-500">
+                  <span className="text-blue-600 font-medium">{activeCount}</span> active
+                </p>
+                <p className="text-sm text-gray-500">
+                  <span className="text-green-600 font-medium">{completedCount}</span> completed
+                </p>
               </div>
-              <span className="text-sm text-gray-500 font-medium">
-                {Math.round((completedCount / tasks.length) * 100)}%
-              </span>
             </div>
-          )}
-        </div>
-      </header>
+
+            {/* Progress bar */}
+            {tasks.length > 0 && (
+              <FadeInWhenVisible
+                className="hidden sm:flex items-center gap-3"
+                distance={30}
+                delay={0.1}
+              >
+                <div className="flex gap-1">
+                  <div className="w-12 h-2 bg-blue-500 rounded-full overflow-hidden" title="Active">
+                    <div className="h-full bg-blue-500 rounded-full transition-all duration-300" style={{ width: '100%' }} />
+                  </div>
+                  <div className="w-12 h-2 bg-green-500 rounded-full overflow-hidden" title="Completed">
+                    <div className="h-full bg-green-500 rounded-full transition-all duration-300" style={{ width: `${(completedCount / tasks.length) * 100}%` }} />
+                  </div>
+                </div>
+                <span className="text-sm text-gray-500 font-medium">
+                  {Math.round((completedCount / tasks.length) * 100)}%
+                </span>
+              </FadeInWhenVisible>
+            )}
+          </div>
+        </header>
+      </FadeInWhenVisible>
 
       {/* Error Banner */}
       {error && (
@@ -349,67 +397,105 @@ export default function TasksPage() {
       )}
 
       {/* Actions Bar */}
-      <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 mb-6">
-        <div className="flex flex-col sm:flex-row sm:items-center gap-4">
-          {/* Filter Tabs */}
-          {tasks.length > 0 && (
-            <div className="flex gap-1 p-1 bg-gray-100 rounded-lg w-fit">
-              {(['all', 'active', 'completed'] as FilterType[]).map((f) => {
-                const config = {
-                  all: { bg: 'bg-gray-200', text: 'text-gray-800', activeBg: 'bg-white', activeText: 'text-blue-600' },
-                  active: { bg: 'bg-blue-100', text: 'text-blue-700', activeBg: 'bg-white', activeText: 'text-blue-700' },
-                  completed: { bg: 'bg-green-100', text: 'text-green-700', activeBg: 'bg-white', activeText: 'text-green-700' },
-                }[f]
+      <FadeInWhenVisible className="mb-6" distance={30} delay={0.1}>
+        <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
+          <div className="flex flex-col sm:flex-row sm:items-center gap-4">
+            {/* Filter Tabs */}
+            {tasks.length > 0 && (
+              <FadeInWhenVisible
+                className="flex gap-1 p-1 bg-gray-100 rounded-lg w-fit"
+                distance={30}
+                delay={0.2}
+              >
+                {(['all', 'active', 'completed'] as FilterType[]).map((f) => {
+                  const config = {
+                    all: { bg: 'bg-gray-200', text: 'text-gray-800', activeBg: 'bg-white', activeText: 'text-blue-600' },
+                    active: { bg: 'bg-blue-100', text: 'text-blue-700', activeBg: 'bg-white', activeText: 'text-blue-700' },
+                    completed: { bg: 'bg-green-100', text: 'text-green-700', activeBg: 'bg-white', activeText: 'text-green-700' },
+                  }[f]
 
-                return (
-                  <button
-                    key={f}
-                    type="button"
-                    onClick={() => setFilter(f)}
-                    className={`px-4 py-2 rounded-md text-sm font-medium capitalize transition-all ${
-                      filter === f
-                        ? `${config.activeBg} ${config.activeText} shadow-sm`
-                        : `${config.bg} ${config.text} hover:opacity-80`
-                    }`}
-                  >
-                    {f} ({filterCounts[f]})
-                  </button>
-                )
-              })}
-            </div>
-          )}
+                  return (
+                    <button
+                      key={f}
+                      type="button"
+                      onClick={() => setFilter(f)}
+                      className={`px-4 py-2 rounded-md text-sm font-medium capitalize transition-all ${
+                        filter === f
+                          ? `${config.activeBg} ${config.activeText} shadow-sm`
+                          : `${config.bg} ${config.text} hover:opacity-80`
+                      }`}
+                    >
+                      {f} ({filterCounts[f]})
+                    </button>
+                  )
+                })}
+              </FadeInWhenVisible>
+            )}
 
-          {/* Search */}
-          <div className="w-full sm:w-64">
-            <SearchInput
-              value={search}
-              onChange={setSearch}
-              placeholder="Search tasks..."
-              loading={loading}
-            />
+            {/* Search */}
+            <FadeInWhenVisible className="w-full sm:w-64" distance={30} delay={0.3}>
+              <SearchInput
+                value={search}
+                onChange={setSearch}
+                placeholder="Search tasks..."
+                loading={loading}
+              />
+            </FadeInWhenVisible>
+          </div>
+
+          <div className="flex items-center gap-3">
+            {/* New Task Button */}
+            {!showForm && !editingTask && (
+              <FadeInWhenVisible className="flex" distance={30} delay={0.4}>
+                <button
+                  type="button"
+                  onClick={() => setShowForm(true)}
+                  disabled={isCreating}
+                  className="inline-flex items-center gap-2 px-5 py-2.5 bg-gradient-to-r from-blue-500 to-blue-600 text-white rounded-lg font-medium hover:from-blue-600 hover:to-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 disabled:from-blue-300 disabled:to-blue-400 disabled:cursor-not-allowed transition-all shadow-sm hover:shadow-md"
+                >
+                  <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4v16m8-8H4" />
+                  </svg>
+                  Add Task
+                </button>
+              </FadeInWhenVisible>
+            )}
+
+            {/* View Toggle */}
+            <FadeInWhenVisible className="flex rounded-lg border border-gray-300 overflow-hidden" distance={30} delay={0.5}>
+              <button
+                type="button"
+                onClick={() => setViewMode('list')}
+                className={`px-4 py-2 text-sm font-medium ${
+                  viewMode === 'list'
+                    ? 'bg-blue-600 text-white'
+                    : 'bg-white text-gray-700 hover:bg-gray-50'
+                }`}
+                aria-label="List view"
+              >
+                List
+              </button>
+              <button
+                type="button"
+                onClick={() => setViewMode('calendar')}
+                className={`px-4 py-2 text-sm font-medium ${
+                  viewMode === 'calendar'
+                    ? 'bg-blue-600 text-white'
+                    : 'bg-white text-gray-700 hover:bg-gray-50'
+                }`}
+                aria-label="Calendar view"
+              >
+                Calendar
+              </button>
+            </FadeInWhenVisible>
+
+            {/* Sort Dropdown */}
+            <FadeInWhenVisible distance={30} delay={0.6}>
+              <SortDropdown value={sort} onChange={setSort} />
+            </FadeInWhenVisible>
           </div>
         </div>
-
-        <div className="flex items-center gap-3">
-          {/* New Task Button */}
-          {!showForm && !editingTask && (
-            <button
-              type="button"
-              onClick={() => setShowForm(true)}
-              disabled={isCreating}
-              className="inline-flex items-center gap-2 px-5 py-2.5 bg-gradient-to-r from-blue-500 to-blue-600 text-white rounded-lg font-medium hover:from-blue-600 hover:to-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 disabled:from-blue-300 disabled:to-blue-400 disabled:cursor-not-allowed transition-all shadow-sm hover:shadow-md"
-            >
-              <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4v16m8-8H4" />
-              </svg>
-              Add Task
-            </button>
-          )}
-
-          {/* Sort Dropdown */}
-          <SortDropdown value={sort} onChange={setSort} />
-        </div>
-      </div>
+      </FadeInWhenVisible>
 
       {/* Create Form */}
       {showForm && (
@@ -441,39 +527,65 @@ export default function TasksPage() {
         </div>
       )}
 
-      {/* Task List */}
+      {/* Task View - List or Calendar */}
       <section>
-        {filteredTasks.length === 0 ? (
-          <EmptyState onAction={() => setShowForm(true)} />
+        {viewMode === 'list' ? (
+          // List View
+          <>
+            {filteredTasks.length === 0 ? (
+              <EmptyState onAction={() => setShowForm(true)} />
+            ) : (
+              <motion.div
+                className="space-y-3"
+                layout
+              >
+                <AnimatePresence mode="popLayout">
+                  {filteredTasks.map((task, index) => (
+                    <motion.div
+                      key={task.id}
+                      layout
+                      initial={{ opacity: 0, y: 20 }}
+                      animate={{ opacity: 1, y: 0 }}
+                      exit={{ opacity: 0, scale: 0.95 }}
+                      transition={{ duration: 0.2 }}
+                    >
+                      <TaskCardDnD
+                        task={task}
+                        index={index}
+                        totalItems={filteredTasks.length}
+                        onComplete={handleToggleComplete}
+                        onDelete={handleDeleteClick}
+                        onEdit={startEdit}
+                        onMove={(fromIndex, toIndex) => {
+                          const newTasks = [...filteredTasks];
+                          const [movedTask] = newTasks.splice(fromIndex, 1);
+                          newTasks.splice(toIndex, 0, movedTask);
+                          handleReorderTasks(newTasks);
+                        }}
+                      />
+                    </motion.div>
+                  ))}
+                </AnimatePresence>
+              </motion.div>
+            )}
+          </>
         ) : (
-          <motion.div
-            className="space-y-3"
-            layout
-          >
-            <AnimatePresence mode="popLayout">
-              {filteredTasks.map((task) => (
-                <motion.div
-                  key={task.id}
-                  layout
-                  initial={{ opacity: 0, y: 20 }}
-                  animate={{ opacity: 1, y: 0 }}
-                  exit={{ opacity: 0, scale: 0.95 }}
-                  transition={{ duration: 0.2 }}
-                >
-                  <TaskCard
-                    task={task}
-                    onComplete={handleToggleComplete}
-                    onDelete={handleDeleteClick}
-                    onEdit={startEdit}
-                    loadingOperations={{
-                      complete: isUpdating(task.id),
-                      delete: isDeleting(task.id),
-                    }}
-                  />
-                </motion.div>
-              ))}
-            </AnimatePresence>
-          </motion.div>
+          // Calendar View
+          <div className="mt-6">
+            <CalendarView
+              tasks={filteredTasks.filter(task => task.due_date)} // Only show tasks with due dates
+              onTaskSelect={startEdit}
+              onDateSelect={(date) => {
+                // Set the date as default for new task form
+                setShowForm(true);
+                // You could pre-populate the date in the form if needed
+              }}
+              onTaskCreate={(date) => {
+                setShowForm(true);
+                // Pre-populate the date in the form if needed
+              }}
+            />
+          </div>
         )}
       </section>
 
@@ -490,6 +602,6 @@ export default function TasksPage() {
           variant="danger"
         />
       )}
-    </div>
+    </motion.div>
   )
 }

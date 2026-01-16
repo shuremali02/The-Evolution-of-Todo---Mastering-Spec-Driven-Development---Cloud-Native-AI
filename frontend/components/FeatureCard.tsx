@@ -5,6 +5,8 @@
 
 'use client';
 
+import { FadeInWhenVisible } from '@/components/ScrollAnimations';
+
 interface FeatureCardProps {
   icon: string;
   title: string;
@@ -17,9 +19,10 @@ export default function FeatureCard({
   description,
 }: FeatureCardProps) {
   return (
-    <article
+    <FadeInWhenVisible
       className="bg-white rounded-lg border border-gray-200 p-6 hover:shadow-md transition-shadow"
       aria-label={`Feature: ${title}`}
+      distance={30}
     >
       {/* Icon container with professional icon */}
       <div className="w-12 h-12 rounded-lg bg-gray-100 flex items-center justify-center mb-4">
@@ -63,7 +66,7 @@ export default function FeatureCard({
       <p className="text-gray-600 leading-relaxed">
         {description}
       </p>
-    </article>
+    </FadeInWhenVisible>
   );
 }
 

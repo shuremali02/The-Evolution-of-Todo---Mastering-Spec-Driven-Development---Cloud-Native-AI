@@ -16,6 +16,7 @@ import { ErrorState } from '@/components/ErrorState';
 import { format } from 'date-fns';
 import { WelcomeMessage } from '@/components/Dashboard/WelcomeMessage';
 import { QuickTaskForm } from '@/components/QuickTaskForm';
+import { FadeInWhenVisible, StaggerContainer, StaggerChild } from '@/components/ScrollAnimations';
 
 export default function DashboardPage() {
   const { data, loading, error, refetch } = useDashboardData();
@@ -58,58 +59,66 @@ export default function DashboardPage() {
 
   return (
     <AuthGuard>
-      <div className="min-h-screen bg-gray-50 dark:bg-gray-900 p-4 md:p-8">
+      <FadeInWhenVisible className="min-h-screen bg-gray-50 dark:bg-gray-900 p-4 md:p-8" distance={30}>
         <div className="max-w-7xl mx-auto">
           {/* Header Section */}
-          <header className="mb-8">
-            <h1 className="text-3xl font-bold text-gray-900 dark:text-white mb-2">
-              <WelcomeMessage />
-            </h1>
-            <p className="text-gray-600 dark:text-gray-400">
-              {format(new Date(), 'EEEE, MMMM d, yyyy')}
-            </p>
-          </header>
+          <FadeInWhenVisible className="mb-8" distance={30}>
+            <header>
+              <h1 className="text-3xl font-bold text-gray-900 dark:text-white mb-2">
+                <WelcomeMessage />
+              </h1>
+              <p className="text-gray-600 dark:text-gray-400">
+                {format(new Date(), 'EEEE, MMMM d, yyyy')}
+              </p>
+            </header>
+          </FadeInWhenVisible>
 
           {/* Stats Summary */}
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
-            <div className="bg-white dark:bg-gray-800 rounded-lg shadow p-6">
-              <h3 className="text-lg font-medium text-gray-900 dark:text-white mb-2">Total Tasks</h3>
-              <p className="text-3xl font-bold text-blue-600">{stats.total_tasks}</p>
-            </div>
-            <div className="bg-white dark:bg-gray-800 rounded-lg shadow p-6">
-              <h3 className="text-lg font-medium text-gray-900 dark:text-white mb-2">Completed Today</h3>
-              <p className="text-3xl font-bold text-green-600">{stats.tasks_completed_today}</p>
-            </div>
-            <div className="bg-white dark:bg-gray-800 rounded-lg shadow p-6">
-              <h3 className="text-lg font-medium text-gray-900 dark:text-white mb-2">Overdue Tasks</h3>
-              <p className="text-3xl font-bold text-red-600">{stats.overdue_tasks}</p>
-            </div>
-          </div>
+          <StaggerContainer className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8" staggerChildren={0.1}>
+            <StaggerChild>
+              <FadeInWhenVisible className="bg-white dark:bg-gray-800 rounded-lg shadow p-6" distance={30}>
+                <h3 className="text-lg font-medium text-gray-900 dark:text-white mb-2">Total Tasks</h3>
+                <p className="text-3xl font-bold text-blue-600">{stats.total_tasks}</p>
+              </FadeInWhenVisible>
+            </StaggerChild>
+            <StaggerChild>
+              <FadeInWhenVisible className="bg-white dark:bg-gray-800 rounded-lg shadow p-6" distance={30}>
+                <h3 className="text-lg font-medium text-gray-900 dark:text-white mb-2">Completed Today</h3>
+                <p className="text-3xl font-bold text-green-600">{stats.tasks_completed_today}</p>
+              </FadeInWhenVisible>
+            </StaggerChild>
+            <StaggerChild>
+              <FadeInWhenVisible className="bg-white dark:bg-gray-800 rounded-lg shadow p-6" distance={30}>
+                <h3 className="text-lg font-medium text-gray-900 dark:text-white mb-2">Overdue Tasks</h3>
+                <p className="text-3xl font-bold text-red-600">{stats.overdue_tasks}</p>
+              </FadeInWhenVisible>
+            </StaggerChild>
+          </StaggerContainer>
 
           {/* Main Dashboard Layout */}
-          <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
+          <FadeInWhenVisible className="grid grid-cols-1 lg:grid-cols-3 gap-8" distance={30} delay={0.2}>
             {/* Left Column (60% width on larger screens) */}
             <div className="lg:col-span-2 space-y-8">
               {/* Task Overview Card */}
-              <div className="bg-white dark:bg-gray-800 rounded-lg shadow">
+              <FadeInWhenVisible className="bg-white dark:bg-gray-800 rounded-lg shadow" distance={30} delay={0.3}>
                 <TaskStatsCard stats={stats} />
-              </div>
+              </FadeInWhenVisible>
 
               {/* Recent Activity Feed */}
-              <div className="bg-white dark:bg-gray-800 rounded-lg shadow">
+              <FadeInWhenVisible className="bg-white dark:bg-gray-800 rounded-lg shadow" distance={30} delay={0.4}>
                 <ActivityFeed activities={recent_activity} />
-              </div>
+              </FadeInWhenVisible>
 
               {/* Upcoming Deadlines */}
-              <div className="bg-white dark:bg-gray-800 rounded-lg shadow">
+              <FadeInWhenVisible className="bg-white dark:bg-gray-800 rounded-lg shadow" distance={30} delay={0.5}>
                 <DeadlineList deadlines={upcoming_deadlines} />
-              </div>
+              </FadeInWhenVisible>
             </div>
 
             {/* Right Column (40% width on larger screens) */}
             <div className="space-y-8">
               {/* Quick Task Form */}
-              <div className="bg-white dark:bg-gray-800 rounded-lg shadow">
+              <FadeInWhenVisible className="bg-white dark:bg-gray-800 rounded-lg shadow" distance={30} delay={0.3}>
                 <div className="p-6">
                   <h3 className="text-lg font-medium text-gray-900 dark:text-white mb-4">Create New Task</h3>
                   <QuickTaskForm
@@ -119,15 +128,15 @@ export default function DashboardPage() {
                     }}
                   />
                 </div>
-              </div>
+              </FadeInWhenVisible>
 
               {/* Quick Actions Panel */}
-              <div className="bg-white dark:bg-gray-800 rounded-lg shadow">
+              <FadeInWhenVisible className="bg-white dark:bg-gray-800 rounded-lg shadow" distance={30} delay={0.4}>
                 <QuickActions />
-              </div>
+              </FadeInWhenVisible>
 
               {/* Productivity Stats */}
-              <div className="bg-white dark:bg-gray-800 rounded-lg shadow p-6">
+              <FadeInWhenVisible className="bg-white dark:bg-gray-800 rounded-lg shadow p-6" distance={30} delay={0.5}>
                 <h3 className="text-lg font-medium text-gray-900 dark:text-white mb-4">Productivity Stats</h3>
                 <div className="space-y-4">
                   <div>
@@ -145,10 +154,10 @@ export default function DashboardPage() {
                     <p className="text-xl font-semibold">{stats.average_completion_time.toFixed(1)} hrs</p>
                   </div>
                 </div>
-              </div>
+              </FadeInWhenVisible>
 
               {/* Priority Distribution */}
-              <div className="bg-white dark:bg-gray-800 rounded-lg shadow p-6">
+              <FadeInWhenVisible className="bg-white dark:bg-gray-800 rounded-lg shadow p-6" distance={30} delay={0.6}>
                 <h3 className="text-lg font-medium text-gray-900 dark:text-white mb-4">Priority Distribution</h3>
                 <div className="space-y-3">
                   <div className="flex justify-between items-center">
@@ -164,11 +173,11 @@ export default function DashboardPage() {
                     <span className="font-medium text-green-600">{stats.low_priority_tasks || 0}</span>
                   </div>
                 </div>
-              </div>
+              </FadeInWhenVisible>
             </div>
-          </div>
+          </FadeInWhenVisible>
         </div>
-      </div>
+      </FadeInWhenVisible>
     </AuthGuard>
   );
 }

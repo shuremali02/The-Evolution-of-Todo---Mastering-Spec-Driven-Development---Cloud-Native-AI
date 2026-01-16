@@ -76,7 +76,7 @@ export default function Testimonials({
   return (
     <section
       id="testimonials"
-      className="py-20 bg-gradient-to-b from-white to-gray-50"
+      className="py-20 bg-gradient-to-b from-white to-gray-50 dark:from-gray-900 dark:to-gray-800"
       aria-labelledby="testimonials-heading"
     >
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
@@ -84,11 +84,11 @@ export default function Testimonials({
         <div className="text-center mb-16">
           <h2
             id="testimonials-heading"
-            className="text-3xl sm:text-4xl font-bold text-gray-900 mb-4"
+            className="text-3xl sm:text-4xl font-bold text-gray-900 dark:text-white mb-4"
           >
             {sectionHeading}
           </h2>
-          <p className="text-lg text-gray-600 max-w-2xl mx-auto">
+          <p className="text-lg text-gray-600 dark:text-gray-300 max-w-2xl mx-auto">
             {sectionSubheading}
           </p>
         </div>
@@ -98,7 +98,7 @@ export default function Testimonials({
           {testimonials.map((testimonial, index) => (
             <div
               key={testimonial.id}
-              className={`group relative bg-white rounded-2xl p-8 shadow-lg hover:shadow-xl transition-all duration-300 ${
+              className={`group relative bg-white dark:bg-gray-800 rounded-2xl p-8 shadow-lg hover:shadow-xl transition-all duration-300 ${
                 index === 1 ? 'md:-mt-4 md:mb-4' : ''
               }`}
               aria-label={`Testimonial from ${testimonial.author}`}
@@ -109,7 +109,7 @@ export default function Testimonials({
               {/* Quote icon */}
               <div className="mb-6">
                 <svg
-                  className="w-10 h-10 text-indigo-200 group-hover:text-indigo-300 transition-colors"
+                  className="w-10 h-10 text-indigo-200 dark:text-gray-600 group-hover:text-indigo-300 transition-colors"
                   fill="currentColor"
                   viewBox="0 0 24 24"
                   aria-hidden="true"
@@ -119,7 +119,7 @@ export default function Testimonials({
               </div>
 
               {/* Content */}
-              <p className="text-gray-600 leading-relaxed mb-6">
+              <p className="text-gray-600 dark:text-gray-300 leading-relaxed mb-6">
                 {testimonial.content}
               </p>
 
@@ -133,14 +133,14 @@ export default function Testimonials({
                 <img
                   src={testimonial.avatar}
                   alt=""
-                  className="w-12 h-12 rounded-full bg-gray-100"
+                  className="w-12 h-12 rounded-full bg-gray-100 dark:bg-gray-700"
                   loading="lazy"
                 />
                 <div>
-                  <p className="font-semibold text-gray-900">
+                  <p className="font-semibold text-gray-900 dark:text-white">
                     {testimonial.author}
                   </p>
-                  <p className="text-sm text-gray-500">
+                  <p className="text-sm text-gray-500 dark:text-gray-400">
                     {testimonial.role}
                   </p>
                 </div>
@@ -150,25 +150,25 @@ export default function Testimonials({
         </div>
 
         {/* Trust badges */}
-        <div className="mt-16 pt-8 border-t border-gray-200">
-          <p className="text-center text-sm text-gray-500 mb-6">
+        <div className="mt-16 pt-8 border-t border-gray-200 dark:border-gray-700">
+          <p className="text-center text-sm text-gray-500 dark:text-gray-400 mb-6">
             Trusted by teams at
           </p>
           <div className="flex flex-wrap justify-center items-center gap-8 md:gap-16 opacity-50">
             {/* Company logos (text-based for demo) */}
-            <div className="flex items-center gap-2 text-gray-400 font-semibold text-lg">
+            <div className="flex items-center gap-2 text-gray-400 dark:text-gray-500 font-semibold text-lg">
               <span className="text-2xl">🏢</span>
               <span>Acme Corp</span>
             </div>
-            <div className="flex items-center gap-2 text-gray-400 font-semibold text-lg">
+            <div className="flex items-center gap-2 text-gray-400 dark:text-gray-500 font-semibold text-lg">
               <span className="text-2xl">🚀</span>
               <span>StartUp Inc</span>
             </div>
-            <div className="flex items-center gap-2 text-gray-400 font-semibold text-lg">
+            <div className="flex items-center gap-2 text-gray-400 dark:text-gray-500 font-semibold text-lg">
               <span className="text-2xl">💡</span>
               <span>TechFlow</span>
             </div>
-            <div className="flex items-center gap-2 text-gray-400 font-semibold text-lg">
+            <div className="flex items-center gap-2 text-gray-400 dark:text-gray-500 font-semibold text-lg">
               <span className="text-2xl">🎯</span>
               <span>GoalCo</span>
             </div>

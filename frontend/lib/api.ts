@@ -350,6 +350,18 @@ class ApiClient {
     })
   }
 
+  /**
+   * Reorder tasks by updating their position.
+   * Task: T011
+   * Spec: Phase 1 UI Enhancements - Drag-and-Drop Task Reordering
+   */
+  async reorderTasks(taskIds: string[]): Promise<{ success: boolean; message: string; count: number }> {
+    return this.request('/tasks/reorder', {
+      method: 'PATCH',
+      body: JSON.stringify({ task_ids: taskIds }),
+    })
+  }
+
 
   // ========== Dashboard API Methods ==========
 

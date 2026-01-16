@@ -12,6 +12,7 @@ import HowItWorks from '@/components/HowItWorks';
 import Testimonials from '@/components/Testimonials';
 import CTASection from '@/components/CTASection';
 import Footer from '@/components/Footer';
+import { FadeInWhenVisible } from '@/components/ScrollAnimations';
 
 export default function LandingPage() {
   // Feature cards data with professional icon names
@@ -97,26 +98,38 @@ export default function LandingPage() {
           className="py-16 bg-gray-50 dark:bg-gray-800"
           aria-labelledby="features-heading"
         >
-          <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-            <h2
-              id="features-heading"
-              className="text-3xl sm:text-4xl font-bold text-gray-900 dark:text-white text-center mb-4"
-            >
-              Powerful Features
-            </h2>
-            <p className="text-lg text-gray-600 dark:text-gray-300 text-center mb-12 max-w-2xl mx-auto">
-              Everything you need to stay organized and get things done
-            </p>
+          <div className="w-full px-4 sm:px-6 lg:px-8">
+            <div className="max-w-7xl mx-auto">
+              <FadeInWhenVisible
+                className="text-center mb-4"
+                distance={30}
+              >
+                <h2
+                  id="features-heading"
+                  className="text-3xl sm:text-4xl font-bold text-gray-900 dark:text-white"
+                >
+                  Powerful Features
+                </h2>
+              </FadeInWhenVisible>
 
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-              {features.map((feature) => (
-                <FeatureCard
-                  key={feature.title}
-                  icon={feature.icon}
-                  title={feature.title}
-                  description={feature.description}
-                />
-              ))}
+              <FadeInWhenVisible
+                className="text-lg text-gray-600 dark:text-gray-300 text-center mb-12 max-w-2xl mx-auto"
+                distance={30}
+                delay={0.1}
+              >
+                Everything you need to stay organized and get things done
+              </FadeInWhenVisible>
+
+              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                {features.map((feature, index) => (
+                  <FeatureCard
+                    key={feature.title}
+                    icon={feature.icon}
+                    title={feature.title}
+                    description={feature.description}
+                  />
+                ))}
+              </div>
             </div>
           </div>
         </section>
