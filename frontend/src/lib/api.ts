@@ -1,203 +1,407 @@
-// Task: T013, T021, T031
-// Spec: US1 - User Registration, US2 - Login, US4 - Logout
+/**
+ * Task: T020, T022, T027, T032, T037, T043, T048
+ * Spec: 002-authentication/contracts/jwt-spec.md - Frontend Integration
+ * Spec: 003-task-crud - Task API Client Methods
+ */
 
-import type { SignupRequest, LoginRequest, TokenResponse, UserProfile } from '@/types/auth';
+import type { Task, TaskCreate, TaskUpdate } from '../types/task'
+import type { UserProfile } from '../types/auth'
+import type { DashboardStats, RecentActivityItem, UpcomingDeadlineItem, DashboardResponse } from '../types/dashboard'
 
-class ApiError extends Error {
-  constructor(public status: number, message: string) {
-    super(message);
-    this.name = 'ApiError';
-  }
-}
+const DEFAULT_DEV_API_URL = 'http://localhost:8000/api/v1'
+const DEFAULT_PROD_API_URL = 'https://shurem-todo-app.hf.space/api/v1'  // Your backend URL
 
-async function fetchApi<T>(
-  endpoint: string,
-  options: RequestInit = {}
-): Promise<T> {
-  // Get API base URL - use environment variable or default
-  const API_BASE_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8000';
-
-  // Check if we're in the browser environment before accessing localStorage
-  const token = typeof window !== 'undefined' ? localStorage.getItem('access_token') : null;
-
-  const headers = {
-    'Content-Type': 'application/json',
-    ...(token && { Authorization: `Bearer ${token}` }),
-    ...options.headers,
-  };
-
-  const response = await fetch(`${API_BASE_URL}${endpoint}`, {
-    ...options,
-    headers,
-  });
-
-  if (!response.ok) {
-    const error = await response.json().catch(() => ({ detail: 'An error occurred' }));
-    throw new ApiError(response.status, error.detail || 'An error occurred');
+function getApiUrl(): string {
+  // Use environment variable if available
+  if (process.env.NEXT_PUBLIC_API_URL) {
+    return process.env.NEXT_PUBLIC_API_URL
   }
 
-  return response.json();
-}
-
-export async function signup(data: SignupRequest): Promise<TokenResponse> {
-  const response = await fetchApi<TokenResponse>('/api/v1/auth/signup', {
-    method: 'POST',
-    body: JSON.stringify(data),
-  });
-
-  // Store token only in browser environment
+  // For production deployments, use the backend API URL
+  // This should be configured separately from the frontend URL
   if (typeof window !== 'undefined') {
-    localStorage.setItem('access_token', response.access_token);
-    localStorage.setItem('username', response.username);
+    // In production, use your actual backend URL
+    // For development, default to localhost
+    return process.env.NODE_ENV === 'production'
+      ? DEFAULT_PROD_API_URL  // Using your actual backend URL
+      : DEFAULT_DEV_API_URL
   }
 
-  return response;
+  // For server-side rendering, use environment variable or default to dev URL
+  return DEFAULT_DEV_API_URL
 }
 
-export async function login(data: LoginRequest): Promise<TokenResponse> {
-  const response = await fetchApi<TokenResponse>('/api/v1/auth/login', {
-    method: 'POST',
-    body: JSON.stringify(data),
-  });
+/**
+ * API client for communicating with FastAPI backend.
+ * Automatically attaches JWT tokens to requests and handles authentication errors.
+ */
+class ApiClient {
+  private baseURL: string
 
-  // Store token only in browser environment
-  if (typeof window !== 'undefined') {
-    localStorage.setItem('access_token', response.access_token);
-    localStorage.setItem('username', response.username);
+  constructor(baseURL?: string) {
+    this.baseURL = baseURL || getApiUrl()
   }
 
-  return response;
-}
+  /**
+   * Get stored JWT token from sessionStorage.
+   */
+  private getToken(): string | null {
+    if (typeof window === 'undefined') return null
+    return sessionStorage.getItem('access_token')
+  }
 
-export async function getProfile(): Promise<UserProfile> {
-  return fetchApi<UserProfile>('/api/v1/auth/me');
-}
+  /**
+   * Store JWT token in sessionStorage.
+   */
+  private setToken(token: string): void {
+    if (typeof window === 'undefined') return
+    sessionStorage.setItem('access_token', token)
+  }
 
-export function logout(): void {
-  if (typeof window !== 'undefined') {
-    localStorage.removeItem('access_token');
-    localStorage.removeItem('username');
+  /**
+   * Clear stored JWT token.
+   */
+  public clearToken(): void {
+    if (typeof window === 'undefined') return
+    sessionStorage.removeItem('access_token')
+  }
+
+  /**
+   * Make HTTP request to API with automatic JWT attachment.
+   *
+   * @param endpoint - API endpoint path (e.g., "/tasks")
+   * @param options - Fetch options (method, body, headers, etc.)
+   * @returns Parsed JSON response
+   * @throws Error if request fails
+   */
+  async request<T = any>(endpoint: string, options: RequestInit = {}): Promise<T> {
+    const token = this.getToken()
+
+    const headers: HeadersInit = {
+      'Content-Type': 'application/json',
+      ...(token && { Authorization: `Bearer ${token}` }),
+      ...options.headers,
+    }
+
+    const response = await fetch(`${this.baseURL}${endpoint}`, {
+      ...options,
+      headers,
+    })
+
+    // Handle 401 Unauthorized - token expired or invalid
+    if (response.status === 401) {
+      this.clearToken()
+      // Redirect to login (only in browser)
+      if (typeof window !== 'undefined') {
+        window.location.href = '/login'
+      }
+      throw new Error('Unauthorized - redirecting to login')
+    }
+
+    // Handle other errors
+    if (!response.ok) {
+      const error = await response.json().catch(() => ({ detail: 'Request failed' }))
+
+      // Map technical error messages to user-friendly messages
+      const getUserFriendlyMessage = (errorMessage: string): string => {
+        const errorMap: Record<string, string> = {
+          // Authentication errors
+          'Could not validate credentials': 'Session expired. Please log in again.',
+          'Unauthorized': 'Access denied. Please log in to continue.',
+          'Expired signature': 'Your session has expired. Please log in again.',
+
+          // Common validation errors
+          'Task not found': 'The task you are looking for does not exist.',
+          'Task does not belong to user': 'You do not have permission to access this task.',
+          'Invalid input': 'The information provided is not valid. Please check and try again.',
+          'Validation Error': 'Please check the information you entered and try again.',
+        };
+
+        // Check if the error message contains any of the keys as substrings
+        for (const [technical, userFriendly] of Object.entries(errorMap)) {
+          if (errorMessage.toLowerCase().includes(technical.toLowerCase())) {
+            return userFriendly;
+          }
+        }
+
+        // Default fallback message
+        return error.detail || `HTTP ${response.status}: ${response.statusText}`;
+      };
+
+      const userFriendlyMessage = getUserFriendlyMessage(error.detail || `HTTP ${response.status}: ${response.statusText}`);
+      throw new Error(userFriendlyMessage);
+    }
+
+    // Check if response has body content before parsing JSON
+    if (response.status === 204 || !response.body) {
+      // No content responses (like 204 No Content) return undefined
+      return undefined as T;
+    }
+
+    // Check if response has content length of 0
+    const contentLength = response.headers.get('content-length');
+    if (contentLength === '0') {
+      return undefined as T;
+    }
+
+    // For other responses, check content type and parse accordingly
+    const contentType = response.headers.get('content-type');
+    if (contentType && contentType.includes('application/json')) {
+      return response.json();
+    } else {
+      // For non-JSON responses, try to parse as JSON or return empty object
+      const text = await response.text();
+      if (!text) {
+        return undefined as T;
+      }
+      try {
+        return JSON.parse(text) as T;
+      } catch {
+        // If it's not JSON-parseable, return as text or empty object
+        return {} as T;
+      }
+    }
+  }
+
+  /**
+   * Register a new user account.
+   *
+   * @param username - User username (3-20 chars, alphanumeric/_/- only)
+   * @param email - User email address
+   * @param password - User password (min 8 characters)
+   * @param confirmPassword - Password confirmation (must match password)
+   * @returns Auth response with token and user info
+   */
+  async signup(username: string, email: string, password: string, confirmPassword: string) {
+    const data = await this.request('/auth/signup', {
+      method: 'POST',
+      body: JSON.stringify({ username, email, password, confirm_password: confirmPassword }),
+    })
+    // Store token after successful signup
+    this.setToken(data.access_token)
+    return data
+  }
+
+  /**
+   * Login existing user with email or username.
+   *
+   * @param emailOrUsername - User email or username
+   * @param password - User password
+   * @returns Auth response with token and user info
+   */
+  async login(emailOrUsername: string, password: string) {
+    const data = await this.request('/auth/login', {
+      method: 'POST',
+      body: JSON.stringify({ email_or_username: emailOrUsername, password }),
+    })
+    // Store token after successful login
+    this.setToken(data.access_token)
+    return data
+  }
+
+  /**
+   * Logout current user.
+   * Clears stored token only. Caller should handle redirect.
+   */
+  async logout() {
+    try {
+      // Call the logout endpoint
+      await this.request('/auth/logout', {
+        method: 'POST',
+      });
+    } catch (error) {
+      // If the logout API call fails, still clear the token
+      console.error('Logout API call failed:', error);
+    } finally {
+      // Clear token regardless of API call result
+      this.clearToken();
+    }
+  }
+
+  /**
+   * Change user's password.
+   *
+   * @param currentPassword - Current password for verification
+   * @param newPassword - New password (min 8 characters)
+   * @param confirmPassword - New password confirmation (must match new password)
+   * @returns Success message
+   */
+  async changePassword(currentPassword: string, newPassword: string, confirmPassword: string) {
+    return this.request('/auth/change-password', {
+      method: 'POST',
+      body: JSON.stringify({
+        current_password: currentPassword,
+        new_password: newPassword,
+        confirm_password: confirmPassword
+      }),
+    });
+  }
+
+  /**
+   * Update user's email address.
+   *
+   * @param newEmail - New email address
+   * @param password - Current password for verification
+   * @returns Success message with new email
+   */
+  async updateEmail(newEmail: string, password: string) {
+    return this.request('/auth/update-email', {
+      method: 'POST',
+      body: JSON.stringify({
+        new_email: newEmail,
+        password: password
+      }),
+    });
+  }
+
+  /**
+   * Check if user is authenticated (has valid token).
+   * Note: This only checks if token exists, not if it's valid.
+   * Backend will validate on actual API calls.
+   */
+  /**
+   * Get current user profile.
+   *
+   * @returns User profile information
+   */
+  async getProfile(): Promise<UserProfile> {
+    return this.request<UserProfile>('/auth/me')
+  }
+
+  isAuthenticated(): boolean {
+    return this.getToken() !== null
+  }
+
+  // ========== Task API Methods ==========
+
+  /**
+   * Get all tasks for authenticated user.
+   * Task: T022
+   * Spec: US-1 View All Tasks
+   */
+  async getTasks(search?: string, filterStatus?: string, sort?: string, limit?: number, offset?: number): Promise<Task[]> {
+    // Build query parameters
+    const params = new URLSearchParams();
+    if (search) params.append('search', search);
+    if (filterStatus) params.append('filter_status', filterStatus);
+    if (sort) params.append('sort', sort);
+    if (limit) params.append('limit', limit.toString());
+    if (offset) params.append('offset', offset.toString());
+
+    const queryString = params.toString();
+    const endpoint = queryString ? `/tasks?${queryString}` : '/tasks';
+
+    const response = await this.request<{ tasks: Task[] }>(endpoint)
+    return response.tasks || []
+  }
+
+  /**
+   * Create a new task.
+   * Task: T027
+   * Spec: US-2 Create Task
+   */
+  async createTask(data: TaskCreate): Promise<Task> {
+    return this.request<Task>('/tasks', {
+      method: 'POST',
+      body: JSON.stringify(data),
+    })
+  }
+
+  /**
+   * Get a single task by ID.
+   * Task: T032
+   * Spec: US-3 View Single Task
+   */
+  async getTask(taskId: string): Promise<Task> {
+    return this.request<Task>(`/tasks/${taskId}`)
+  }
+
+  /**
+   * Update a task.
+   * Task: T037
+   * Spec: US-4 Update Task
+   */
+  async updateTask(taskId: string, data: TaskUpdate): Promise<Task> {
+    return this.request<Task>(`/tasks/${taskId}`, {
+      method: 'PUT',
+      body: JSON.stringify(data),
+    })
+  }
+
+  /**
+   * Mark task as complete.
+   * Task: T043
+   * Spec: US-5 Toggle Completion
+   */
+  async completeTask(taskId: string): Promise<Task> {
+    return this.request<Task>(`/tasks/${taskId}/complete`, {
+      method: 'PATCH',
+    })
+  }
+
+  /**
+   * Delete a task.
+   * Task: T048
+   * Spec: US-6 Delete Task
+   */
+  async deleteTask(taskId: string): Promise<void> {
+    await this.request(`/tasks/${taskId}`, {
+      method: 'DELETE',
+    })
+  }
+
+  /**
+   * Reorder tasks by updating their position.
+   * Task: T011
+   * Spec: Phase 1 UI Enhancements - Drag-and-Drop Task Reordering
+   */
+  async reorderTasks(taskIds: string[]): Promise<{ success: boolean; message: string; count: number }> {
+    return this.request('/tasks/reorder', {
+      method: 'PATCH',
+      body: JSON.stringify({ task_ids: taskIds }),
+    })
+  }
+
+
+  // ========== Dashboard API Methods ==========
+
+  /**
+   * Get dashboard statistics for authenticated user.
+   * Task: T033
+   * Spec: 006 Dashboard - Statistics endpoint
+   */
+  async getTaskStats(): Promise<DashboardStats> {
+    return this.request<DashboardStats>('/tasks/stats')
+  }
+
+  /**
+   * Get recent activity for authenticated user.
+   * Task: T036
+   * Spec: 006 Dashboard - Recent activity endpoint
+   */
+  async getRecentActivity(): Promise<RecentActivityItem[]> {
+    return this.request<RecentActivityItem[]>('/tasks/recent')
+  }
+
+  /**
+   * Get upcoming deadlines for authenticated user.
+   * Task: T037
+   * Spec: 006 Dashboard - Upcoming deadlines endpoint
+   */
+  async getUpcomingDeadlines(): Promise<UpcomingDeadlineItem[]> {
+    return this.request<UpcomingDeadlineItem[]>('/tasks/upcoming')
   }
 }
 
-export function isAuthenticated(): boolean {
-  if (typeof window !== 'undefined') {
-    return !!localStorage.getItem('access_token');
+// Export singleton instance with lazy initialization to avoid SSR issues
+let _apiClient: ApiClient | null = null
+
+export const getApiClient = (): ApiClient => {
+  if (!_apiClient) {
+    _apiClient = new ApiClient()
   }
-  return false;
+  return _apiClient
 }
 
-export async function changePassword(currentPassword: string, newPassword: string, confirmPassword: string): Promise<void> {
-  const response = await fetchApi<void>('/api/v1/auth/change-password', {
-    method: 'POST',
-    body: JSON.stringify({
-      current_password: currentPassword,
-      new_password: newPassword,
-      confirm_password: confirmPassword
-    }),
-  });
-
-  return response;
-}
-
-export async function updateEmail(newEmail: string, password: string): Promise<void> {
-  const response = await fetchApi<void>('/api/v1/auth/update-email', {
-    method: 'POST',
-    body: JSON.stringify({
-      new_email: newEmail,
-      password: password
-    }),
-  });
-
-  return response;
-}
-
-// Task-related API functions
-export async function getTasks(): Promise<any[]> {
-  const response = await fetchApi<any>('/api/v1/tasks', {
-    method: 'GET',
-  });
-
-  // The backend returns a TaskListResponse with tasks property
-  return response.tasks || [];
-}
-
-export async function createTask(taskData: any): Promise<any> {
-  const response = await fetchApi<any>('/api/v1/tasks', {
-    method: 'POST',
-    body: JSON.stringify(taskData),
-  });
-
-  return response;
-}
-
-export async function getTask(taskId: string): Promise<any> {
-  const response = await fetchApi<any>(`/api/v1/tasks/${taskId}`, {
-    method: 'GET',
-  });
-
-  return response;
-}
-
-export async function updateTask(taskId: string, taskData: any): Promise<any> {
-  const response = await fetchApi<any>(`/api/v1/tasks/${taskId}`, {
-    method: 'PUT',
-    body: JSON.stringify(taskData),
-  });
-
-  return response;
-}
-
-export async function completeTask(taskId: string): Promise<any> {
-  const response = await fetchApi<any>(`/api/v1/tasks/${taskId}/complete`, {
-    method: 'PATCH',
-  });
-
-  return response;
-}
-
-export async function deleteTask(taskId: string): Promise<void> {
-  await fetchApi<void>(`/api/v1/tasks/${taskId}`, {
-    method: 'DELETE',
-  });
-}
-
-// Define the ApiClient interface for type safety
-interface ApiClient {
-  // Auth functions
-  login: (data: LoginRequest) => Promise<TokenResponse>;
-  signup: (data: SignupRequest) => Promise<TokenResponse>;
-  getProfile: () => Promise<UserProfile>;
-  logout: () => void;
-  isAuthenticated: () => boolean;
-  changePassword: (currentPassword: string, newPassword: string, confirmPassword: string) => Promise<void>;
-  updateEmail: (newEmail: string, password: string) => Promise<void>;
-
-  // Task functions
-  getTasks: () => Promise<any[]>;
-  createTask: (taskData: any) => Promise<any>;
-  getTask: (taskId: string) => Promise<any>;
-  updateTask: (taskId: string, taskData: any) => Promise<any>;
-  completeTask: (taskId: string) => Promise<any>;
-  deleteTask: (taskId: string) => Promise<void>;
-}
-
-// Export a client object for backward compatibility with existing code
-export const apiClient: ApiClient = {
-  // Auth functions
-  login: login,
-  signup: signup,
-  getProfile: getProfile,
-  logout: logout,
-  isAuthenticated: isAuthenticated,
-  changePassword: changePassword,
-  updateEmail: updateEmail,
-
-  // Task functions
-  getTasks: getTasks,
-  createTask: createTask,
-  getTask: getTask,
-  updateTask: updateTask,
-  completeTask: completeTask,
-  deleteTask: deleteTask,
-};
+// For backward compatibility, still export as apiClient
+export const apiClient = getApiClient()

@@ -5,6 +5,8 @@
 
 'use client';
 
+import { FadeInWhenVisible, StaggerContainer, StaggerChild } from '@/components/ScrollAnimations';
+
 interface Step {
   number: number;
   title: string;
@@ -55,59 +57,83 @@ export default function HowItWorks({
   return (
     <section
       id="how-it-works"
-      className="py-16 bg-white"
+      className="py-16 bg-white dark:bg-gray-900"
       aria-labelledby="how-it-works-heading"
     >
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        {/* Section Heading */}
-        <div className="text-center mb-12">
-          <h2
-            id="how-it-works-heading"
-            className="text-3xl sm:text-4xl font-bold text-gray-900 mb-4"
+      <div className="w-full px-4 sm:px-6 lg:px-8">
+        <div className="max-w-7xl mx-auto">
+          {/* Section Heading */}
+          <FadeInWhenVisible
+            className="text-center mb-12"
+            distance={30}
           >
-            {sectionHeading}
-          </h2>
-          <p className="text-lg text-gray-600 max-w-2xl mx-auto">
-            Get started with Todo App in just three simple steps
-          </p>
-        </div>
-
-        {/* Steps */}
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
-          {steps.map((step, index) => (
-            <div
-              key={step.number}
-              className="relative text-center"
-              aria-label={`Step ${step.number}: ${step.title}`}
+            <h2
+              id="how-it-works-heading"
+              className="text-3xl sm:text-4xl font-bold text-gray-900 dark:text-white mb-4"
             >
-              {/* Step Number Circle */}
-              <div className="w-16 h-16 mx-auto mb-4 rounded-full bg-blue-600 text-white flex items-center justify-center font-bold text-xl">
-                {step.number}
-              </div>
+              {sectionHeading}
+            </h2>
+            <p className="text-lg text-gray-600 dark:text-gray-300 max-w-2xl mx-auto">
+              Get started with Todo App in just three simple steps
+            </p>
+          </FadeInWhenVisible>
 
-              {/* Icon */}
-              {step.icon && (
-                <div className="absolute top-0 left-1/2 -translate-x-1/2 -translate-y-1 w-8 h-8 bg-white rounded-full flex items-center justify-center text-blue-600">
-                  {renderIcon(step.icon)}
+          {/* Steps */}
+          <StaggerContainer
+            className="grid grid-cols-1 md:grid-cols-3 gap-8"
+            staggerChildren={0.1}
+          >
+            {steps.map((step, index) => (
+              <StaggerChild
+                key={step.number}
+                className="relative text-center"
+                aria-label={`Step ${step.number}: ${step.title}`}
+              >
+                {/* Step Number Circle */}
+                <FadeInWhenVisible
+                  className="w-16 h-16 mx-auto mb-4 rounded-full bg-blue-600 text-white flex items-center justify-center font-bold text-xl"
+                  distance={30}
+                  delay={index * 0.1}
+                >
+                  {step.number}
+                </FadeInWhenVisible>
+
+                {/* Icon */}
+                {step.icon && (
+                  <FadeInWhenVisible
+                    className="absolute top-0 left-1/2 -translate-x-1/2 -translate-y-1 w-8 h-8 bg-white dark:bg-gray-800 rounded-full flex items-center justify-center text-blue-600 dark:text-blue-400"
+                    distance={30}
+                    delay={index * 0.1 + 0.1}
+                  >
+                    {renderIcon(step.icon)}
+                  </FadeInWhenVisible>
+                )}
+
+                {/* Step Content */}
+                <div className="pt-2">
+                  <FadeInWhenVisible
+                    className="text-xl font-semibold text-gray-900 dark:text-white mb-2"
+                    distance={30}
+                    delay={index * 0.1 + 0.2}
+                  >
+                    {step.title}
+                  </FadeInWhenVisible>
+                  <FadeInWhenVisible
+                    className="text-gray-600 dark:text-gray-300 leading-relaxed"
+                    distance={30}
+                    delay={index * 0.1 + 0.3}
+                  >
+                    {step.description}
+                  </FadeInWhenVisible>
                 </div>
-              )}
 
-              {/* Step Content */}
-              <div className="pt-2">
-                <h3 className="text-xl font-semibold text-gray-900 mb-2">
-                  {step.title}
-                </h3>
-                <p className="text-gray-600 leading-relaxed">
-                  {step.description}
-                </p>
-              </div>
-
-              {/* Connector line (desktop) */}
-              {index < steps.length - 1 && (
-                <div className="hidden md:block absolute top-8 left-[62%] right-[62%] h-0.5 bg-gray-200 -z-10" />
-              )}
-            </div>
-          ))}
+                {/* Connector line (desktop) */}
+                {index < steps.length - 1 && (
+                  <div className="hidden md:block absolute top-8 left-[62%] right-[62%] h-0.5 bg-gray-200 dark:bg-gray-700 -z-10" />
+                )}
+              </StaggerChild>
+            ))}
+          </StaggerContainer>
         </div>
       </div>
     </section>

@@ -1,20 +1,24 @@
 /**
- * Task: T002, T014, T017, T034, T035
+ * Task: T002, T014, T017, T034, T035, T022, T023
  * Spec: 005-task-management-ui/tasks.md - Task Card Component (Clean UI)
+ * Spec: Phase 1 UI Enhancements - Enhanced Animations
  *
  * Clean task card with:
  * - Status colors (gray for pending, green for completed)
  * - Simple hover effects
  * - Professional look
+ * - Enhanced animations and micro-interactions
  */
 
 'use client'
 
 import { useState, useEffect } from 'react'
+import { motion, AnimatePresence, Variants } from 'framer-motion'
 import type { Task } from '@/types/task'
 import { formatRelativeTime, formatDateTime } from '@/lib/format'
 import { PriorityBadge } from '@/components/PriorityBadge'
 import { DueDateBadge } from '@/components/DueDateBadge'
+import { useReducedMotion } from '@/utils/accessibility'
 
 interface TaskCardProps {
   task: Task
@@ -36,6 +40,7 @@ export function TaskCard({
 }: TaskCardProps) {
   const [isDeleting, setIsDeleting] = useState(false)
   const [isCompleting, setIsCompleting] = useState(false)
+  const prefersReducedMotion = useReducedMotion()
 
   const handleComplete = async () => {
     if (isCompleting) return
@@ -99,22 +104,55 @@ export function TaskCard({
         ),
       }
     : {
-        border: 'border-gray-200 bg-white hover:border-blue-300 hover:shadow-md',
+        border: 'border-gray-200 bg-white hover:border-blue-300',
         checkbox: 'text-blue-600 focus:ring-blue-500',
         badge: 'bg-blue-100 text-blue-700',
         icon: null,
       }
 
+  // Animation variants
+  const cardVariants: Variants = prefersReducedMotion
+    ? {
+        rest: {
+          boxShadow: '0 1px 2px 0 rgb(0 0 0 / 0.05)',
+        },
+        hover: {
+          boxShadow: '0 1px 2px 0 rgb(0 0 0 / 0.05)',
+          y: 0
+        },
+      }
+    : {
+        rest: {
+          boxShadow: '0 1px 2px 0 rgb(0 0 0 / 0.05)',
+        },
+        hover: {
+          boxShadow: '0 4px 6px -1px rgb(0 0 0 / 0.1), 0 2px 4px -2px rgb(0 0 0 / 0.1)',
+          y: -2
+        },
+      }
+
   return (
-    <article
-      className={`group flex items-start gap-4 p-4 rounded-lg border transition-all ${
+    <motion.article
+      className={`group flex items-start gap-4 p-4 rounded-lg border transition-colors ${
         statusConfig.border
       } ${isLoading ? 'opacity-50' : ''}`}
       aria-labelledby={`task-title-${task.id}`}
+      variants={cardVariants}
+      whileHover={!prefersReducedMotion ? 'hover' : undefined}
+      whileTap={!prefersReducedMotion ? { scale: 0.99 } : undefined}
+      initial={{ opacity: 0, y: 10 }}
+      animate={{ opacity: 1, y: 0 }}
+      exit={{ opacity: 0, scale: 0.95 }}
+      transition={{
+        type: 'spring',
+        stiffness: 300,
+        damping: 30,
+        duration: prefersReducedMotion ? 0 : 0.3
+      }}
     >
       {/* Checkbox */}
       <div className="relative mt-0.5">
-        <input
+        <motion.input
           type="checkbox"
           checked={task.completed}
           onChange={handleComplete}
@@ -122,12 +160,21 @@ export function TaskCard({
           aria-label={task.completed ? 'Mark as incomplete' : 'Mark as complete'}
           className={`w-5 h-5 rounded border-gray-300 ${statusConfig.checkbox} focus:ring-2 cursor-pointer disabled:cursor-not-allowed transition-colors`}
           onKeyDown={handleCheckboxKeyDown}
+          whileHover={!prefersReducedMotion ? { scale: 1.1 } : undefined}
+          whileTap={!prefersReducedMotion ? { scale: 0.9 } : undefined}
         />
-        {isCompleting && (
-          <div className="absolute inset-0 flex items-center justify-center">
-            <div className="w-4 h-4 border-2 border-blue-600 border-t-transparent rounded-full animate-spin" />
-          </div>
-        )}
+        <AnimatePresence>
+          {isCompleting && (
+            <motion.div
+              initial={{ opacity: 0, scale: 0.5 }}
+              animate={{ opacity: 1, scale: 1 }}
+              exit={{ opacity: 0, scale: 0.5 }}
+              className="absolute inset-0 flex items-center justify-center"
+            >
+              <div className="w-4 h-4 border-2 border-blue-600 border-t-transparent rounded-full animate-spin" />
+            </motion.div>
+          )}
+        </AnimatePresence>
       </div>
 
       {/* Content */}
@@ -135,73 +182,120 @@ export function TaskCard({
         <div className="flex items-start justify-between gap-4">
           <div className="min-w-0">
             <div className="flex items-center gap-2 flex-wrap">
-              <span className={`px-2 py-0.5 text-xs font-medium rounded-full ${statusConfig.badge}`}>
+              <motion.span
+                className={`px-2 py-0.5 text-xs font-medium rounded-full ${statusConfig.badge}`}
+                initial={{ opacity: 0, scale: 0.8 }}
+                animate={{ opacity: 1, scale: 1 }}
+                transition={{ delay: 0.1 }}
+              >
                 {task.completed ? 'Completed' : 'Active'}
-              </span>
+              </motion.span>
               <PriorityBadge priority={task.priority} />
               <DueDateBadge dueDate={task.due_date} />
               {task.reminder && (
-                <span className="inline-flex items-center px-2 py-0.5 rounded-full text-xs font-medium bg-purple-100 text-purple-800">
+                <motion.span
+                  className="inline-flex items-center px-2 py-0.5 rounded-full text-xs font-medium bg-purple-100 text-purple-800"
+                  initial={{ opacity: 0, x: 10 }}
+                  animate={{ opacity: 1, x: 0 }}
+                  transition={{ delay: 0.15 }}
+                >
                   <svg className="mr-1 w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
                   </svg>
                   Reminder
-                </span>
+                </motion.span>
               )}
             </div>
-            <h3
+            <motion.h3
               id={`task-title-${task.id}`}
               className={`font-medium truncate ${
                 task.completed ? 'text-gray-500 line-through' : 'text-gray-900'
               }`}
+              initial={{ opacity: 0, x: -5 }}
+              animate={{ opacity: 1, x: 0 }}
+              transition={{ delay: 0.05 }}
             >
               {task.title}
-            </h3>
-            {task.description && (
-              <p className={`mt-1 text-sm line-clamp-2 ${
-                task.completed ? 'text-gray-400' : 'text-gray-600'
-              }`}>
-                {task.description}
-              </p>
-            )}
-            <p className="mt-2 text-xs text-gray-400" title={formatDateTime(task.created_at)}>
+            </motion.h3>
+            <AnimatePresence>
+              {task.description && (
+                <motion.p
+                  initial={{ opacity: 0, height: 0 }}
+                  animate={{ opacity: 1, height: 'auto' }}
+                  exit={{ opacity: 0, height: 0 }}
+                  className={`mt-1 text-sm line-clamp-2 ${
+                    task.completed ? 'text-gray-400' : 'text-gray-600'
+                  }`}
+                >
+                  {task.description}
+                </motion.p>
+              )}
+            </AnimatePresence>
+            <motion.p
+              className="mt-2 text-xs text-gray-400"
+              title={formatDateTime(task.created_at)}
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              transition={{ delay: 0.2 }}
+            >
               {formatRelativeTime(task.created_at)}
-            </p>
+            </motion.p>
           </div>
 
           {/* Actions */}
           <div className="flex items-center gap-2 flex-shrink-0">
             {isPending && (
-              <button
+              <motion.button
                 type="button"
                 onClick={handleEdit}
                 disabled={isLoading}
                 className="p-2 text-gray-400 hover:text-blue-600 rounded-lg hover:bg-gray-100 transition-colors disabled:opacity-50"
                 aria-label={`Edit ${task.title}`}
+                whileHover={!prefersReducedMotion ? { scale: 1.1, backgroundColor: '#f3f4f6' } : undefined}
+                whileTap={!prefersReducedMotion ? { scale: 0.95 } : undefined}
               >
                 <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" />
                 </svg>
-              </button>
+              </motion.button>
             )}
-            <button
+            <motion.button
               type="button"
               onClick={handleDelete}
               disabled={isLoading}
               className="p-2 text-gray-400 hover:text-red-600 rounded-lg hover:bg-red-50 transition-colors disabled:opacity-50"
               aria-label={`Delete ${task.title}`}
+              whileHover={!prefersReducedMotion ? { scale: 1.1, backgroundColor: '#fee2e2' } : undefined}
+              whileTap={!prefersReducedMotion ? { scale: 0.95 } : undefined}
             >
-              {isDeleting ? (
-                <div className="w-4 h-4 border-2 border-red-600 border-t-transparent rounded-full animate-spin" />
-              ) : (
-                <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
-                </svg>
-              )}
-            </button>
+              <AnimatePresence mode="wait">
+                {isDeleting ? (
+                  <motion.div
+                    key="deleting-spinner"
+                    initial={{ opacity: 0, scale: 0.5 }}
+                    animate={{ opacity: 1, scale: 1 }}
+                    exit={{ opacity: 0, scale: 0.5 }}
+                    className="w-4 h-4 border-2 border-red-600 border-t-transparent rounded-full animate-spin"
+                  />
+                ) : (
+                  <motion.svg
+                    key="delete-icon"
+                    className="w-4 h-4"
+                    fill="none"
+                    stroke="currentColor"
+                    viewBox="0 0 24 24"
+                    initial={{ rotate: 0 }}
+                    animate={{ rotate: 0 }}
+                    whileHover={!prefersReducedMotion ? { rotate: 5 } : undefined}
+                  >
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
+                  </motion.svg>
+                )}
+              </AnimatePresence>
+            </motion.button>
           </div>
         </div>
       </div>
-    </article>
+    </motion.article>
   )
 }

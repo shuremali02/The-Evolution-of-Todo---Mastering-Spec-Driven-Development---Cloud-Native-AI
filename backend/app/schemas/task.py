@@ -40,6 +40,7 @@ class TaskCreate(BaseModel):
         description: Task description (optional, max 1000 characters)
         priority: Task priority (optional, default: medium)
         due_date: Task due date (optional)
+        position: Position for drag-and-drop ordering (optional)
     """
     title: str = Field(
         ...,
@@ -64,6 +65,10 @@ class TaskCreate(BaseModel):
         None,
         description="Task reminder datetime (optional)"
     )
+    position: Optional[int] = Field(
+        None,
+        description="Position for drag-and-drop ordering (optional)"
+    )
 
     @model_validator(mode='after')
     def convert_timezones_to_utc(self):
@@ -87,6 +92,7 @@ class TaskUpdate(BaseModel):
         completed: New completion status (optional)
         priority: New priority level (optional)
         due_date: New due date (optional)
+        position: New position for drag-and-drop ordering (optional)
     """
     title: Optional[str] = Field(
         None,
@@ -114,6 +120,10 @@ class TaskUpdate(BaseModel):
     reminder: Optional[datetime] = Field(
         None,
         description="Task reminder datetime (optional)"
+    )
+    position: Optional[int] = Field(
+        None,
+        description="Position for drag-and-drop ordering (optional)"
     )
 
     @model_validator(mode='after')

@@ -10,7 +10,7 @@ from fastapi import APIRouter, Depends, HTTPException, status, Query
 from sqlmodel import select
 from sqlalchemy.ext.asyncio import AsyncSession
 from typing import List, Optional
-from datetime import datetime
+from datetime import datetime, timezone
 
 from app.database import get_session
 from app.auth.dependencies import get_current_user_id
@@ -78,6 +78,8 @@ async def get_tasks(
         statement = statement.order_by(Task.priority.asc())
     elif sort == "due_date":
         statement = statement.order_by(Task.due_date.asc())
+    elif sort == "position":
+        statement = statement.order_by(Task.position.asc())
 
     # Apply pagination
     statement = statement.offset(offset).limit(limit)
