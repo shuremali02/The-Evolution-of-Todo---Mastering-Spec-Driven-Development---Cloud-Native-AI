@@ -15,11 +15,13 @@ interface FooterLink {
 interface FooterProps {
   appName?: string;
   year?: number;
+  fullWidth?: boolean;
 }
 
 export default function Footer({
   appName = 'Todo App',
   year = new Date().getFullYear(),
+  fullWidth = false,
 }: FooterProps) {
   const productLinks: FooterLink[] = [
     { label: 'Features', href: '#features' },
@@ -47,7 +49,7 @@ export default function Footer({
       role="contentinfo"
       aria-label="Footer"
     >
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
+      <div className={`${fullWidth ? 'w-full' : 'max-w-7xl mx-auto'} px-4 sm:px-6 lg:px-8 py-12`}>
         {/* Main footer content */}
         <div className="grid grid-cols-2 md:grid-cols-4 gap-8 mb-8">
           {/* Brand section */}

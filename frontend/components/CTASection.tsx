@@ -17,12 +17,14 @@ interface CTASectionProps {
   headline: string;
   subtext?: string;
   ctaButton: CTAButton;
+  fullWidth?: boolean;
 }
 
 export default function CTASection({
   headline,
   subtext,
   ctaButton,
+  fullWidth = false,
 }: CTASectionProps) {
   return (
     <section
@@ -30,7 +32,7 @@ export default function CTASection({
       className="bg-gray-900 py-16 sm:py-20"
       aria-labelledby="cta-heading"
     >
-      <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
+      <div className={`${fullWidth ? 'w-full' : 'max-w-4xl mx-auto'} px-4 sm:px-6 lg:px-8 text-center`}>
         {/* Headline */}
         <h2
           id="cta-heading"

@@ -17,11 +17,13 @@ interface Step {
 interface HowItWorksProps {
   steps: Step[];
   sectionHeading?: string;
+  fullWidth?: boolean;
 }
 
 export default function HowItWorks({
   steps,
   sectionHeading = 'How It Works',
+  fullWidth = false,
 }: HowItWorksProps) {
   const renderIcon = (iconName?: string) => {
     if (!iconName) return null;
@@ -61,7 +63,7 @@ export default function HowItWorks({
       aria-labelledby="how-it-works-heading"
     >
       <div className="w-full px-4 sm:px-6 lg:px-8">
-        <div className="max-w-7xl mx-auto">
+        <div className={`${fullWidth ? 'w-full' : 'max-w-7xl mx-auto'}`}>
           {/* Section Heading */}
           <FadeInWhenVisible
             className="text-center mb-12"

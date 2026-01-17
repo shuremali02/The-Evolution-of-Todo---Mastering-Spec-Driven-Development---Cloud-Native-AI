@@ -5,13 +5,12 @@
 
 'use client';
 
-import PublicNavbar from '@/components/PublicNavbar';
+import { PublicPageLayout } from '@/components/PublicPageLayout';
 import Hero from '@/components/Hero';
 import FeatureCard from '@/components/FeatureCard';
 import HowItWorks from '@/components/HowItWorks';
 import Testimonials from '@/components/Testimonials';
 import CTASection from '@/components/CTASection';
-import Footer from '@/components/Footer';
 import { FadeInWhenVisible } from '@/components/ScrollAnimations';
 
 export default function LandingPage() {
@@ -72,90 +71,83 @@ export default function LandingPage() {
   ];
 
   return (
-    <div className="min-h-screen flex flex-col">
-      <PublicNavbar />
+    <PublicPageLayout breadcrumbs={[]} showBreadcrumbs={false} fullWidth={true}>
+      {/* Hero Section */}
+      <Hero
+        headline="Transform Your Productivity"
+        subheadline="Manage tasks efficiently, stay organized, and achieve your goals with our modern task management app. Join thousands of productive users today."
+        primaryCTA={{
+          label: 'Sign Up Free',
+          href: '/signup',
+          type: 'primary',
+        }}
+        secondaryCTA={{
+          label: 'Learn More',
+          href: '#features',
+        }}
+        fullWidth={true}
+      />
 
-      {/* Main Content */}
-      <main className="flex-grow">
-        {/* Hero Section */}
-        <Hero
-          headline="Transform Your Productivity"
-          subheadline="Manage tasks efficiently, stay organized, and achieve your goals with our modern task management app. Join thousands of productive users today."
-          primaryCTA={{
-            label: 'Sign Up Free',
-            href: '/signup',
-            type: 'primary',
-          }}
-          secondaryCTA={{
-            label: 'Learn More',
-            href: '#features',
-          }}
-        />
+      {/* Features Section */}
+      <section
+        id="features"
+        className="py-16 bg-gray-50 dark:bg-gray-800"
+        aria-labelledby="features-heading"
+      >
+        <div className="w-full px-4 sm:px-6 lg:px-8">
+          <FadeInWhenVisible
+            className="text-center mb-4"
+            distance={30}
+          >
+            <h2
+              id="features-heading"
+              className="text-3xl sm:text-4xl font-bold text-gray-900 dark:text-white"
+            >
+              Powerful Features
+            </h2>
+          </FadeInWhenVisible>
 
-        {/* Features Section */}
-        <section
-          id="features"
-          className="py-16 bg-gray-50 dark:bg-gray-800"
-          aria-labelledby="features-heading"
-        >
-          <div className="w-full px-4 sm:px-6 lg:px-8">
-            <div className="max-w-7xl mx-auto">
-              <FadeInWhenVisible
-                className="text-center mb-4"
-                distance={30}
-              >
-                <h2
-                  id="features-heading"
-                  className="text-3xl sm:text-4xl font-bold text-gray-900 dark:text-white"
-                >
-                  Powerful Features
-                </h2>
-              </FadeInWhenVisible>
+          <FadeInWhenVisible
+            className="text-lg text-gray-600 dark:text-gray-300 text-center mb-12 max-w-2xl mx-auto"
+            distance={30}
+            delay={0.1}
+          >
+            Everything you need to stay organized and get things done
+          </FadeInWhenVisible>
 
-              <FadeInWhenVisible
-                className="text-lg text-gray-600 dark:text-gray-300 text-center mb-12 max-w-2xl mx-auto"
-                distance={30}
-                delay={0.1}
-              >
-                Everything you need to stay organized and get things done
-              </FadeInWhenVisible>
-
-              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-                {features.map((feature, index) => (
-                  <FeatureCard
-                    key={feature.title}
-                    icon={feature.icon}
-                    title={feature.title}
-                    description={feature.description}
-                  />
-                ))}
-              </div>
-            </div>
+          <div className="w-full grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+            {features.map((feature, index) => (
+              <FeatureCard
+                key={feature.title}
+                icon={feature.icon}
+                title={feature.title}
+                description={feature.description}
+              />
+            ))}
           </div>
-        </section>
+        </div>
+      </section>
 
-        {/* How It Works Section */}
-        <HowItWorks
-          steps={steps}
-          sectionHeading="How It Works"
-        />
+      {/* How It Works Section */}
+      <HowItWorks
+        steps={steps}
+        sectionHeading="How It Works"
+        fullWidth={true}
+      />
 
-        {/* Testimonials Section */}
-        <Testimonials />
+      {/* Testimonials Section */}
+      <Testimonials fullWidth={true} />
 
-        {/* CTA Section */}
-        <CTASection
-          headline="Ready to Get Started?"
-          subtext="Join thousands of productive users and transform the way you manage your tasks. It's free to try."
-          ctaButton={{
-            label: 'Start Your Free Trial',
-            href: '/signup',
-          }}
-        />
-      </main>
-
-      {/* Footer */}
-      <Footer />
-    </div>
+      {/* CTA Section */}
+      <CTASection
+        headline="Ready to Get Started?"
+        subtext="Join thousands of productive users and transform the way you manage your tasks. It's free to try."
+        ctaButton={{
+          label: 'Start Your Free Trial',
+          href: '/signup',
+        }}
+        fullWidth={true}
+      />
+    </PublicPageLayout>
   );
 }

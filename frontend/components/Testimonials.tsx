@@ -22,11 +22,13 @@ interface Testimonial {
 interface TestimonialsProps {
   sectionHeading?: string;
   sectionSubheading?: string;
+  fullWidth?: boolean;
 }
 
 export default function Testimonials({
   sectionHeading = 'Loved by Productive Teams',
   sectionSubheading = 'See what our users are saying about Todo App',
+  fullWidth = false,
 }: TestimonialsProps) {
   const testimonials: Testimonial[] = [
     {
@@ -79,7 +81,7 @@ export default function Testimonials({
       className="py-20 bg-gradient-to-b from-white to-gray-50 dark:from-gray-900 dark:to-gray-800"
       aria-labelledby="testimonials-heading"
     >
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+      <div className={`${fullWidth ? 'w-full' : 'max-w-7xl mx-auto'} px-4 sm:px-6 lg:px-8`}>
         {/* Section Header */}
         <div className="text-center mb-16">
           <h2

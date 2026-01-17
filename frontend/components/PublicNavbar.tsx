@@ -17,9 +17,10 @@ interface NavLink {
 
 interface PublicNavbarProps {
   onNavigate?: (section: string) => void;
+  fullWidth?: boolean;
 }
 
-export default function PublicNavbar({ onNavigate }: PublicNavbarProps) {
+export default function PublicNavbar({ onNavigate, fullWidth = false }: PublicNavbarProps) {
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
 
   const navLinks: NavLink[] = [
@@ -51,7 +52,7 @@ export default function PublicNavbar({ onNavigate }: PublicNavbarProps) {
       role="navigation"
       aria-label="Main navigation"
     >
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+      <div className={`${fullWidth ? '' : 'max-w-7xl'} mx-auto px-4 sm:px-6 lg:px-8`}>
         <div className="flex justify-between items-center h-16">
           {/* Logo - Text only, no emoji */}
           <div className="flex items-center">
