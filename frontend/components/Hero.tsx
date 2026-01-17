@@ -19,6 +19,7 @@ interface HeroProps {
   subheadline: string;
   primaryCTA?: CTAButton;
   secondaryCTA?: CTAButton;
+  fullWidth?: boolean;
 }
 
 export default function Hero({
@@ -34,6 +35,7 @@ export default function Hero({
     href: '#features',
     type: 'secondary',
   },
+  fullWidth = false,
 }: HeroProps) {
   const getButtonClasses = (button: CTAButton) => {
     const baseClasses = 'px-6 py-3 rounded-lg font-medium transition-colors';
@@ -50,7 +52,7 @@ export default function Hero({
       className="bg-white dark:bg-gray-900 py-16 sm:py-20 lg:py-24"
       aria-labelledby="hero-headline"
     >
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+      <div className={`${fullWidth ? 'w-full' : 'max-w-7xl mx-auto'} px-4 sm:px-6 lg:px-8`}>
         <div className="flex flex-col lg:flex-row items-center justify-between gap-12 lg:gap-16">
           {/* Content - with scroll animations */}
           <FadeInWhenVisible

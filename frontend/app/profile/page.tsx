@@ -8,7 +8,6 @@
 import { useState, useEffect } from 'react';
 import { useSearchParams } from 'next/navigation';
 import { ProfileTabLayout } from '@/components/ProfileTabLayout';
-import { Breadcrumb } from '@/components/Breadcrumb';
 import { FadeInWhenVisible } from '@/components/ScrollAnimations';
 
 export default function ProfilePage() {
@@ -25,11 +24,6 @@ export default function ProfilePage() {
 
   return (
     <>
-      <Breadcrumb items={[
-        { label: 'Home', href: '/' },
-        { label: 'Profile', href: '/profile' }
-      ]} />
-
       <FadeInWhenVisible className="bg-white dark:bg-gray-800 shadow rounded-lg p-6" distance={30}>
         <h1 className="text-2xl font-bold text-gray-900 dark:text-white mb-6">User Profile</h1>
 

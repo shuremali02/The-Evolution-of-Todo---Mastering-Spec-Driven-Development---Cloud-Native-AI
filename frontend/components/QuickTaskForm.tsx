@@ -22,11 +22,12 @@ export const QuickTaskForm: React.FC<QuickTaskFormProps> = ({
   onCancel,
   className = ''
 }) => {
-  const [formData, setFormData] = useState<Omit<TaskCreate, 'reminder'>>({
+  const [formData, setFormData] = useState<TaskCreate>({
     title: '',
     description: '',
     priority: 'medium',
     due_date: null,
+    reminder: null,
   });
   const [loading, setLoading] = useState(false);
   const [errors, setErrors] = useState<Record<string, string>>({});
@@ -115,8 +116,16 @@ export const QuickTaskForm: React.FC<QuickTaskFormProps> = ({
     }
   };
 
+  const handleReminderChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const { value } = e.target;
+    setFormData(prev => ({
+      ...prev,
+      reminder: value || null
+    }));
+  };
+
   return (
-    <form onSubmit={handleSubmit} className={`bg-white dark:bg-gray-800 rounded-lg shadow-md p-4 ${className}`}>
+    <form id="create-new-task-form" onSubmit={handleSubmit} className={`bg-white dark:bg-gray-800 rounded-lg shadow-md p-4 ${className}`}>
       <div className="space-y-3">
         <div>
           <label htmlFor="title" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
@@ -191,6 +200,20 @@ export const QuickTaskForm: React.FC<QuickTaskFormProps> = ({
               } bg-white dark:bg-gray-700 text-gray-900 dark:text-white`}
             />
           </div>
+        </div>
+
+        <div>
+          <label htmlFor="reminder" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
+            Reminder
+          </label>
+          <input
+            type="datetime-local"
+            id="reminder"
+            name="reminder"
+            value={formData.reminder || ''}
+            onChange={handleReminderChange}
+            className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md bg-white dark:bg-gray-700 text-gray-900 dark:text-white"
+          />
         </div>
 
         <div className="flex space-x-2 pt-2">

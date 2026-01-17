@@ -15,7 +15,16 @@ export const QuickActions: React.FC<QuickActionsProps> = () => {
   const router = useRouter();
 
   const handleCreateTask = () => {
-    router.push('/tasks/create');
+    // Scroll to the QuickTaskForm on the dashboard page
+    const element = document.getElementById('create-new-task-form');
+    if (element) {
+      element.scrollIntoView({ behavior: 'smooth' });
+      // Optionally focus on the title input
+      const titleInput = element.querySelector('input[name="title"]');
+      if (titleInput) {
+        setTimeout(() => (titleInput as HTMLElement).focus(), 300);
+      }
+    }
   };
 
   const handleViewAllTasks = () => {
