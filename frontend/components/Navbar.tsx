@@ -13,6 +13,7 @@ import toast from 'react-hot-toast';
 import { useRouter } from 'next/navigation';
 import { ThemeToggle } from '@/components/ThemeToggle';
 import { useTheme } from '@/context/ThemeContext';
+import { AppLogo } from '@/components/AppLogo';
 
 interface NavbarProps {
   onLogout: () => void;
@@ -93,11 +94,9 @@ export function Navbar({ onLogout }: NavbarProps) {
     >
       <div className="w-full px-4 sm:px-6 lg:px-8">
         <div className="flex justify-between items-center h-16">
-          {/* Logo - Text only, no emoji */}
+          {/* Logo with icon */}
           <div className="flex items-center">
-            <h1 className="text-xl font-bold text-gray-900 dark:text-white tracking-tight">
-              Todo App
-            </h1>
+            <AppLogo size="md" />
           </div>
 
           {/* Navigation Links - Show only when authenticated */}

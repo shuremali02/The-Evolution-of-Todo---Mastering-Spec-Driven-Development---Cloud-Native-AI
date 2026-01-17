@@ -10,6 +10,9 @@ import { Providers } from './providers'
 export const metadata: Metadata = {
   title: 'Hackathon Todo',
   description: 'Multi-user task management application with JWT authentication',
+  icons: {
+    icon: '/favicon.ico',
+  },
 }
 
 export default function RootLayout({

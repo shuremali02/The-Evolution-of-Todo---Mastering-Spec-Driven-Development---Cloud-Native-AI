@@ -8,6 +8,7 @@
 import { useState } from 'react';
 import Link from 'next/link';
 import { ThemeToggle } from '@/components/ThemeToggle';
+import { AppLogo } from '@/components/AppLogo';
 
 interface NavLink {
   label: string;
@@ -54,16 +55,14 @@ export default function PublicNavbar({ onNavigate, fullWidth = false }: PublicNa
     >
       <div className={`${fullWidth ? '' : 'max-w-7xl'} mx-auto px-4 sm:px-6 lg:px-8`}>
         <div className="flex justify-between items-center h-16">
-          {/* Logo - Text only, no emoji */}
+          {/* Logo with icon */}
           <div className="flex items-center">
             <Link
               href="/"
               className="flex items-center text-gray-900 dark:text-white hover:text-blue-600 dark:hover:text-blue-400 transition-colors"
               aria-label="Todo App home"
             >
-              <span className="text-xl font-bold tracking-tight">
-                Todo App
-              </span>
+              <AppLogo size="md" />
             </Link>
           </div>
 

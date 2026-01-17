@@ -6,6 +6,7 @@
 'use client';
 
 import Link from 'next/link';
+import { AppLogo } from '@/components/AppLogo';
 
 interface FooterLink {
   label: string;
@@ -45,7 +46,7 @@ export default function Footer({
 
   return (
     <footer
-      className="bg-gray-900 text-white"
+      className="bg-white dark:bg-gray-900 text-gray-900 dark:text-white"
       role="contentinfo"
       aria-label="Footer"
     >
@@ -55,18 +56,22 @@ export default function Footer({
           {/* Brand section */}
           <div className="col-span-2 md:col-span-1">
             <div className="mb-4">
-              <span className="text-xl font-bold tracking-tight">
-                {appName}
-              </span>
+              <Link
+                href="/"
+                className="flex items-center"
+                aria-label="Todo App home"
+              >
+                <AppLogo size="md"/>
+              </Link>
             </div>
-            <p className="text-gray-400 text-sm leading-relaxed">
+            <p className="text-gray-600 dark:text-gray-400 text-sm leading-relaxed">
               Transform your productivity with our modern task management app. Built for individuals and teams.
             </p>
           </div>
 
           {/* Product Links */}
           <div>
-            <h4 className="text-sm font-medium text-white mb-4">
+            <h4 className="text-sm font-medium text-gray-900 dark:text-white mb-4">
               Product
             </h4>
             <nav aria-label="Product links">
@@ -75,7 +80,7 @@ export default function Footer({
                   <li key={link.href}>
                     <Link
                       href={link.href}
-                      className="text-gray-400 hover:text-white text-sm transition-colors"
+                      className="text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-white text-sm transition-colors"
                       aria-label={link.label}
                     >
                       {link.label}
@@ -88,7 +93,7 @@ export default function Footer({
 
           {/* Company Links */}
           <div>
-            <h4 className="text-sm font-medium text-white mb-4">
+            <h4 className="text-sm font-medium text-gray-900 dark:text-white mb-4">
               Company
             </h4>
             <nav aria-label="Company links">
@@ -97,7 +102,7 @@ export default function Footer({
                   <li key={link.href}>
                     <Link
                       href={link.href}
-                      className="text-gray-400 hover:text-white text-sm transition-colors"
+                      className="text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-white text-sm transition-colors"
                       aria-label={link.label}
                     >
                       {link.label}
@@ -110,7 +115,7 @@ export default function Footer({
 
           {/* Social Links */}
           <div>
-            <h4 className="text-sm font-medium text-white mb-4">
+            <h4 className="text-sm font-medium text-gray-900 dark:text-white mb-4">
               Connect
             </h4>
             <nav aria-label="Social links">
@@ -119,7 +124,7 @@ export default function Footer({
                   <li key={link.href}>
                     <Link
                       href={link.href}
-                      className="text-gray-400 hover:text-white text-sm transition-colors"
+                      className="text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-white text-sm transition-colors"
                       aria-label={link.label}
                       target="_blank"
                       rel="noopener noreferrer"
@@ -134,17 +139,17 @@ export default function Footer({
         </div>
 
         {/* Bottom section */}
-        <div className="pt-8 border-t border-gray-800">
+        <div className="pt-8 border-t border-gray-200 dark:border-gray-800">
           <div className="flex flex-col md:flex-row justify-between items-center gap-4">
             {/* Copyright */}
             <div className="text-center md:text-left">
-              <p className="text-gray-400 text-sm">
+              <p className="text-gray-600 dark:text-gray-400 text-sm">
                 © {year} {appName}. All rights reserved.
               </p>
             </div>
 
             {/* Made with love */}
-            <div className="flex items-center gap-2 text-gray-400 text-sm">
+            <div className="flex items-center gap-2 text-gray-600 dark:text-gray-400 text-sm">
               <span>Built for productive people</span>
             </div>
           </div>

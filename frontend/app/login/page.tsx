@@ -7,6 +7,7 @@
 
 import { Suspense } from 'react';
 import { LoginForm } from '@/src/components/auth/LoginForm';
+import { AppLogo } from '@/components/AppLogo';
 
 function LoginFormWrapper() {
   return (
@@ -32,7 +33,9 @@ export default function LoginPage() {
           </svg>
         </div>
         <div className="relative z-10 flex flex-col justify-center px-12 xl:px-20 text-white">
-          <h1 className="text-4xl xl:text-5xl font-bold mb-6 tracking-tight">Todo App</h1>
+          <div className="flex items-center mb-6">
+            <AppLogo size="xl" permanentWhite={true} />
+          </div>
           <p className="text-xl text-slate-300 mb-8 leading-relaxed">
             Manage your tasks efficiently and boost your productivity with our intuitive task management platform.
           </p>
@@ -69,7 +72,7 @@ export default function LoginPage() {
       <div className="flex-1 flex items-center justify-center p-8 bg-gray-50 dark:bg-gray-900">
         <div className="w-full max-w-md">
           <div className="lg:hidden mb-8 text-center">
-            <h1 className="text-2xl font-bold text-gray-900 dark:text-white tracking-tight">Todo App</h1>
+            <AppLogo size="lg" permanentWhite={true} />
           </div>
           <div className="bg-white dark:bg-gray-800 rounded-lg shadow-sm border border-gray-200 dark:border-gray-700 p-8">
             <h2 className="text-2xl font-bold text-gray-900 dark:text-white mb-2">Welcome back</h2>
