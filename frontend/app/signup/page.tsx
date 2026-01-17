@@ -6,6 +6,7 @@
 'use client';
 
 import { SignupForm } from '@/src/components/auth/SignupForm';
+import { AppLogo } from '@/components/AppLogo';
 
 export default function SignupPage() {
   return (
@@ -23,7 +24,9 @@ export default function SignupPage() {
             </svg>
           </div>
           <div className="relative z-10 flex flex-col justify-center px-12 xl:px-20 text-white">
-            <h1 className="text-4xl xl:text-5xl font-bold mb-6 tracking-tight">Todo App</h1>
+            <div className="flex items-center mb-6">
+              <AppLogo size="xl" permanentWhite={true} />
+            </div>
             <p className="text-xl text-slate-300 mb-8 leading-relaxed">
               Create your account and start organizing your tasks to boost your productivity.
             </p>
@@ -60,7 +63,7 @@ export default function SignupPage() {
         <div className="flex-1 flex items-center justify-center p-8 bg-gray-50 dark:bg-gray-900">
           <div className="w-full max-w-md">
             <div className="lg:hidden mb-8 text-center">
-              <h1 className="text-2xl font-bold text-gray-900 dark:text-white tracking-tight">Todo App</h1>
+              <AppLogo size="lg" permanentWhite={true} />
             </div>
             <div className="bg-white dark:bg-gray-800 rounded-lg shadow-sm border border-gray-200 dark:border-gray-700 p-8">
               <SignupForm />
