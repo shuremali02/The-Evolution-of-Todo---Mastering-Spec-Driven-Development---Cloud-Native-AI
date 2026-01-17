@@ -11,7 +11,11 @@ export const metadata: Metadata = {
   title: 'Hackathon Todo',
   description: 'Multi-user task management application with JWT authentication',
   icons: {
-    icon: '/favicon.ico',
+    icon: [
+      { url: '/favicon.ico', sizes: '32x32' },
+      { url: '/favicon.svg', type: 'image/svg+xml' },
+      { url: '/favicon-16x16.svg', sizes: '16x16', type: 'image/svg+xml' }
+    ],
   },
 }
 
