@@ -24,7 +24,7 @@ export function PublicPageLayout({
   return (
     <div className="min-h-screen flex flex-col bg-white dark:bg-gray-900">
       <PublicNavbar fullWidth={fullWidth} />
-      <main className={`${fullWidth ? '' : 'max-w-7xl mx-auto'} px-4 sm:px-6 lg:px-8 w-full flex-grow`}>
+      <main className={`${fullWidth ? 'w-full' : 'max-w-7xl mx-auto'} px-4 sm:px-6 lg:px-8 w-full flex-grow`}>
         {showBreadcrumbs && <Breadcrumb items={breadcrumbs} />}
         {children}
       </main>

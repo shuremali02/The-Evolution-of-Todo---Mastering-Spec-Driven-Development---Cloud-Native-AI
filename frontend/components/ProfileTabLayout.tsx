@@ -7,7 +7,7 @@
 
 import { useState, useEffect } from 'react';
 import { useSearchParams, useRouter } from 'next/navigation';
-import { UserProfile } from '@/src/components/auth/UserProfile';
+import { EnhancedProfile } from '@/components/EnhancedProfile';
 import { PasswordChangeForm } from '@/src/components/auth/PasswordChangeForm';
 import { EmailUpdateForm } from '@/src/components/auth/EmailUpdateForm';
 import { apiClient } from '@/lib/api';
@@ -125,7 +125,7 @@ export function ProfileTabLayout({ initialSection = 'profile' }: ProfileTabLayou
             {activeSection === 'profile' && (
               <div>
                 <h2 className="text-lg font-medium text-gray-900 dark:text-white mb-4">Profile Information</h2>
-                <UserProfile user={userData || undefined} />
+                <EnhancedProfile user={userData || undefined} />
               </div>
             )}
 

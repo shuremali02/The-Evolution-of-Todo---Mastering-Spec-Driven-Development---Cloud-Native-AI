@@ -8,13 +8,17 @@ import type { Task, TaskCreate, TaskUpdate } from '../types/task'
 import type { UserProfile } from '../types/auth'
 import type { DashboardStats, RecentActivityItem, UpcomingDeadlineItem, DashboardResponse } from '../types/dashboard'
 
-const DEFAULT_DEV_API_URL = 'http://localhost:8000/api/v1'
-const DEFAULT_PROD_API_URL = 'https://shurem-todo-app.hf.space/api/v1'  // Your backend URL
+const DEFAULT_DEV_API_URL_V1 = 'http://localhost:8000/api/v1'
+const DEFAULT_DEV_CHAT_API_URL = 'http://localhost:8000/api/v1'  // Chat API URL (same as backend)
+const DEFAULT_PROD_API_URL_V1 = 'https://shurem-todo-app.hf.space/api/v1'  // Your backend URL
+const DEFAULT_PROD_CHAT_API_URL = 'https://shurem-todo-app.hf.space/api/v1'  // Chat API URL (same as backend)
 
-function getApiUrl(): string {
+function getApiUrl(version: 'v1' | 'chat' = 'v1'): string {
   // Use environment variable if available
-  if (process.env.NEXT_PUBLIC_API_URL) {
+  if (version === 'v1' && process.env.NEXT_PUBLIC_API_URL) {
     return process.env.NEXT_PUBLIC_API_URL
+  } else if (version === 'chat' && process.env.NEXT_PUBLIC_CHAT_API_URL) {
+    return process.env.NEXT_PUBLIC_CHAT_API_URL
   }
 
   // For production deployments, use the backend API URL
@@ -22,13 +26,19 @@ function getApiUrl(): string {
   if (typeof window !== 'undefined') {
     // In production, use your actual backend URL
     // For development, default to localhost
-    return process.env.NODE_ENV === 'production'
-      ? DEFAULT_PROD_API_URL  // Using your actual backend URL
-      : DEFAULT_DEV_API_URL
+    if (version === 'v1') {
+      return process.env.NODE_ENV === 'production'
+        ? DEFAULT_PROD_API_URL_V1  // Using your actual backend URL
+        : DEFAULT_DEV_API_URL_V1
+    } else { // chat version
+      return process.env.NODE_ENV === 'production'
+        ? DEFAULT_PROD_CHAT_API_URL  // Using your actual backend URL
+        : DEFAULT_DEV_CHAT_API_URL
+    }
   }
 
   // For server-side rendering, use environment variable or default to dev URL
-  return DEFAULT_DEV_API_URL
+  return version === 'v1' ? DEFAULT_DEV_API_URL_V1 : DEFAULT_DEV_CHAT_API_URL
 }
 
 /**
@@ -37,9 +47,11 @@ function getApiUrl(): string {
  */
 class ApiClient {
   private baseURL: string
+  private apiVersion: 'v1' | 'chat'
 
-  constructor(baseURL?: string) {
-    this.baseURL = baseURL || getApiUrl()
+  constructor(baseURL?: string, apiVersion: 'v1' | 'chat' = 'v1') {
+    this.baseURL = baseURL || getApiUrl(apiVersion)
+    this.apiVersion = apiVersion
   }
 
   /**
@@ -75,6 +87,14 @@ class ApiClient {
    * @throws Error if request fails
    */
   async request<T = any>(endpoint: string, options: RequestInit = {}): Promise<T> {
+    // Determine the correct base URL based on the endpoint
+    let effectiveBaseURL = this.baseURL;
+
+    // If the endpoint starts with /chat, use the chat API URL
+    if (endpoint.startsWith('/chat')) {
+      effectiveBaseURL = getApiUrl('chat');
+    }
+
     const token = this.getToken()
 
     const headers: HeadersInit = {
@@ -83,7 +103,7 @@ class ApiClient {
       ...options.headers,
     }
 
-    const response = await fetch(`${this.baseURL}${endpoint}`, {
+    const response = await fetch(`${effectiveBaseURL}${endpoint}`, {
       ...options,
       headers,
     })
@@ -362,6 +382,40 @@ class ApiClient {
     })
   }
 
+  // ========== Chat API Methods ==========
+
+  /**
+   * Send a message to the AI chatbot.
+   * Task: T032
+   * Spec: 010-ai-chatbot - Chat API endpoint
+   */
+  async sendMessage(conversationId: string | null, message: string) {
+    return this.request('/chat', {
+      method: 'POST',
+      body: JSON.stringify({
+        conversation_id: conversationId || undefined,
+        message: message
+      }),
+    })
+  }
+
+  /**
+   * Get conversation history.
+   * Task: T032
+   * Spec: 010-ai-chatbot - Chat API endpoint
+   */
+  async getConversationHistory(conversationId: string) {
+    return this.request(`/chat/conversations/${conversationId}`)
+  }
+
+  /**
+   * List user's conversations.
+   * Task: T032
+   * Spec: 010-ai-chatbot - Chat API endpoint
+   */
+  async listConversations() {
+    return this.request('/chat/conversations')
+  }
 
   // ========== Dashboard API Methods ==========
 

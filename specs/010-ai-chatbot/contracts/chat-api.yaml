@@ -1,0 +1,118 @@
+# OpenAPI Specification: AI Chatbot API
+
+## Chat Endpoint
+
+```yaml
+openapi: 3.0.0
+info:
+  title: AI Chatbot API
+  version: 1.0.0
+  description: API for AI-powered chatbot for todo management
+
+paths:
+  /api/chat:
+    post:
+      summary: Send message to AI chatbot
+      description: Process user message and return AI response with tool calls
+      security:
+        - BearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                conversation_id:
+                  type: integer
+                  description: Existing conversation ID (creates new if not provided)
+                  nullable: true
+                message:
+                  type: string
+                  description: User's natural language message
+                  example: "Add a task to buy groceries"
+              required:
+                - message
+      responses:
+        '200':
+          description: Successful response from AI chatbot
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  conversation_id:
+                    type: integer
+                    description: The conversation ID
+                  response:
+                    type: string
+                    description: AI assistant's response
+                    example: "Created task: Buy groceries"
+                  tool_calls:
+                    type: array
+                    items:
+                      type: object
+                      properties:
+                        name:
+                          type: string
+                          description: Name of the MCP tool called
+                        arguments:
+                          type: object
+                          description: Arguments passed to the tool
+                  tool_responses:
+                    type: array
+                    items:
+                      type: object
+                      properties:
+                        tool_call_id:
+                          type: string
+                          description: ID of the tool call
+                        output:
+                          type: object
+                          description: Output from the tool execution
+        '401':
+          description: Unauthorized - Invalid or missing JWT token
+        '422':
+          description: Unprocessable Entity - Invalid request parameters
+        '500':
+          description: Internal Server Error
+
+components:
+  securitySchemes:
+    BearerAuth:
+      type: http
+      scheme: bearer
+      bearerFormat: JWT
+
+security:
+  - BearerAuth: []
+```
+
+## MCP Tools API
+
+The MCP server exposes the following tools for the AI agent:
+
+### add_task Tool
+- Purpose: Create a new task
+- Parameters: user_id (string, required), title (string, required), description (string, optional)
+- Returns: task_id, status, title
+
+### list_tasks Tool
+- Purpose: Retrieve tasks from the list
+- Parameters: user_id (string, required), status (string, optional: "all", "pending", "completed")
+- Returns: Array of task objects
+
+### complete_task Tool
+- Purpose: Mark a task as complete
+- Parameters: user_id (string, required), task_id (integer, required)
+- Returns: task_id, status, title
+
+### delete_task Tool
+- Purpose: Remove a task from the list
+- Parameters: user_id (string, required), task_id (integer, required)
+- Returns: task_id, status, title
+
+### update_task Tool
+- Purpose: Modify task title or description
+- Parameters: user_id (string, required), task_id (integer, required), title (string, optional), description (string, optional)
+- Returns: task_id, status, title
