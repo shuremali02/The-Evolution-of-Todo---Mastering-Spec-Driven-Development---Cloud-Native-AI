@@ -13,6 +13,8 @@ import uuid
 
 if TYPE_CHECKING:
     from app.models.task import Task
+    from app.models.conversation import Conversation
+    from app.models.message import Message
 
 
 class User(SQLModel, table=True):
@@ -64,5 +66,7 @@ class User(SQLModel, table=True):
         description="Last modification timestamp"
     )
 
-    # Relationship to tasks
+    # Relationships to related entities
     tasks: List["Task"] = Relationship(back_populates="user")
+    conversations: List["Conversation"] = Relationship(back_populates="user")
+    messages: List["Message"] = Relationship(back_populates="user")

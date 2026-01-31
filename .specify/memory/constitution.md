@@ -272,18 +272,39 @@ Agents MUST enforce the SDD pipeline:
 
 The following technologies and patterns are DEFERRED to future phases:
 
-- **Phase-3+**: AI chatbot integration, conversational UI
 - **Phase-4+**: Microservices, service mesh, Dapr
 - **Phase-5+**: Kafka, event streaming, message brokers
 - **Phase-6+**: Kubernetes, container orchestration, cloud deployment
-- **Phase-7+**: MCP (Model Context Protocol) integrations, agent-to-agent communication
+- **Phase-7+**: Advanced agent-to-agent communication beyond MCP
 - **Phase-8+**: Distributed systems, multi-region deployments, production hardening
 
-### Section 7.2 - Scope Rejection
+### Section 7.2 - Phase 3 Technologies (NOW PERMITTED)
+
+With the completion of Phase 2, the following technologies and patterns are NOW PERMITTED for Phase 3:
+
+- **AI Chatbot Integration**: OpenAI Agents SDK, conversational UI
+- **MCP (Model Context Protocol)**: Official MCP SDK, MCP tools
+- **OpenAI ChatKit**: Frontend chat interface
+- **AI-Powered Task Management**: Natural language processing for todo operations
+- **Stateless Conversation Architecture**: Database-persisted conversation state
+- **MCP Server Architecture**: Official MCP SDK with exposed task operation tools
+
+### Section 7.3 - Scope Transition
+
+Phase 3 is now active and focused on:
+- Building an AI-powered chatbot for todo management
+- Implementing MCP server architecture
+- Creating natural language interfaces
+- Integrating OpenAI Agents with existing task management system
+- Maintaining compatibility with existing Phase 2 authentication (Better Auth)
+
+Phase 2 (full-stack web application) is COMPLETE. All new work should align with Phase 3 objectives.
+
+### Section 7.4 - Scope Rejection
 
 Any request to implement technologies or patterns from future phases MUST be rejected with:
 - Clear citation of this Article (VII)
-- Explanation that Phase-2 is focused on full-stack web application
+- Explanation that Phase-3 is focused on AI chatbot with MCP architecture
 - Guidance that the feature belongs to a later phase
 
 Agents MUST NOT implement "simple versions" or "prototypes" of future-phase technologies.

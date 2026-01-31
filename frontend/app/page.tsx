@@ -71,7 +71,7 @@ export default function LandingPage() {
   ];
 
   return (
-    <PublicPageLayout breadcrumbs={[]} showBreadcrumbs={false} fullWidth={true}>
+    <PublicPageLayout breadcrumbs={[]} showBreadcrumbs={false} fullWidth={false}>
       {/* Hero Section */}
       <Hero
         headline="Transform Your Productivity"
@@ -94,7 +94,7 @@ export default function LandingPage() {
         className="py-16 bg-gray-50 dark:bg-gray-800"
         aria-labelledby="features-heading"
       >
-        <div className="w-full px-4 sm:px-6 lg:px-8">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <FadeInWhenVisible
             className="text-center mb-4"
             distance={30}
@@ -115,7 +115,7 @@ export default function LandingPage() {
             Everything you need to stay organized and get things done
           </FadeInWhenVisible>
 
-          <div className="w-full grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
             {features.map((feature, index) => (
               <FeatureCard
                 key={feature.title}

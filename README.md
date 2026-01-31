@@ -6,11 +6,11 @@ A spec-driven multi-user task management web application built with Next.js, Fas
 
 This project demonstrates **Spec-Driven Development (SDD)** using Spec-Kit Plus methodology. Every feature is specified before implementation, and all code traces to specifications.
 
-### Current Phase: Phase-2 (Full-Stack Web)
+### Current Phase: Phase-3 (AI Chatbot Integration)
 
 - **Phase-1** (✅ Completed): CLI Todo App - Process validation
-- **Phase-2** (🚧 Current): Full-Stack Web App - Multi-user system
-- **Phase-3** (🔮 Future): AI Chatbot Integration
+- **Phase-2** (✅ Completed): Full-Stack Web App - Multi-user system
+- **Phase-3** (🚀 Current): AI Chatbot Integration
 
 ## Technology Stack
 
@@ -206,6 +206,77 @@ Use `@specs/...` pattern:
 - `@specs/ui/pages.md` - UI pages
 - `@specs/ui/components.md` - UI components
 
+## Phase-3 Features (AI Chatbot)
+
+### Implemented
+- ✅ AI-powered chatbot for task management
+- ✅ Natural language processing for task operations
+- ✅ MCP (Model Context Protocol) server architecture
+- ✅ OpenAI Agents SDK integration
+- ✅ MCP tools for task operations (add, list, complete, delete, update)
+- ✅ Conversation persistence in database
+- ✅ JWT authentication with user isolation
+- ✅ ChatKit-like frontend interface
+- ✅ Stateless server architecture for scalability
+- ✅ Complete task management via natural language
+
+### Features
+- **Natural Language Processing**: Communicate with the AI assistant using plain English
+- **Task Management**: Add, list, complete, update, and delete tasks
+- **Conversation Persistence**: Maintain conversation history in the database
+- **User Isolation**: Secure data separation between users
+- **JWT Authentication**: Secure API access with token validation
+
+### Architecture
+```
+┌─────────────────┐     ┌──────────────────────────────────────────────┐     ┌─────────────────┐
+│                 │     │              FastAPI Server                   │     │                 │
+│                 │     │  ┌────────────────────────────────────────┐  │     │                 │
+│  ChatKit UI     │────▶│  │         Chat Endpoint                  │  │     │    Neon DB      │
+│  (Frontend)     │     │  │  POST /api/chat                        │  │     │  (PostgreSQL)   │
+│                 │     │  └───────────────┬────────────────────────┘  │     │                 │
+│                 │     │                  │                           │     │  - tasks        │
+│                 │     │                  ▼                           │     │  - conversations│
+│                 │     │  ┌────────────────────────────────────────┐  │     │  - messages     │
+│                 │◀────│  │      OpenAI Agents SDK                 │  │     │                 │
+│                 │     │  │      (Agent + Runner)                  │  │     │                 │
+│                 │     │  └───────────────┬────────────────────────┘  │     │                 │
+│                 │     │                  │                           │     │                 │
+│                 │     │                  ▼                           │     │                 │
+│                 │     │  ┌────────────────────────────────────────┐  │────▶│                 │
+│                 │     │  │         MCP Server                 │  │     │                 │
+│                 │     │  │  (MCP Tools for Task Operations)       │  │◀────│                 │
+│                 │     │  └────────────────────────────────────────┘  │     │                 │
+└─────────────────┘     └──────────────────────────────────────────────┘     └─────────────────┘
+```
+
+### MCP Tools
+The system exposes the following MCP tools for the AI agent:
+- `add_task`: Create a new task
+- `list_tasks`: Retrieve tasks from the list
+- `complete_task`: Mark a task as complete
+- `delete_task`: Remove a task from the list
+- `update_task`: Modify task title or description
+
+### API Endpoints
+- `POST /api/chat`: Send message & get AI response
+
+### Natural Language Commands
+The chatbot understands various commands:
+- "Add a task to buy groceries" → Creates a new task
+- "Show me all my tasks" → Lists all tasks
+- "What's pending?" → Lists pending tasks
+- "Mark task 3 as complete" → Completes task #3
+- "Delete the meeting task" → Deletes specified task
+- "Change task 1 to 'Call mom tonight'" → Updates task title
+
+### Technology Stack
+- **Frontend**: OpenAI ChatKit, Next.js 14+, TypeScript, Tailwind CSS
+- **Backend**: Python FastAPI, SQLModel, Neon Serverless PostgreSQL
+- **AI Framework**: OpenAI Agents SDK
+- **MCP Server**: Official MCP SDK
+- **Authentication**: Better Auth with JWT tokens
+
 ## Phase-2 Features
 
 ### Implemented (To Be Built)
@@ -217,7 +288,6 @@ Use `@specs/...` pattern:
 - ✅ Responsive web UI
 
 ### Out of Scope (Phase-2)
-- ❌ AI chatbot (Phase-3)
 - ❌ Task categories/tags
 - ❌ Task search and filtering
 - ❌ Email verification

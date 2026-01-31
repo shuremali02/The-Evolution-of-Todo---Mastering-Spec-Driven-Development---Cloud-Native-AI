@@ -1,0 +1,194 @@
+# API Contracts: Phase III Chatbot Issues Fixes
+
+## Fixed Chat Endpoint
+
+### POST /api/v1/chat
+Process a chat message through the AI agent with proper authentication.
+
+**Headers**:
+- `Authorization: Bearer <jwt_token>` (required)
+- `Content-Type: application/json` (required)
+
+**Request Body**:
+```json
+{
+  "conversation_id": "string (optional)",
+  "message": "string (required, min 1 char, max 5000 chars)"
+}
+```
+
+**Response (200 OK)**:
+```json
+{
+  "conversation_id": "string",
+  "response": "string",
+  "tool_calls": "array of objects"
+}
+```
+
+**Error Responses**:
+- `401 Unauthorized`: Invalid or missing JWT token
+- `422 Unprocessable Entity`: Validation error in request body
+- `500 Internal Server Error`: Server error during processing
+
+## Conversation Management Endpoints
+
+### GET /api/v1/chat/conversations
+List all conversations for the authenticated user.
+
+**Headers**:
+- `Authorization: Bearer <jwt_token>` (required)
+
+**Response (200 OK)**:
+```json
+{
+  "conversations": [
+    {
+      "id": "string",
+      "created_at": "ISO 8601 timestamp",
+      "updated_at": "ISO 8601 timestamp"
+    }
+  ]
+}
+```
+
+### GET /api/v1/chat/conversations/{conversation_id}
+Get the history of a specific conversation.
+
+**Headers**:
+- `Authorization: Bearer <jwt_token>` (required)
+
+**Response (200 OK)**:
+```json
+{
+  "conversation_id": "string",
+  "history": [
+    {
+      "role": "user|assistant",
+      "content": "string",
+      "timestamp": "ISO 8601 timestamp",
+      "tool_calls": "array or null",
+      "tool_responses": "array or null"
+    }
+  ]
+}
+```
+
+### DELETE /api/v1/chat/conversations/{conversation_id}
+Delete a specific conversation.
+
+**Headers**:
+- `Authorization: Bearer <jwt_token>` (required)
+
+**Response (200 OK)**:
+```json
+{
+  "detail": "Conversation deleted successfully"
+}
+```
+
+## MCP Tool Contracts
+
+### add_task Tool
+**Purpose**: Create a new task in the user's task list
+
+**Input Parameters**:
+```json
+{
+  "user_id": "string (required)",
+  "title": "string (required)",
+  "description": "string (optional)"
+}
+```
+
+**Output**:
+```json
+{
+  "task_id": "string",
+  "status": "created",
+  "title": "string"
+}
+```
+
+### list_tasks Tool
+**Purpose**: Retrieve tasks from the user's task list
+
+**Input Parameters**:
+```json
+{
+  "user_id": "string (required)",
+  "status": "string (optional: all|pending|completed)"
+}
+```
+
+**Output**:
+```json
+[
+  {
+    "id": "string",
+    "title": "string",
+    "completed": "boolean"
+  }
+]
+```
+
+### complete_task Tool
+**Purpose**: Mark a task as complete in the user's task list
+
+**Input Parameters**:
+```json
+{
+  "user_id": "string (required)",
+  "task_id": "string (required)"
+}
+```
+
+**Output**:
+```json
+{
+  "task_id": "string",
+  "status": "completed",
+  "title": "string"
+}
+```
+
+### delete_task Tool
+**Purpose**: Delete a task from the user's task list
+
+**Input Parameters**:
+```json
+{
+  "user_id": "string (required)",
+  "task_id": "string (required)"
+}
+```
+
+**Output**:
+```json
+{
+  "task_id": "string",
+  "status": "deleted"
+}
+```
+
+### update_task Tool
+**Purpose**: Update a task in the user's task list
+
+**Input Parameters**:
+```json
+{
+  "user_id": "string (required)",
+  "task_id": "string (required)",
+  "title": "string (optional)",
+  "description": "string (optional)"
+}
+```
+
+**Output**:
+```json
+{
+  "task_id": "string",
+  "status": "updated",
+  "title": "string"
+}
+```
