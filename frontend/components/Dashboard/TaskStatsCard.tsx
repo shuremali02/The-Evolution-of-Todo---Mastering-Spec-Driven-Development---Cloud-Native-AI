@@ -45,7 +45,7 @@ export const TaskStatsCard: React.FC<TaskStatsCardProps> = ({ stats }) => {
   return (
     <div className="p-6">
       <div className="flex justify-between items-center mb-6">
-        <h2 className="text-xl font-semibold text-gray-900 dark:text-white">Task Overview</h2>
+        <h2 className="text-xl font-semibold text-gray-900 dark:text-white [text-shadow:_0_1px_2px_rgb(0_0_0_/_20%)] dark:[text-shadow:_0_1px_2px_rgb(0_0_0_/_10%)]">Task Overview</h2>
         <div className="flex space-x-2">
           <button className="px-3 py-1 text-sm bg-gray-100 dark:bg-gray-700 rounded-md text-gray-700 dark:text-gray-300 hover:bg-gray-200 dark:hover:bg-gray-600">
             Today
@@ -85,7 +85,7 @@ export const TaskStatsCard: React.FC<TaskStatsCardProps> = ({ stats }) => {
 
         <div>
           <div className="mb-6">
-            <h3 className="text-lg font-medium text-gray-900 dark:text-white mb-4">Completion Rate</h3>
+            <h3 className="text-lg font-medium text-gray-900 dark:text-white mb-4 [text-shadow:_0_1px_2px_rgb(0_0_0_/_20%)] dark:[text-shadow:_0_1px_2px_rgb(0_0_0_/_10%)]">Completion Rate</h3>
             <div className="w-full bg-gray-200 dark:bg-gray-700 rounded-full h-4">
               <div
                 className="bg-green-600 h-4 rounded-full"
@@ -93,7 +93,7 @@ export const TaskStatsCard: React.FC<TaskStatsCardProps> = ({ stats }) => {
               ></div>
             </div>
             <div className="mt-2 text-right">
-              <span className="text-lg font-semibold text-gray-900 dark:text-white">
+              <span className="text-lg font-semibold text-gray-900 dark:text-white [text-shadow:_0_1px_2px_rgb(0_0_0_/_20%)] dark:[text-shadow:_0_1px_2px_rgb(0_0_0_/_10%)]">
                 {completionPercentage}%
               </span>
             </div>
@@ -101,20 +101,20 @@ export const TaskStatsCard: React.FC<TaskStatsCardProps> = ({ stats }) => {
 
           <div className="grid grid-cols-2 gap-4">
             <div className="bg-blue-50 dark:bg-blue-900/20 rounded-lg p-4">
-              <p className="text-sm text-blue-800 dark:text-blue-200">Total Tasks</p>
-              <p className="text-2xl font-bold text-blue-600 dark:text-blue-400">{stats.total_tasks}</p>
+              <p className="text-sm text-blue-800 dark:text-blue-200 [text-shadow:_0_1px_2px_rgb(0_0_0_/_20%)] dark:[text-shadow:_0_1px_2px_rgb(0_0_0_/_10%)]">Total Tasks</p>
+              <p className="text-2xl font-bold text-blue-600 dark:text-blue-400 [text-shadow:_0_1px_2px_rgb(0_0_0_/_30%)] dark:[text-shadow:_0_1px_2px_rgb(0_0_0_/_20%)]">{stats.total_tasks}</p>
             </div>
             <div className="bg-green-50 dark:bg-green-900/20 rounded-lg p-4">
-              <p className="text-sm text-green-800 dark:text-green-200">Completed</p>
-              <p className="text-2xl font-bold text-green-600 dark:text-green-400">{stats.completed_tasks}</p>
+              <p className="text-sm text-green-800 dark:text-green-200 [text-shadow:_0_1px_2px_rgb(0_0_0_/_20%)] dark:[text-shadow:_0_1px_2px_rgb(0_0_0_/_10%)]">Completed</p>
+              <p className="text-2xl font-bold text-green-600 dark:text-green-400 [text-shadow:_0_1px_2px_rgb(0_0_0_/_30%)] dark:[text-shadow:_0_1px_2px_rgb(0_0_0_/_20%)]">{stats.completed_tasks}</p>
             </div>
             <div className="bg-yellow-50 dark:bg-yellow-900/20 rounded-lg p-4">
-              <p className="text-sm text-yellow-800 dark:text-yellow-200">Pending</p>
-              <p className="text-2xl font-bold text-yellow-600 dark:text-yellow-400">{stats.pending_tasks}</p>
+              <p className="text-sm text-yellow-800 dark:text-yellow-200 [text-shadow:_0_1px_2px_rgb(0_0_0_/_20%)] dark:[text-shadow:_0_1px_2px_rgb(0_0_0_/_10%)]">Pending</p>
+              <p className="text-2xl font-bold text-yellow-600 dark:text-yellow-400 [text-shadow:_0_1px_2px_rgb(0_0_0_/_30%)] dark:[text-shadow:_0_1px_2px_rgb(0_0_0_/_20%)]">{stats.pending_tasks}</p>
             </div>
             <div className="bg-red-50 dark:bg-red-900/20 rounded-lg p-4">
-              <p className="text-sm text-red-800 dark:text-red-200">Overdue</p>
-              <p className="text-2xl font-bold text-red-600 dark:text-red-400">{stats.overdue_tasks}</p>
+              <p className="text-sm text-red-800 dark:text-red-200 [text-shadow:_0_1px_2px_rgb(0_0_0_/_20%)] dark:[text-shadow:_0_1px_2px_rgb(0_0_0_/_10%)]">Overdue</p>
+              <p className="text-2xl font-bold text-red-600 dark:text-red-400 [text-shadow:_0_1px_2px_rgb(0_0_0_/_30%)] dark:[text-shadow:_0_1px_2px_rgb(0_0_0_/_20%)]">{stats.overdue_tasks}</p>
             </div>
           </div>
         </div>

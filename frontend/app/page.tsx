@@ -46,6 +46,11 @@ export default function LandingPage() {
       title: 'Team Collaboration',
       description: 'Share tasks, assign responsibilities, and work together seamlessly with your team.',
     },
+    {
+      icon: 'message-circle',
+      title: 'AI-Powered Assistance',
+      description: 'Get intelligent help with your tasks through our integrated AI chatbot. Ask questions, get suggestions, and boost productivity.',
+    },
   ];
 
   // How it works steps
@@ -85,7 +90,7 @@ export default function LandingPage() {
           label: 'Learn More',
           href: '#features',
         }}
-        fullWidth={true}
+        fullWidth={false}
       />
 
       {/* Features Section */}
@@ -112,7 +117,7 @@ export default function LandingPage() {
             distance={30}
             delay={0.1}
           >
-            Everything you need to stay organized and get things done
+            Everything you need to stay organized and get things done with AI-powered assistance
           </FadeInWhenVisible>
 
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">

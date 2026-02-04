@@ -9,7 +9,6 @@ import { ReactNode } from 'react'
 import { Breadcrumb } from '@/components/Breadcrumb'
 import { AuthGuard } from '@/components/AuthGuard'
 import { Navbar } from '@/components/Navbar'
-import { Providers } from '@/app/providers'
 import { useRouter } from 'next/navigation'
 import Footer from '@/components/Footer'
 
@@ -43,17 +42,15 @@ export function LayoutWrapper({
   }
 
   return (
-    <Providers>
-      <AuthGuard>
-        <div className="min-h-screen flex flex-col bg-gray-50 dark:bg-gray-900">
-          <Navbar onLogout={handleLogout} />
-          <main className={`${fullWidth ? '' : 'max-w-7xl mx-auto'} px-4 py-8 w-full flex-grow`}>
-            {showBreadcrumbs && <Breadcrumb items={breadcrumbs} />}
-            {children}
-          </main>
-          <Footer fullWidth={fullWidth} />
-        </div>
-      </AuthGuard>
-    </Providers>
+    <AuthGuard>
+      <div className="min-h-screen flex flex-col bg-gray-50 dark:bg-gray-900">
+        <Navbar onLogout={handleLogout} />
+        <main className={`${fullWidth ? '' : 'max-w-7xl mx-auto'} px-4 pt-24 pb-8 w-full flex-grow`}>
+          {showBreadcrumbs && <Breadcrumb items={breadcrumbs} />}
+          {children}
+        </main>
+        <Footer fullWidth={fullWidth} />
+      </div>
+    </AuthGuard>
   )
 }

@@ -1,0 +1,77 @@
+# UI Enhancement API Contract
+# This contract defines the API endpoints for UI enhancement features
+
+openapi: 3.0.0
+info:
+  title: UI Enhancement API
+  version: 1.0.0
+  description: API for managing UI enhancements and AI-powered visual elements
+
+paths:
+  /api/v1/ui-enhancements:
+    get:
+      summary: Get available UI enhancements
+      responses:
+        '200':
+          description: List of available UI enhancements
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  enhancements:
+                    type: array
+                    items:
+                      $ref: '#/components/schemas/UIEnhancement'
+
+  /api/v1/ai-insights/{taskId}:
+    get:
+      summary: Get AI insights for a specific task
+      parameters:
+        - name: taskId
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: AI insights for the task
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AITaskInsight'
+
+components:
+  schemas:
+    UIEnhancement:
+      type: object
+      properties:
+        id:
+          type: string
+        name:
+          type: string
+        type:
+          type: string
+          enum: [animation, visual, interaction, theme]
+        enabled:
+          type: boolean
+        priority:
+          type: number
+
+    AITaskInsight:
+      type: object
+      properties:
+        taskId:
+          type: string
+        priorityScore:
+          type: number
+          minimum: 0
+          maximum: 10
+        suggestions:
+          type: array
+          items:
+            type: string
+        confidence:
+          type: number
+          minimum: 0
+          maximum: 1

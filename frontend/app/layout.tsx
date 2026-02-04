@@ -1,6 +1,6 @@
 /**
- * Task: T036
- * Spec: Enhanced Chatbot UI with Floating Icon - Root layout with floating chat icon
+ * Task: T040, T044
+ * Spec: 012-AI-Powered UI Enhancements
  */
 
 import type { Metadata } from 'next'
@@ -8,8 +8,8 @@ import './globals.css'
 import { Providers } from './providers'
 
 export const metadata: Metadata = {
-  title: 'Hackathon Todo',
-  description: 'Multi-user task management application with JWT authentication',
+  title: 'AI-Powered Task Manager',
+  description: 'AI-enhanced multi-user task management application with intelligent features',
   icons: {
     icon: [
       { url: '/favicon.ico', sizes: '32x32' },
@@ -26,7 +26,7 @@ export default function RootLayout({
 }) {
   return (
     <html lang="en" className="light" suppressHydrationWarning={true}>
-      <body className="min-h-screen bg-white dark:bg-gray-900">
+      <body className="min-h-screen bg-gradient-ai">
         <Providers>
           {children}
         </Providers>

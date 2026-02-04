@@ -98,7 +98,7 @@ export const ActivityFeed: React.FC<ActivityFeedProps> = ({ activities }) => {
 
   return (
     <div className="p-6">
-      <h2 className="text-xl font-semibold text-gray-900 dark:text-white mb-6">Recent Activity</h2>
+      <h2 className="text-xl font-semibold text-gray-900 dark:text-white mb-6 [text-shadow:_0_1px_2px_rgb(0_0_0_/_20%)] dark:[text-shadow:_0_1px_2px_rgb(0_0_0_/_10%)]">Recent Activity</h2>
 
       {activities.length === 0 ? (
         <div className="text-center py-8">
@@ -112,11 +112,11 @@ export const ActivityFeed: React.FC<ActivityFeedProps> = ({ activities }) => {
                 <div className="flex space-x-3">
                   {getActivityIcon(item.type)}
                   <div className="flex-1 min-w-0">
-                    <p className="text-sm text-gray-900 dark:text-white truncate">
+                    <p className="text-sm text-gray-900 dark:text-white truncate [text-shadow:_0_1px_2px_rgb(0_0_0_/_20%)] dark:[text-shadow:_0_1px_2px_rgb(0_0_0_/_10%)]">
                       {getActivityText(item)}
                     </p>
                     <div className="flex items-center mt-1">
-                      <p className="text-xs text-gray-500 dark:text-gray-400">
+                      <p className="text-xs text-gray-500 dark:text-gray-400 [text-shadow:_0_1px_2px_rgb(0_0_0_/_30%)] dark:[text-shadow:_0_1px_2px_rgb(0_0_0_/_15%)]">
                         {formatDistanceToNow(new Date(item.timestamp), { addSuffix: true })}
                       </p>
                       <span className={`ml-2 inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${getPriorityColor(item.priority)}`}>

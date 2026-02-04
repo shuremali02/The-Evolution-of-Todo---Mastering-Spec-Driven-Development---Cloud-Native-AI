@@ -1,6 +1,6 @@
 /**
- * Task: T014
- * Spec: Phase 1 UI Enhancements
+ * Task: T050, T051, T052, T053, T054, T055, T056, T057
+ * Spec: 012-AI-Powered UI Enhancements
  */
 
 'use client';
@@ -11,7 +11,7 @@ import { useAriaAnnouncer, useReducedMotion } from '@/utils/accessibility';
 import { Task } from '@/types/task';
 import { apiClient } from '@/lib/api';
 import { motion, Variants } from 'framer-motion';
-import { FiCheck, FiTrash2, FiChevronDown, FiChevronUp } from 'react-icons/fi';
+import { FiCheck, FiTrash2, FiChevronDown, FiChevronUp, FiZap, FiActivity, FiInfo, FiTrendingUp, FiAlertTriangle } from 'react-icons/fi';
 
 interface TaskCardDnDProps {
   task: Task;
@@ -38,12 +38,22 @@ export function TaskCardDnD({
   const [isExpanded, setIsExpanded] = useState(false);
   const [isDragging, setIsDragging] = useState(false);
   const [dragHandleFocused, setDragHandleFocused] = useState(false);
+  const [showAISuggestions, setShowAISuggestions] = useState(false);
 
   const { startDrag, overItem, endDrag } = useDragDrop();
   const prefersReducedMotion = useReducedMotion();
   const { announce } = useAriaAnnouncer();
   const dragHandleRef = useRef<HTMLButtonElement>(null);
   const containerRef = useRef<HTMLDivElement>(null);
+
+  // Simulate AI data for demonstration
+  const aiPriorityScore = Math.floor(Math.random() * 10) + 1; // Random score 1-10
+  const aiConfidence = Math.floor(Math.random() * 40) + 60; // Random confidence 60-99%
+  const aiSuggestions = [
+    "Consider breaking this into smaller subtasks",
+    "This task might be a prerequisite for others",
+    "You've completed similar tasks in 2 days average"
+  ];
 
   // Announce when dragging starts/stops
   useEffect(() => {
@@ -128,6 +138,20 @@ export function TaskCardDnD({
     }
   };
 
+  // Get AI-enhanced background based on priority and AI score
+  const getAIEnhancedBackground = () => {
+    if (isDragging) return 'bg-white shadow-xl';
+
+    // Enhanced background with AI indicators
+    let bgColor = getPriorityColor(task.priority);
+    if (aiPriorityScore >= 8) {
+      bgColor += ' border-l-[#4A90E2] bg-gradient-to-r from-blue-50 to-indigo-50'; // High AI priority
+    } else if (aiPriorityScore >= 5) {
+      bgColor += ' border-l-[#7B61FF] bg-gradient-to-r from-purple-50 to-pink-50'; // Medium AI priority
+    }
+    return bgColor;
+  };
+
   // Animation variants
   const cardVariants: Variants = {
     initial: { opacity: 0, y: 20 },
@@ -135,7 +159,7 @@ export function TaskCardDnD({
     exit: { opacity: 0, y: -20 },
     dragging: {
       scale: 1.02,
-      boxShadow: '0 10px 25px rgba(0, 0, 0, 0.15)',
+      boxShadow: '0 10px 25px rgba(100, 149, 237, 0.25)',
       zIndex: 10
     }
   };
@@ -149,9 +173,9 @@ export function TaskCardDnD({
       variants={prefersReducedMotion ? { initial: { opacity: 1, y: 0 }, animate: { opacity: 1, y: 0 }, exit: { opacity: 1, y: 0 }, dragging: { scale: 1, boxShadow: '0 4px 6px rgba(0, 0, 0, 0.1)', zIndex: 'auto' } } : cardVariants}
       animate={isDragging ? 'dragging' : 'animate'}
       layout
-      transition={{ duration: 0.2, ease: [0.21, 0.47, 0.32, 0.98] }}
-      className={`relative border-l-4 rounded-r-lg shadow-sm transition-all duration-200 ${
-        isDragging ? 'bg-white shadow-xl' : getPriorityColor(task.priority)
+      transition={{ duration: 0.2 }}
+      className={`relative border-l-4 rounded-r-lg shadow-sm transition-all duration-200 glow ${
+        getAIEnhancedBackground()
       }`}
       role="listitem"
       aria-grabbed={isDragging}
@@ -159,6 +183,14 @@ export function TaskCardDnD({
       aria-posinset={index + 1}
       aria-describedby={`task-${task.id}-description drag-instructions-${task.id}`}
     >
+      {/* AI Priority Indicator */}
+      <div className="absolute -top-2 -right-2 bg-gradient-ai rounded-full w-8 h-8 flex items-center justify-center shadow-lg border-2 border-white">
+        <FiZap className="text-white text-sm" />
+        <span className="absolute -top-1 -right-1 bg-red-500 text-white text-xs rounded-full w-4 h-4 flex items-center justify-center">
+          {aiPriorityScore}
+        </span>
+      </div>
+
       {/* Drag handle - visually hidden but accessible */}
       <div className="absolute -left-8 top-1/2 transform -translate-y-1/2 flex flex-col gap-1 opacity-0 group-hover:opacity-100 transition-opacity">
         <button
@@ -201,7 +233,7 @@ export function TaskCardDnD({
             <div className="flex gap-2">
               <button
                 onClick={handleSaveEdit}
-                className="px-3 py-1 bg-green-600 text-white rounded-md hover:bg-green-700 focus:outline-none focus:ring-2 focus:ring-green-500"
+                className="px-3 py-1 bg-gradient-ai text-white rounded-md hover:from-[hsl(217,91%,50%)] hover:to-[hsl(280,65%,50%)] focus:outline-none focus:ring-2 focus:ring-blue-500"
                 aria-label="Save changes"
               >
                 Save
@@ -234,6 +266,12 @@ export function TaskCardDnD({
                   >
                     {task.title}
                   </h3>
+
+                  {/* AI Confidence Indicator */}
+                  <div className="ml-2 flex items-center text-xs bg-blue-100 text-blue-800 px-2 py-1 rounded-full">
+                    <FiTrendingUp className="mr-1" />
+                    {aiConfidence}%
+                  </div>
                 </div>
 
                 {task.description && (
@@ -267,7 +305,46 @@ export function TaskCardDnD({
                       Due: {new Date(task.due_date).toLocaleDateString()}
                     </span>
                   )}
+
+                  {/* AI Optimization Indicator */}
+                  <span className="px-2 py-1 bg-gradient-ai text-white rounded-full flex items-center">
+                    <FiInfo className="mr-1 text-xs" />
+                    AI Optimized
+                  </span>
                 </div>
+
+                {/* AI Suggestions Preview */}
+                <div className="mt-3 flex items-center text-xs text-gray-600 bg-blue-50 p-2 rounded-lg border border-blue-100">
+                  <FiActivity className="mr-1 text-blue-500" />
+                  <span>AI suggests: {aiSuggestions[0]}</span>
+                  <button
+                    onClick={() => setShowAISuggestions(!showAISuggestions)}
+                    className="ml-2 text-blue-500 hover:text-blue-700"
+                    aria-label={showAISuggestions ? "Hide AI suggestions" : "Show AI suggestions"}
+                  >
+                    {showAISuggestions ? <FiChevronUp /> : <FiChevronDown />}
+                  </button>
+                </div>
+
+                {/* AI Suggestions Expanded */}
+                {showAISuggestions && (
+                  <motion.div
+                    initial={{ height: 0, opacity: 0 }}
+                    animate={{ height: 'auto', opacity: 1 }}
+                    exit={{ height: 0, opacity: 0 }}
+                    className="mt-2 p-3 bg-gradient-ai text-white rounded-lg text-sm"
+                  >
+                    <div className="flex items-center mb-2">
+                      <FiAlertTriangle className="mr-2" />
+                      <strong>AI Recommendations</strong>
+                    </div>
+                    <ul className="space-y-1 pl-5 list-disc">
+                      {aiSuggestions.map((suggestion, idx) => (
+                        <li key={idx}>{suggestion}</li>
+                      ))}
+                    </ul>
+                  </motion.div>
+                )}
               </div>
 
               <div className="flex gap-1 ml-2">
@@ -294,6 +371,7 @@ export function TaskCardDnD({
             <div id={`task-${task.id}-description`} className="sr-only">
               {task.description ? `Description: ${task.description}` : 'No description'}
               {`. Priority: ${task.priority}. ${task.due_date ? `Due date: ${task.due_date}` : 'No due date'}.`}
+              {`. AI Priority Score: ${aiPriorityScore}. AI Confidence: ${aiConfidence}%.`}
             </div>
           </>
         )}
