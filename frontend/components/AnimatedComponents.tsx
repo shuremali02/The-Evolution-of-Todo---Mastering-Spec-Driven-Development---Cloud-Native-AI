@@ -36,7 +36,6 @@ export function AnimatedDiv({
       transition: {
         duration,
         delay,
-        ease: [0.21, 0.47, 0.32, 0.98] as const, // Custom easing for smooth animation
       },
     },
     exit: {
@@ -45,7 +44,6 @@ export function AnimatedDiv({
       y: direction === 'up' ? 20 : direction === 'down' ? -20 : 0,
       transition: {
         duration: duration * 0.8,
-        ease: [0.21, 0.47, 0.32, 0.98] as const,
       },
     },
   };
@@ -97,7 +95,6 @@ export function AnimatedList({
               transition: {
                 delay: delay + i * stagger,
                 duration: 0.3,
-                ease: [0.21, 0.47, 0.32, 0.98],
               },
             }),
           }}
@@ -134,7 +131,6 @@ export function AnimatedListItem({
           transition={{
             delay: index * stagger,
             duration: 0.3,
-            ease: [0.21, 0.47, 0.32, 0.98],
           }}
           className={className}
         >

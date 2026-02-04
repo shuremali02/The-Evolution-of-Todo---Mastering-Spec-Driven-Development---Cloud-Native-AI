@@ -57,7 +57,7 @@ export const DeadlineList: React.FC<DeadlineListProps> = ({ deadlines }) => {
 
   return (
     <div className="p-6">
-      <h2 className="text-xl font-semibold text-gray-900 dark:text-white mb-6">Upcoming Deadlines</h2>
+      <h2 className="text-xl font-semibold text-gray-900 dark:text-white mb-6 [text-shadow:_0_1px_2px_rgb(0_0_0_/_20%)] dark:[text-shadow:_0_1px_2px_rgb(0_0_0_/_10%)]">Upcoming Deadlines</h2>
 
       {deadlines.length === 0 ? (
         <div className="text-center py-8">
@@ -72,7 +72,7 @@ export const DeadlineList: React.FC<DeadlineListProps> = ({ deadlines }) => {
             >
               <div className="flex justify-between items-start">
                 <div>
-                  <h3 className="font-medium text-gray-900 dark:text-white">{deadline.title}</h3>
+                  <h3 className="font-medium text-gray-900 dark:text-white [text-shadow:_0_1px_2px_rgb(0_0_0_/_20%)] dark:[text-shadow:_0_1px_2px_rgb(0_0_0_/_10%)]">{deadline.title}</h3>
                   <div className="mt-1 flex items-center space-x-4 flex-wrap">
                     <span className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${
                       deadline.is_overdue
@@ -82,10 +82,10 @@ export const DeadlineList: React.FC<DeadlineListProps> = ({ deadlines }) => {
                           : deadline.priority === 'medium'
                             ? 'bg-yellow-100 text-yellow-800 dark:bg-yellow-900/30 dark:text-yellow-400'
                             : 'bg-green-100 text-green-800 dark:bg-green-900/30 dark:text-green-400'
-                    }`}>
+                    } [text-shadow:_0_1px_2px_rgb(0_0_0_/_30%)] dark:[text-shadow:_0_1px_2px_rgb(0_0_0_/_15%)]`}>
                       {deadline.priority}
                     </span>
-                    <span className="text-sm text-gray-500 dark:text-gray-400">
+                    <span className="text-sm text-gray-500 dark:text-gray-400 [text-shadow:_0_1px_2px_rgb(0_0_0_/_30%)] dark:[text-shadow:_0_1px_2px_rgb(0_0_0_/_15%)]">
                       {formatDate(deadline.due_date)}
                     </span>
                     {deadline.reminder && (
@@ -106,7 +106,7 @@ export const DeadlineList: React.FC<DeadlineListProps> = ({ deadlines }) => {
                       : deadline.days_until_due <= 3
                         ? 'text-yellow-600 dark:text-yellow-400'
                         : 'text-green-600 dark:text-green-400'
-                }`}>
+                } [text-shadow:_0_1px_2px_rgb(0_0_0_/_30%)] dark:[text-shadow:_0_1px_2px_rgb(0_0_0_/_15%)]`}>
                   {getDaysText(deadline.days_until_due, deadline.is_overdue)}
                 </span>
               </div>

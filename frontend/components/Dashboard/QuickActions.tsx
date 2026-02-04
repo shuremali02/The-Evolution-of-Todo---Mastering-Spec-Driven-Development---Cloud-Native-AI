@@ -43,7 +43,7 @@ export const QuickActions: React.FC<QuickActionsProps> = () => {
 
   return (
     <div className="p-6">
-      <h2 className="text-xl font-semibold text-gray-900 dark:text-white mb-6">Quick Actions</h2>
+      <h2 className="text-xl font-semibold text-gray-900 dark:text-white mb-6 [text-shadow:_0_1px_2px_rgb(0_0_0_/_20%)] dark:[text-shadow:_0_1px_2px_rgb(0_0_0_/_10%)]">Quick Actions</h2>
 
       <div className="space-y-4">
         <button
