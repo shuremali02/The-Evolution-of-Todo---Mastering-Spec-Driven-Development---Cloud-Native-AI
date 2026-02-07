@@ -1,0 +1,9 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(npm install)",
+      "Bash(npm run build)",
+      "Bash(ls -la \"/mnt/e/The Evolution of Todo – Mastering Spec-Driven Development & Cloud Native AI/specs/011-chatbot-issues-fixes/\")"
+    ]
+  }
+}

@@ -5,6 +5,7 @@
 
 /** @type {import('next').NextConfig} */
 const nextConfig = {
+  output: 'standalone',  // Enable standalone output for Docker
   reactStrictMode: true,
   async rewrites() {
     return [

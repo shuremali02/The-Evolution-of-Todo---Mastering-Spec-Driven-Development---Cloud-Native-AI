@@ -52,6 +52,10 @@ class AIAgent:
             # The MCP server is running on port 8000
             mcp_url = os.getenv("MCP_SERVER_URL", "http://127.0.0.1:8000")
 
+            # For Hugging Face Spaces, the MCP server should be accessible locally
+            # Check if the server is actually available before proceeding
+            print(f"Attempting to connect to MCP server at {mcp_url}")
+
             # Get the Gemini API key to potentially pass to the MCP server if needed
             gemini_api_key = os.getenv("GEMINI_API_KEY")
 

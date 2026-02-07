@@ -24,78 +24,74 @@ Follow-up TODOs: None
 
 ## Preamble
 
-This Constitution establishes the non-negotiable laws governing all development, specification, planning, and implementation activities during Phase-2 of the Agentic Engineering Hackathon. All agents, developers, and contributors MUST comply with every provision herein. This Constitution supersedes all other guidance, preferences, or conventions.
+This Constitution establishes the non-negotiable laws governing all development, specification, planning, and implementation activities during Phase-4 of the Agentic Engineering Hackathon. All agents, developers, and contributors MUST comply with every provision herein. This Constitution supersedes all other guidance, preferences, or conventions.
 
-## Article I: Phase-2 Purpose & Scope
+## Article I: Phase-4 Purpose & Scope
 
 ### Section 1.1 - Purpose
 
-Phase-2 exists to build a full-stack web application with multi-user support, authentication, and rich UI interactions. The purpose is to:
+Phase-4 exists to deploy the Todo Chatbot application on a local Kubernetes cluster using containerization, orchestration, and AI-assisted DevOps practices. The purpose is to:
 
-- **Build Full-Stack Application**: Create a modern web application with both frontend and backend
-- **Implement Authentication**: Add JWT-based authentication and user management
-- **Develop Rich UI**: Create an intuitive user interface with React/Next.js
-- **Establish Data Persistence**: Implement database-backed data storage with proper user isolation
+- **Containerize Applications**: Package frontend and backend as Docker containers using AI assistance
+- **Orchestrate with Kubernetes**: Deploy on Minikube for local Kubernetes cluster management
+- **Automate with AI DevOps**: Use kubectl-ai and Kagent for intelligent Kubernetes operations
+- **Package with Helm**: Create and manage deployment configurations using Helm charts
+- **Enable AI-Assisted Operations**: Leverage Docker AI Agent (Gordon) for intelligent container operations
 
-Phase-2 delivers a production-ready multi-user application. Success is measured by functionality, security, and user experience.
+Phase-4 delivers a containerized, orchestrated cloud-native deployment of the Todo Chatbot application. Success is measured by successful deployment, scalability, and operational efficiency using AI-assisted DevOps tools.
 
 ### Section 1.2 - Scope
 
-The deliverable for Phase-2 is a full-stack web application with:
+The deliverable for Phase-4 is a local Kubernetes deployment of the Todo Chatbot application with:
 
-- Frontend: Next.js 14+ with App Router, TypeScript, Tailwind CSS
-- Backend: FastAPI with JWT authentication, SQLModel ORM
-- Database: PostgreSQL with user data isolation
-- Authentication: Better Auth with JWT tokens
-- UI: Modern React components with responsive design
+- Containerization: Docker containers for frontend and backend using Docker AI Agent (Gordon)
+- Orchestration: Kubernetes cluster deployed on Minikube
+- Packaging: Helm charts for application deployment
+- AI DevOps: kubectl-ai and Kagent for intelligent Kubernetes operations
+- Infrastructure as Code: Declarative deployment configurations
 
 ## Article II: Technology Stack Requirements
 
 ### Section 2.1 - Permitted Technologies (MUST USE)
 
-Phase-2 development MUST use these technologies:
+Phase-4 development MUST use these technologies:
 
-**Frontend**:
-- Next.js 14+ with App Router (NOT Pages Router)
-- TypeScript 5.x with strict mode
-- React 18+ with Server Components
-- Tailwind CSS 3.4+ for styling
-- Client-side state management as needed
+**Containerization**:
+- Docker Desktop for container management
+- Docker AI Agent (Gordon) for intelligent Docker operations
+- Containerized frontend and backend applications
 
-**Backend**:
-- Python 3.11+ with FastAPI framework
-- SQLModel ORM for database operations
-- Pydantic v2 for data validation
-- python-jose for JWT handling
-- bcrypt for password hashing
+**Orchestration**:
+- Kubernetes (Minikube) for local cluster management
+- Helm Charts for deployment packaging
+- kubectl-ai for AI-assisted Kubernetes operations
+- Kagent for intelligent cluster management
 
-**Database**:
-- PostgreSQL (Neon Serverless recommended)
-- Alembic for database migrations
-- Connection pooling for performance
+**Application Stack** (Maintained from Previous Phases):
+- Frontend: Next.js 14+ with App Router, TypeScript 5.x, React 18+, Tailwind CSS
+- Backend: Python 3.11+ with FastAPI, SQLModel ORM, Pydantic v2
+- Database: PostgreSQL with Neon Serverless
+- Authentication: Better Auth with JWT tokens
+- API: REST API under `/api/v1/` prefix
 
-**Authentication**:
-- Better Auth for authentication management
-- JWT tokens for stateless authentication
-- Secure token storage (httpOnly cookies preferred)
-
-**API**:
-- REST API under `/api/v1/` prefix
-- JSON request/response bodies
-- Standard HTTP methods (GET, POST, PUT, PATCH, DELETE)
-- Proper HTTP status codes
+**AI DevOps Tools**:
+- Docker AI Agent (Gordon) for intelligent Docker operations
+- kubectl-ai for AI-assisted Kubernetes commands
+- Kagent for cluster analysis and optimization
 
 ### Section 2.2 - Forbidden Technologies (MUST NOT)
 
-The following technologies are EXPLICITLY FORBIDDEN in Phase-2:
+The following technologies are EXPLICITLY FORBIDDEN in Phase-4:
 
 **Legacy Tech**:
-- CLI applications (Phase-1 technology)
-- File-based storage (Phase-1 technology)
-- Synchronous database operations (when async available)
-- Plain JavaScript (TypeScript required)
+- Manual Docker operations (use Docker AI Agent Gordon instead)
+- Manual Kubernetes operations (use kubectl-ai and Kagent instead)
+- Manual Helm chart creation (use AI assistance instead)
+- Direct cluster access without proper tooling
+- Hardcoded configurations in deployment files
 
 **Architecture**:
+- Non-containerized deployments (must use Docker containers)
 - Direct database connections from frontend
 - Shared secrets in client-side code
 - User data without proper isolation
@@ -106,23 +102,35 @@ The following technologies are EXPLICITLY FORBIDDEN in Phase-2:
 - JWT tokens without proper validation
 - Exposing sensitive data in error messages
 - Skipping input validation
+- Unsecured container images
+- Insecure cluster configurations
 
 ## Article III: Architecture Rules
 
-### Section 3.1 - Frontend-Backend Separation
+### Section 3.1 - Containerized Deployment Architecture
 
 The application MUST:
-- Separate frontend and backend as distinct systems
-- Communicate only via documented REST API
-- Frontend NEVER connect directly to database
-- Allow independent deployment of frontend and backend
+- Be packaged as Docker containers for both frontend and backend
+- Deploy to Kubernetes cluster using Helm charts
+- Maintain separation between frontend and backend services
+- Use environment variables for configuration management
+- Implement proper health checks and readiness probes
 
 The application MUST NOT:
-- Share code between frontend and backend (except DTOs)
-- Bypass API for direct database access from frontend
-- Mix frontend and backend concerns in same files
+- Use host networking (use Kubernetes service discovery)
+- Hardcode configuration values in container images
+- Bypass Kubernetes service mesh capabilities
 
-### Section 3.2 - Authentication & Authorization
+### Section 3.2 - Container Orchestration Principles
+
+Deployment MUST:
+- Use Kubernetes manifests managed by Helm charts
+- Implement proper resource limits and requests
+- Use ConfigMaps and Secrets for configuration and sensitive data
+- Implement proper service discovery between frontend and backend
+- Include proper logging and monitoring configurations
+
+### Section 3.3 - Authentication & Authorization (Maintained from Previous Phases)
 
 All protected endpoints MUST:
 - Require valid JWT token for access
@@ -136,7 +144,7 @@ User data MUST:
 - Prevent access to other users' data
 - Default to deny access (principle of least privilege)
 
-### Section 3.3 - API-First Architecture
+### Section 3.4 - API-First Architecture (Maintained from Previous Phases)
 
 All endpoints MUST:
 - Be under `/api/v1/` prefix
@@ -272,16 +280,14 @@ Agents MUST enforce the SDD pipeline:
 
 The following technologies and patterns are DEFERRED to future phases:
 
-- **Phase-4+**: Microservices, service mesh, Dapr
 - **Phase-5+**: Kafka, event streaming, message brokers
-- **Phase-6+**: Kubernetes, container orchestration, cloud deployment
-- **Phase-7+**: Advanced agent-to-agent communication beyond MCP
-- **Phase-8+**: Distributed systems, multi-region deployments, production hardening
+- **Phase-6+**: Advanced agent-to-agent communication beyond MCP
+- **Phase-7+**: Distributed systems, multi-region deployments, production hardening
+- **Phase-8+**: Advanced monitoring, observability, and alerting systems
 
-### Section 7.2 - Phase 3 Technologies (NOW PERMITTED)
+### Section 7.2 - Phase 3 Technologies (NOW COMPLETED)
 
-With the completion of Phase 2, the following technologies and patterns are NOW PERMITTED for Phase 3:
-
+Phase 3 (AI Chatbot Integration) is now complete with:
 - **AI Chatbot Integration**: OpenAI Agents SDK, conversational UI
 - **MCP (Model Context Protocol)**: Official MCP SDK, MCP tools
 - **OpenAI ChatKit**: Frontend chat interface
@@ -289,57 +295,82 @@ With the completion of Phase 2, the following technologies and patterns are NOW 
 - **Stateless Conversation Architecture**: Database-persisted conversation state
 - **MCP Server Architecture**: Official MCP SDK with exposed task operation tools
 
-### Section 7.3 - Scope Transition
+### Section 7.3 - Phase 4 Technologies (NOW PERMITTED)
 
-Phase 3 is now active and focused on:
-- Building an AI-powered chatbot for todo management
-- Implementing MCP server architecture
-- Creating natural language interfaces
-- Integrating OpenAI Agents with existing task management system
-- Maintaining compatibility with existing Phase 2 authentication (Better Auth)
+With the completion of Phase 3, the following technologies and patterns are NOW PERMITTED for Phase 4:
 
-Phase 2 (full-stack web application) is COMPLETE. All new work should align with Phase 3 objectives.
+- **Containerization**: Docker, Docker Desktop, Docker AI Agent (Gordon)
+- **Container Orchestration**: Kubernetes (Minikube), Helm Charts
+- **AI DevOps Tools**: kubectl-ai, Kagent for intelligent Kubernetes operations
+- **Local Deployment**: Minikube for local Kubernetes cluster
+- **Infrastructure as Code**: Helm Charts for deployment packaging
+- **AI-Assisted Operations**: Docker AI Agent (Gordon) for intelligent Docker operations
 
-### Section 7.4 - Scope Rejection
+### Section 7.4 - Scope Transition
+
+Phase 4 is now active and focused on:
+- Deploying the Todo Chatbot on a local Kubernetes cluster using Minikube
+- Containerizing frontend and backend applications using Docker and Docker AI Agent (Gordon)
+- Creating Helm charts for deployment using kubectl-ai and Kagent
+- Using kubectl-ai and Kagent for AI-assisted Kubernetes operations
+- Maintaining compatibility with existing Phase 3 architecture (AI Chatbot with MCP)
+
+Phase 3 (AI Chatbot Integration) is COMPLETE. All new work should align with Phase 4 objectives.
+
+### Section 7.5 - Scope Rejection
 
 Any request to implement technologies or patterns from future phases MUST be rejected with:
 - Clear citation of this Article (VII)
-- Explanation that Phase-3 is focused on AI chatbot with MCP architecture
+- Explanation that Phase-4 is focused on local Kubernetes deployment with Minikube, Helm, and AI-assisted DevOps
 - Guidance that the feature belongs to a later phase
 
 Agents MUST NOT implement "simple versions" or "prototypes" of future-phase technologies.
 
 ## Article VIII: Quality Standards
 
-### Section 8.1 - Code Quality
+### Section 8.1 - Container Quality
+- Optimized Docker images with minimal attack surface
+- Multi-stage builds to reduce image size
+- Regular security scanning of container images
+- Proper resource allocation in Kubernetes manifests
+
+### Section 8.2 - Deployment Quality
+- Proper health checks and readiness probes
+- Configurable resource limits and requests
+- Secure secret management in Kubernetes
+- Proper logging and monitoring configurations
+
+### Section 8.3 - Code Quality (Maintained from Previous Phases)
 - Follow existing code patterns and conventions
 - Maintain TypeScript strict mode compliance
 - Ensure proper component prop typing
 - Add appropriate error boundaries
 
-### Section 8.2 - User Experience
+### Section 8.4 - User Experience (Maintained from Previous Phases)
 - Consistent with existing application design
 - Accessible to users with disabilities (WCAG 2.1 AA)
 - Responsive across different devices
 - Fast loading and interaction times (<200ms page load)
 
-### Section 8.3 - Performance
+### Section 8.5 - Performance (Maintained from Previous Phases)
 - Optimize data fetching and component rendering
 - Efficient API calls with proper caching
 - Minimize bundle sizes
 - Lazy-load non-critical components
 
-### Section 8.4 - Testing
+### Section 8.6 - Testing
 - API endpoints: integration tests
 - Critical logic: unit tests
 - Auth flows: security tests
+- Container deployment: integration tests
+- Kubernetes manifests: validation tests
 - All tests traceable to Task IDs
 
 ## Article IX: Governance
 
 ### Section 9.1 - Constitutional Supremacy
 
-This Constitution is the supreme governing document for Phase-2. In the event of conflict:
+This Constitution is the supreme governing document for Phase-4. In the event of conflict:
 
 - Constitution > Spec > Plan > Tasks > Code
 - Constitution > User preferences or requests
@@ -381,25 +412,25 @@ All versions MUST be tracked with ratification and amendment dates.
 
 ---
 
-**Version**: 1.0.0
+**Version**: 4.0.0
 **Ratified**: 2026-01-14
-**Last Amended**: 2026-01-14
+**Last Amended**: 2026-02-04
 
 ---
 
 ## Appendix A: Quick Reference
 
-**Permitted**: Next.js, TypeScript, React, Tailwind, FastAPI, SQLModel, PostgreSQL, JWT, Better Auth, REST API
-**Forbidden**: CLI apps, file-based storage, direct DB access from frontend, unauthenticated endpoints
+**Permitted**: Docker, Docker AI Agent (Gordon), Kubernetes (Minikube), Helm Charts, kubectl-ai, Kagent, Next.js, TypeScript, React, Tailwind, FastAPI, SQLModel, PostgreSQL, JWT, Better Auth, REST API
+**Forbidden**: Manual Docker/Kubernetes operations, hardcoded configs, unsecured containers, direct DB access from frontend, unauthenticated endpoints
 
 **Pipeline**: Specify → Plan → Tasks → Implement (Backend) → Implement (Frontend) → Test & Iterate (MANDATORY, NO EXCEPTIONS)
 
 **Traceability**: Every file and function MUST reference Task ID and Spec section
 
-**Security**: JWT validation on all protected endpoints, user data isolation by user_id
+**Security**: JWT validation on all protected endpoints, user data isolation by user_id, secure container images, proper secret management
 
 **Agent Behavior**: Refuse to proceed without Spec. Clarify, never guess. Never invent requirements.
 
 ---
 
-*This Constitution is binding on all agents, developers, and contributors during Phase-2. Compliance is mandatory.*
+*This Constitution is binding on all agents, developers, and contributors during Phase-4. Compliance is mandatory.*

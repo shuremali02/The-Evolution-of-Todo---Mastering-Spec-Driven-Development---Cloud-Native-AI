@@ -1,0 +1,87 @@
+# Default values for todo-chatbot
+
+# Frontend configuration
+frontend:
+  replicaCount: 1
+  image:
+    repository: todo-frontend
+    tag: latest
+    pullPolicy: IfNotPresent
+  service:
+    type: ClusterIP
+    port: 3000
+  ingress:
+    enabled: true
+    className: nginx
+    hosts:
+      - host: todo.local
+        paths:
+          - path: /
+            pathType: Prefix
+    tls: []
+  resources:
+    limits:
+      cpu: 250m
+      memory: 256Mi
+    requests:
+      cpu: 100m
+      memory: 128Mi
+  env:
+    - name: NEXT_PUBLIC_API_URL
+      value: "http://todo-backend-svc:8000/api/v1"
+
+# Backend configuration
+backend:
+  replicaCount: 1
+  image:
+    repository: todo-backend
+    tag: latest
+    pullPolicy: IfNotPresent
+  service:
+    type: ClusterIP
+    port: 8000
+  resources:
+    limits:
+      cpu: 500m
+      memory: 512Mi
+    requests:
+      cpu: 250m
+      memory: 256Mi
+  env:
+    - name: DATABASE_URL
+      value: "postgresql://neondb_owner:npg_Ulao9GqPOr0F@ep-empty-forest-adwdbz6a-pooler.c-2.us-east-1.aws.neon.tech/neondb?sslmode=require&channel_binding=require"
+
+# Database configuration (using PostgreSQL)
+database:
+  enabled: true
+  postgresql:
+    auth:
+      postgresPassword: "password"
+      database: "todo_db"
+    primary:
+      persistence:
+        enabled: false
+
+# Service configuration
+service:
+  type: ClusterIP
+  port: 80
+
+# Ingress configuration
+ingress:
+  enabled: true
+  className: ""
+  annotations: {}
+  hosts:
+    - host: todo.local
+      paths:
+        - path: /
+          pathType: Prefix
+  tls: []
+
+# Node selector and tolerations
+nodeSelector: {}
+
+tolerations: []
+
+affinity: {}
