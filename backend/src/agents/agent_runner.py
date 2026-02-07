@@ -89,7 +89,6 @@ class AgentRunner:
                 })
 
             # Process the message with the AI agent
-            print(f"DEBUG: About to process message with AI agent. User ID: {user_id}, Message: {message_content}")
             logger.info("Processing message with AI agent", user_id=user_id, message_content=message_content)
             ai_response = await self.ai_agent.process_message(
                 user_id=user_id,
@@ -97,11 +96,9 @@ class AgentRunner:
                 conversation_history=conversation_history,
                 session=session
             )
-            print(f"DEBUG: AI agent response received: {ai_response}")
             logger.debug("AI agent response received", response=ai_response)
 
             if not ai_response["success"]:
-                print(f"DEBUG: AI agent returned failure: {ai_response}")
                 logger.warning("AI agent returned failure", response=ai_response)
                 # Save error response message
                 await MessageService.create_message(
@@ -113,20 +110,16 @@ class AgentRunner:
                 )
                 return ai_response
 
-            print(f"DEBUG: AI agent successful, checking for tool calls: {ai_response.get('tool_calls', [])}")
             logger.debug("AI agent successful, checking for tool calls", tool_calls=ai_response.get('tool_calls', []))
 
             # Execute any tool calls that were generated
-            print(f"DEBUG: About to execute tool calls: {ai_response.get('tool_calls', [])}")
             logger.debug("About to execute tool calls", tool_calls=ai_response.get('tool_calls', []))
             tool_responses = []
             tool_results = []  # Store results to incorporate into response
 
             if ai_response.get("tool_calls"):
-                print(f"DEBUG: Processing {len(ai_response['tool_calls'])} tool calls")
                 logger.debug(f"Processing {len(ai_response['tool_calls'])} tool calls")
                 for tool_call in ai_response["tool_calls"]:
-                    print(f"DEBUG: Processing tool call: {tool_call}")
                     logger.debug(f"Processing tool call", tool_call=tool_call)
                     try:
                         # Extract function name and arguments

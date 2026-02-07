@@ -9,18 +9,39 @@ Uses the official mcp.server.fastmcp package with proper context management.
 from dataclasses import dataclass
 from typing import Optional
 import contextlib
-from enum import Enum
 from datetime import datetime
 from mcp.server.fastmcp import FastMCP, Context
-from sqlmodel import Session
 from sqlalchemy.ext.asyncio import create_async_engine, AsyncSession
-from app.models.task import Task
-from app.models.user import User
 from sqlmodel import select
 import os
+import sys
+import importlib.util
 
-# Import the existing TaskPriority from the models
-from app.models.task import TaskPriority
+# Add the project root to the path to resolve imports
+sys.path.insert(0, '/app')
+
+# Import models with fallback for different execution contexts
+try:
+    from app.models.task import Task, TaskPriority
+    from app.models.user import User
+except ImportError:
+    # Fallback: try importing directly from the models directory
+    try:
+        # Load the task module directly
+        task_spec = importlib.util.spec_from_file_location("task", "/app/app/models/task.py")
+        task_module = importlib.util.module_from_spec(task_spec)
+        task_spec.loader.exec_module(task_module)
+        Task = task_module.Task
+        TaskPriority = task_module.TaskPriority
+
+        # Load the user module directly
+        user_spec = importlib.util.spec_from_file_location("user", "/app/app/models/user.py")
+        user_module = importlib.util.module_from_spec(user_spec)
+        user_spec.loader.exec_module(user_module)
+        User = user_module.User
+    except Exception as e:
+        print(f"Error importing models: {e}")
+        raise
 
 
 @dataclass
@@ -472,6 +493,9 @@ async def update_task(
 # Example of how to run the server with proper streamable-http transport
 if __name__ == "__main__":
     import asyncio
+    import signal
+    import sys
+    from contextlib import asynccontextmanager
 
     # Use the proper run method with streamable-http transport
     print("Starting MCP Server for task management tools...")
@@ -483,5 +507,20 @@ if __name__ == "__main__":
     print("  - delete_task")
     print("  - update_task")
 
+    # Define a simple signal handler for graceful shutdown
+    def signal_handler(sig, frame):
+        print('\nShutting down MCP Server gracefully...')
+        sys.exit(0)
+
+    signal.signal(signal.SIGINT, signal_handler)
+    signal.signal(signal.SIGTERM, signal_handler)
+
     # Run the server with streamable-http transport using the mcp instance
-    mcp.run(transport="streamable-http")
+    try:
+        mcp.run(transport="streamable-http")
+    except KeyboardInterrupt:
+        print("\nMCP Server interrupted by user")
+    except Exception as e:
+        print(f"\nError running MCP Server: {e}")
+        import traceback
+        traceback.print_exc()

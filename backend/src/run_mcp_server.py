@@ -11,32 +11,26 @@ from mcp.server.fastmcp import FastMCP
 from src.mcp_server import mcp  # Import the configured MCP instance
 
 
-def main():
+async def main():
     """Start the MCP server and run it."""
     print("Starting MCP Server for task management tools...")
 
-    # Start the MCP server using the correct method
-    # According to MCP documentation, use transport parameter
-    # The port for streamable-http is determined by the server automatically
-    # Use the context manager to properly initialize the lifespan
-    import asyncio
+    # Start the MCP server
+    async with mcp.create_server() as server:
+        print(f"MCP Server running on {server.url}")
+        print("Available tools:")
+        print("- list_tasks")
+        print("- add_task")
+        print("- complete_task")
+        print("- delete_task")
+        print("- update_task")
+        print("\nPress Ctrl+C to stop the server")
 
-    async def run_server():
-        async with mcp.session_manager.run():
-            print("MCP Server is running and ready for connections...")
-            print("Tools available:")
-            for tool_name in mcp._tools.keys():
-                print(f"  - {tool_name}")
-
-            # Keep the server running
-            while True:
-                await asyncio.sleep(1)
-
-    asyncio.run(run_server())
+        await server.wait_shutdown()
 
 
 if __name__ == "__main__":
     try:
-        main()
+        asyncio.run(main())
     except KeyboardInterrupt:
         print("\nShutting down MCP server...")

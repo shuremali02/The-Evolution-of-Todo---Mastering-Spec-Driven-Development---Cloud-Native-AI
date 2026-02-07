@@ -1,4 +1,15 @@
-# Backend - FastAPI + SQLModel
+---
+title: Todo App Backend
+emoji: 🚀
+colorFrom: blue
+colorTo: green
+sdk: docker
+sdk_version: "20.10.0"
+app_file: app/main.py
+pinned: false
+---
+
+# Todo App - Backend with FastAPI + SQLModel
 
 **Task**: T001-T009
 **Spec**: 002-authentication
@@ -10,6 +21,7 @@
 - **Database**: Neon Serverless PostgreSQL
 - **Auth**: JWT with python-jose, BCrypt with passlib
 - **Migrations**: Alembic
+- **Package Manager**: uv (for fast dependency installation)
 
 ## Setup
 
@@ -79,3 +91,56 @@ Required in `.env`:
 - `ALLOWED_ORIGINS` - CORS allowed origins (default: http://localhost:3000)
 
 See `.env.example` for details.
+
+## Deployment with Docker
+
+This application can be deployed using Docker. The Dockerfile uses the **uv package manager** for fast dependency installation.
+
+### Prerequisites
+
+- Docker installed on your system
+- Docker Compose (optional)
+
+### Building the Docker Image
+
+```bash
+# Build the Docker image
+docker build -t todo-app .
+
+# Run the container
+docker run -p 8000:8000 todo-app
+```
+
+### Using Docker Compose (Optional)
+
+Create a `docker-compose.yml` file:
+
+```yaml
+version: '3.8'
+services:
+  todo-app:
+    build: .
+    ports:
+      - "8000:8000"
+    environment:
+      - ENV=production
+      - DATABASE_URL=your_database_url
+      - JWT_SECRET_KEY=your_jwt_secret
+```
+
+Then run:
+
+```bash
+docker-compose up
+```
+
+## About uv Package Manager
+
+This project uses [uv](https://github.com/astral-sh/uv) as the package manager, which is a fast Python package installer and resolver.
+uv is used in the Dockerfile for significantly faster dependency installation compared to pip.
+
+Key benefits of uv:
+- Up to 100x faster than pip install
+- Built with Rust for performance
+- Drop-in replacement for pip
+- Efficient dependency resolution
