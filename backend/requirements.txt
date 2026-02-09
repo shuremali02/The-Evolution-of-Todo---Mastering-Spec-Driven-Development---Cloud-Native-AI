@@ -30,3 +30,6 @@ mcp>=1.0.0
 structlog>=23.2.0
 RapidFuzz>=3.6.1
 openai-agents>=0.1.0
+
+# Dapr
+dapr-ext-fastapi>=0.13.0

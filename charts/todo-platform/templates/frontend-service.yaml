@@ -1,0 +1,19 @@
+{{- if .Values.frontend.enabled }}
+apiVersion: v1
+kind: Service
+metadata:
+  name: {{ include "todo-platform.frontend.fullname" . }}
+  labels:
+    {{- include "todo-platform.labels" . | nindent 4 }}
+    app: frontend
+spec:
+  type: {{ .Values.frontend.service.type }}
+  ports:
+    - port: 80
+      targetPort: 3000
+      protocol: TCP
+      name: http
+  selector:
+    {{- include "todo-platform.selectorLabels" . | nindent 4 }}
+    app: frontend
+{{- end }}

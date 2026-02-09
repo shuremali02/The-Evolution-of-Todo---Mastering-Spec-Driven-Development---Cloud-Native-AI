@@ -3,6 +3,7 @@ from app.database import engine
 from sqlmodel import SQLModel
 from app.models.user import User
 from app.models.task import Task
+from app.models.audit_log import AuditLog
 from sqlalchemy import text
 
 async def create_tables():

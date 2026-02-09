@@ -1,0 +1,15 @@
+apiVersion: v2
+name: todo-platform
+description: A Helm chart for the event-driven todo platform
+type: application
+version: 0.1.0
+appVersion: "1.0.0"
+dependencies:
+  - name: kafka
+    version: 27.1.0
+    repository: https://charts.bitnami.com/bitnami
+    condition: kafka.enabled
+  - name: postgresql
+    version: 15.5.18
+    repository: https://charts.bitnami.com/bitnami
+    condition: postgresql.enabled

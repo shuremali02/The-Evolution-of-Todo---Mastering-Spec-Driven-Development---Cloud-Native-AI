@@ -1,0 +1,26 @@
+---
+apiVersion: dapr.io/v1alpha1
+kind: Component
+metadata:
+  name: kafka-pubsub
+spec:
+  type: pubsub.kafka
+  version: v1
+  metadata:
+  - name: brokers
+    value: {{ .Values.kafka.brokers | default "kafka:9092" | quote }}
+  - name: consumerGroup
+    value: "todo-services"
+  - name: authRequired
+    value: "false"
+---
+apiVersion: dapr.io/v1alpha1
+kind: Component
+metadata:
+  name: statestore
+spec:
+  type: state.postgresql
+  version: v1
+  metadata:
+  - name: connectionString
+    value: {{ .Values.postgresql.auth.connectionString | default "host=todo-postgresql;user=postgres;password={{ .Values.postgresql.auth.postgresPassword }};dbname={{ .Values.postgresql.auth.database }};port=5432" | quote }}

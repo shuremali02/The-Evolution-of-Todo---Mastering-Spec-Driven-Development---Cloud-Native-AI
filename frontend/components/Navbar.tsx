@@ -117,6 +117,12 @@ export function Navbar({ onLogout }: NavbarProps) {
                   Tasks
                 </a>
                 <a
+                  href="/audit"
+                  className="px-3 py-2 text-sm font-medium text-gray-700 dark:text-gray-200 hover:bg-gray-100 dark:hover:bg-gray-700 rounded-md transition-colors"
+                >
+                  Audit Trail
+                </a>
+                <a
                   href="/profile"
                   className="px-3 py-2 text-sm font-medium text-gray-700 dark:text-gray-200 hover:bg-gray-100 dark:hover:bg-gray-700 rounded-md transition-colors"
                 >
@@ -191,6 +197,13 @@ export function Navbar({ onLogout }: NavbarProps) {
                           role="menuitem"
                         >
                           My Tasks
+                        </a>
+                        <a
+                          href="/audit"
+                          className="block px-4 py-2 text-sm text-gray-700 dark:text-gray-200 hover:bg-gray-100 dark:hover:bg-gray-700 hover:text-gray-900 dark:hover:text-white transition-colors"
+                          role="menuitem"
+                        >
+                          Audit Trail
                         </a>
                         <button
                           onClick={handleProfileClick}

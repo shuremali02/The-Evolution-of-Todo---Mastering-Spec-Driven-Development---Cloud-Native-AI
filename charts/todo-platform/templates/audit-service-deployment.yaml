@@ -1,0 +1,51 @@
+{{- if .Values.auditService.enabled }}
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: {{ include "todo-platform.auditService.fullname" . }}
+  labels:
+    {{- include "todo-platform.labels" . | nindent 4 }}
+    app: audit-service
+spec:
+  replicas: {{ .Values.auditService.replicaCount }}
+  selector:
+    matchLabels:
+      {{- include "todo-platform.selectorLabels" . | nindent 6 }}
+      app: audit-service
+  template:
+    metadata:
+      annotations:
+        dapr.io/enabled: "true"
+        dapr.io/app-id: "audit-service"
+        dapr.io/app-port: "8001"
+        dapr.io/config: "dapr-config"
+        dapr.io/log-as-json: "true"
+      labels:
+        {{- include "todo-platform.selectorLabels" . | nindent 8 }}
+        app: audit-service
+    spec:
+      containers:
+        - name: audit-service
+          image: "{{ .Values.auditService.image.repository }}:{{ .Values.auditService.image.tag }}"
+          imagePullPolicy: {{ .Values.auditService.image.pullPolicy }}
+          ports:
+            - containerPort: 8001
+              name: http
+          env:
+            - name: DATABASE_URL
+              value: {{ .Values.auditService.env.DATABASE_URL | quote }}
+          livenessProbe:
+            httpGet:
+              path: /health
+              port: 8001
+            initialDelaySeconds: 30
+            periodSeconds: 10
+          readinessProbe:
+            httpGet:
+              path: /health
+              port: 8001
+            initialDelaySeconds: 5
+            periodSeconds: 5
+          resources:
+            {{- toYaml .Values.resources.auditService | nindent 12 }}
+{{- end }}

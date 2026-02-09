@@ -1,9 +1,11 @@
 """
-Task: T013, T014, T015, T016
+Task: T013, T014, T015, T016, T015, T016, T017, T018
 Spec: 005-task-management-ui/task-ui/spec.md - Task CRUD API Endpoints with UI Enhancements
+Spec: 001-event-driven-todo/spec.md - Event-Driven Architecture
 
 REST API endpoints for task management with JWT authentication and user isolation.
 Extended with search, sort, filter, priority, due_date, and reorder functionality.
+Also includes event publishing to Kafka via Dapr for audit trail.
 """
 
 from fastapi import APIRouter, Depends, HTTPException, status, Query
@@ -16,6 +18,7 @@ from app.database import get_session
 from app.auth.dependencies import get_current_user_id
 from app.models.task import Task
 from app.schemas.task import TaskCreate, TaskUpdate, TaskResponse, TaskListResponse, TaskReorder
+from app.services.event_publisher import event_publisher
 
 router = APIRouter(prefix="/api/v1/tasks", tags=["tasks"])
 
@@ -118,8 +121,9 @@ async def create_task(
     """
     Create a new task for the authenticated user.
 
-    Task: T014
+    Task: T014, T015
     Spec: US-3 Priority Levels, US-4 Due Dates
+    Spec: 001-event-driven-todo/spec.md - Event Publishing
 
     Args:
         task_data: Task creation data with optional priority, due_date, and reminder
@@ -135,6 +139,13 @@ async def create_task(
     session.add(task)
     await session.commit()
     await session.refresh(task)
+
+    # Publish task created event to Kafka via Dapr
+    try:
+        event_publisher.publish_task_created(task, user_id)
+    except Exception as e:
+        print(f"Failed to publish task created event: {str(e)}")
+
     return task
 
 
@@ -188,6 +199,7 @@ async def update_task(
 
     Task: T015
     Spec: US-3 Priority Levels, US-4 Due Dates
+    Spec: 001-event-driven-todo/spec.md - Event Publishing
 
     Args:
         task_id: Task UUID
@@ -221,6 +233,13 @@ async def update_task(
     task.updated_at = datetime.now(timezone.utc).replace(tzinfo=None)
     await session.commit()
     await session.refresh(task)
+
+    # Publish task updated event to Kafka via Dapr
+    try:
+        event_publisher.publish_task_updated(task, user_id)
+    except Exception as e:
+        print(f"Failed to publish task updated event: {str(e)}")
+
     return task
 
 
@@ -235,6 +254,7 @@ async def complete_task(
 
     Task: T015
     Spec: US-4 Due Dates
+    Spec: 001-event-driven-todo/spec.md - Event Publishing
 
     Args:
         task_id: Task UUID
@@ -263,6 +283,13 @@ async def complete_task(
     task.updated_at = datetime.now(timezone.utc).replace(tzinfo=None)
     await session.commit()
     await session.refresh(task)
+
+    # Publish task completed event to Kafka via Dapr
+    try:
+        event_publisher.publish_task_completed(task, user_id)
+    except Exception as e:
+        print(f"Failed to publish task completed event: {str(e)}")
+
     return task
 
 
@@ -277,6 +304,7 @@ async def delete_task(
 
     Task: T015
     Spec: US-4 Due Dates
+    Spec: 001-event-driven-todo/spec.md - Event Publishing
 
     Args:
         task_id: Task UUID
@@ -300,6 +328,12 @@ async def delete_task(
             status_code=status.HTTP_404_NOT_FOUND,
             detail="Task not found"
         )
+
+    # Publish task deleted event to Kafka via Dapr before deleting
+    try:
+        event_publisher.publish_task_deleted(task, user_id)
+    except Exception as e:
+        print(f"Failed to publish task deleted event: {str(e)}")
 
     await session.delete(task)
     await session.commit()
