@@ -206,6 +206,48 @@ Use `@specs/...` pattern:
 - `@specs/ui/pages.md` - UI pages
 - `@specs/ui/components.md` - UI components
 
+## Phase-5 Features (Event-Driven Architecture)
+### Implemented
+
+- ✅ Event-driven architecture using Kafka and Dapr
+- ✅ Task event publishing for create, update, complete, delete operations
+- ✅ Audit service to store all task operations in audit trail
+- ✅ Frontend audit trail page to view chronological history
+- ✅ Dapr pub/sub integration for Kafka messaging
+- ✅ Microservices architecture with backend, audit, and notification services
+- ✅ Helm charts for Kubernetes deployment
+- ✅ CI/CD pipeline for automated cloud deployment
+- ✅ User isolation in audit trail access
+- ✅ Event schema validation and deduplication
+
+### Architecture
+```
+┌─────────────────┐     ┌──────────────────────────────────────────────┐     ┌─────────────────┐
+│                 │     │              FastAPI Backend                │     │                 │
+│                 │     │  ┌────────────────────────────────────────┐  │     │    Kafka        │
+│  Next.js UI     │────▶│  │    Publish Task Events to Kafka      │  │────▶│  (via Dapr)     │
+│  (Frontend)     │     │  │    via Dapr pub/sub                  │  │     │                 │
+│                 │     │  └───────────────┬────────────────────────┘  │     │                 │
+│                 │     │                  │                           │     │                 │
+│                 │     │                  ▼                           │     │                 │
+│                 │     │  ┌────────────────────────────────────────┐  │     │                 │
+│                 │     │  │        Audit Service (via Dapr)      │  │◀────│                 │
+│                 │     │  │  SUBSCRIBE to task-events topic      │  │     │                 │
+│                 │     │  └───────────────┬────────────────────────┘  │     │                 │
+│                 │     │                  │                           │     │                 │
+│                 │     │                  ▼                           │     │                 │
+│                 │     │  ┌────────────────────────────────────────┐  │     │                 │
+│                 │     │  │         PostgreSQL Audit Log         │  │────▶│                 │
+│                 │     │  │  (Stores all task operation events)  │  │     │    Neon DB      │
+│                 │     │  └────────────────────────────────────────┘  │     │  (PostgreSQL)   │
+│                 │     │                                              │     │                 │
+│                 │     │  ┌────────────────────────────────────────┐  │     │                 │
+│                 │     │  │    Notification Service (via Dapr)   │  │     │                 │
+│                 │     │  │  SUBSCRIBE to task-events topic      │  │     │                 │
+│                 │     │  └────────────────────────────────────────┘  │     │                 │
+└─────────────────┘     └──────────────────────────────────────────────┘     └─────────────────┘
+```
+
 ## Phase-3 Features (AI Chatbot)
 
 ### Implemented

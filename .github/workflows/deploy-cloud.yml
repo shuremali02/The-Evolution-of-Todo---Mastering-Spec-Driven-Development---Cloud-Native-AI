@@ -1,0 +1,113 @@
+name: Deploy to Cloud
+
+on:
+  push:
+    branches: [ main ]
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/checkout@v4
+
+    - name: Set up Python
+      uses: actions/setup-python@v4
+      with:
+        python-version: '3.11'
+
+    - name: Install dependencies
+      run: |
+        cd backend
+        pip install -r requirements.txt
+
+    - name: Run tests
+      run: |
+        cd backend
+        python -m pytest tests/ -v
+
+  build-and-push:
+    needs: test
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/checkout@v4
+
+    - name: Set up Docker Buildx
+      uses: docker/setup-buildx-action@v3
+
+    - name: Login to DigitalOcean Container Registry
+      uses: docker/login-action@v3
+      with:
+        registry: registry.digitalocean.com
+        username: ${{ secrets.DIGITALOCEAN_TOKEN }}
+        password: ${{ secrets.DIGITALOCEAN_TOKEN }}
+
+    - name: Build and push backend
+      uses: docker/build-push-action@v5
+      with:
+        context: ./backend
+        push: true
+        tags: registry.digitalocean.com/todo-platform/backend:${{ github.sha }}
+        cache-from: type=gha
+        cache-to: type=gha,mode=max
+
+    - name: Build and push audit service
+      uses: docker/build-push-action@v5
+      with:
+        context: ./services/audit-service
+        push: true
+        tags: registry.digitalocean.com/todo-platform/audit-service:${{ github.sha }}
+        cache-from: type=gha
+        cache-to: type=gha,mode=max
+
+    - name: Build and push notification service
+      uses: docker/build-push-action@v5
+      with:
+        context: ./services/notification-service
+        push: true
+        tags: registry.digitalocean.com/todo-platform/notification-service:${{ github.sha }}
+        cache-from: type=gha
+        cache-to: type=gha,mode=max
+
+  deploy:
+    needs: build-and-push
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/checkout@v4
+
+    - name: Install doctl
+      uses: digitalocean/action-doctl@v2
+      with:
+        token: ${{ secrets.DIGITALOCEAN_TOKEN }}
+
+    - name: Connect to DigitalOcean Kubernetes
+      run: |
+        doctl kubernetes cluster kubeconfig save ${{ secrets.DO_KUBE_CLUSTER_NAME }}
+
+    - name: Install/update Helm
+      run: |
+        curl https://raw.githubusercontent.com/helm/helm/main/scripts/get-helm-3 | bash
+
+    - name: Install Dapr
+      run: |
+        wget -q https://raw.githubusercontent.com/dapr/cli/master/install/install.sh -O - | /bin/bash
+        dapr init -k --wait
+
+    - name: Update Helm release
+      run: |
+        helm upgrade --install todo-platform ./charts/todo-platform \
+          --set backend.image.repository=registry.digitalocean.com/todo-platform/backend \
+          --set backend.image.tag=${{ github.sha }} \
+          --set auditService.image.repository=registry.digitalocean.com/todo-platform/audit-service \
+          --set auditService.image.tag=${{ github.sha }} \
+          --set notificationService.image.repository=registry.digitalocean.com/todo-platform/notification-service \
+          --set notificationService.image.tag=${{ github.sha }} \
+          --set global.jwtSecret=${{ secrets.JWT_SECRET_KEY }} \
+          --namespace default \
+          --atomic \
+          --timeout 10m
+
+    - name: Verify deployment
+      run: |
+        kubectl rollout status deployment/{{ include "todo-platform.backend.fullname" . }} --timeout=5m
+        kubectl rollout status deployment/{{ include "todo-platform.auditService.fullname" . }} --timeout=5m
+        kubectl rollout status deployment/{{ include "todo-platform.notificationService.fullname" . }} --timeout=5m

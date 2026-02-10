@@ -73,6 +73,8 @@ async def init_db():
     This is useful for testing or initial setup.
     """
     from sqlmodel import SQLModel
+    # Import all models to register them with SQLModel
+    from app.models import task, user, conversation, message, dashboard, audit_log
 
     async with engine.begin() as conn:
         # Create all tables defined in SQLModel models

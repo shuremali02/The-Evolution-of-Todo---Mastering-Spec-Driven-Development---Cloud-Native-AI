@@ -8,6 +8,12 @@ import type { Task, TaskCreate, TaskUpdate } from '../types/task'
 import type { UserProfile } from '../types/auth'
 import type { DashboardStats, RecentActivityItem, UpcomingDeadlineItem, DashboardResponse } from '../types/dashboard'
 
+// ========== Environment Variables ==========
+const API_URL = process.env.NEXT_PUBLIC_API_URL || "https://shurem-todo-app.hf.space/api/v1"
+const CHAT_API_URL = process.env.NEXT_PUBLIC_CHAT_API_URL || "https://shurem-todo-app.hf.space/api/v1"
+const NODE_ENV = process.env.NODE_ENV || "production"
+
+// ========== Default API URLs ==========
 const DEFAULT_DEV_API_URL_V1 = 'http://localhost:8000/api/v1'
 const DEFAULT_DEV_CHAT_API_URL = 'http://localhost:8000/api/v1'  // Chat API URL (same as backend)
 const DEFAULT_PROD_API_URL_V1 = 'https://shurem-todo-app.hf.space/api/v1'  // Your backend URL
@@ -15,10 +21,10 @@ const DEFAULT_PROD_CHAT_API_URL = 'https://shurem-todo-app.hf.space/api/v1'  // 
 
 function getApiUrl(version: 'v1' | 'chat' = 'v1'): string {
   // Use environment variable if available
-  if (version === 'v1' && process.env.NEXT_PUBLIC_API_URL) {
-    return process.env.NEXT_PUBLIC_API_URL
-  } else if (version === 'chat' && process.env.NEXT_PUBLIC_CHAT_API_URL) {
-    return process.env.NEXT_PUBLIC_CHAT_API_URL
+  if (version === 'v1' && API_URL) {
+    return API_URL
+  } else if (version === 'chat' && CHAT_API_URL) {
+    return CHAT_API_URL
   }
 
   // For production deployments, use the backend API URL
@@ -27,11 +33,11 @@ function getApiUrl(version: 'v1' | 'chat' = 'v1'): string {
     // In production, use your actual backend URL
     // For development, default to localhost
     if (version === 'v1') {
-      return process.env.NODE_ENV === 'production'
+      return NODE_ENV === 'production'
         ? DEFAULT_PROD_API_URL_V1  // Using your actual backend URL
         : DEFAULT_DEV_API_URL_V1
     } else { // chat version
-      return process.env.NODE_ENV === 'production'
+      return NODE_ENV === 'production'
         ? DEFAULT_PROD_CHAT_API_URL  // Using your actual backend URL
         : DEFAULT_DEV_CHAT_API_URL
     }

@@ -6,7 +6,7 @@
 'use client';
 
 import { useState, useEffect, useRef, Fragment } from 'react';
-import { Avatar } from '@/src/components/ui/Avatar';
+import { Avatar, AvatarFallback } from '@/src/components/ui/Avatar';
 import { apiClient } from '@/lib/api';
 import type { UserProfile as User } from '@/types/auth';
 import toast from 'react-hot-toast';
@@ -117,6 +117,12 @@ export function Navbar({ onLogout }: NavbarProps) {
                   Tasks
                 </a>
                 <a
+                  href="/audit"
+                  className="px-3 py-2 text-sm font-medium text-gray-700 dark:text-gray-200 hover:bg-gray-100 dark:hover:bg-gray-700 rounded-md transition-colors"
+                >
+                  Audit Trail
+                </a>
+                <a
                   href="/profile"
                   className="px-3 py-2 text-sm font-medium text-gray-700 dark:text-gray-200 hover:bg-gray-100 dark:hover:bg-gray-700 rounded-md transition-colors"
                 >
@@ -142,7 +148,11 @@ export function Navbar({ onLogout }: NavbarProps) {
                   aria-expanded={isOpen}
                   aria-haspopup="true"
                 >
-                  <Avatar username={user.username} size="md" />
+                  <Avatar className="h-8 w-8">
+                    <AvatarFallback className="bg-blue-500 text-white text-xs font-semibold">
+                      {(user.username || 'U')[0].toUpperCase()}
+                    </AvatarFallback>
+                  </Avatar>
                   <svg
                     className={`w-4 h-4 text-gray-500 dark:text-gray-400 transition-transform ${isOpen ? 'rotate-180' : ''}`}
                     fill="none"
@@ -191,6 +201,13 @@ export function Navbar({ onLogout }: NavbarProps) {
                           role="menuitem"
                         >
                           My Tasks
+                        </a>
+                        <a
+                          href="/audit"
+                          className="block px-4 py-2 text-sm text-gray-700 dark:text-gray-200 hover:bg-gray-100 dark:hover:bg-gray-700 hover:text-gray-900 dark:hover:text-white transition-colors"
+                          role="menuitem"
+                        >
+                          Audit Trail
                         </a>
                         <button
                           onClick={handleProfileClick}

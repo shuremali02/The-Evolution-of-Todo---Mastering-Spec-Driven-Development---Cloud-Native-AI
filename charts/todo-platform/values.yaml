@@ -1,0 +1,132 @@
+# Global configurations
+global:
+  imageRegistry: ""
+  imagePullSecrets: []
+  storageClass: ""
+  jwtSecret: ""
+
+# Frontend configuration
+frontend:
+  enabled: true
+  replicaCount: 1
+  image:
+    repository: todo-frontend
+    pullPolicy: IfNotPresent
+    tag: "latest"
+  service:
+    type: ClusterIP
+    port: 3000
+  ingress:
+    enabled: false
+    className: ""
+    hosts:
+      - host: chart-example.local
+        paths:
+          - path: /
+            pathType: ImplementationSpecific
+    tls: []
+
+# Backend configuration
+backend:
+  enabled: true
+  replicaCount: 1
+  image:
+    repository: todo-backend
+    pullPolicy: IfNotPresent
+    tag: "latest"
+  service:
+    type: ClusterIP
+    port: 8000
+  env:
+    DATABASE_URL: "postgresql://postgres:password@todo-postgresql:5432/todo_db"
+    JWT_SECRET_KEY: "your-super-secret-jwt-key-change-in-production"
+    ALLOWED_ORIGINS: "http://localhost:3000,http://localhost:8080"
+
+# Audit service configuration
+auditService:
+  enabled: true
+  replicaCount: 1
+  image:
+    repository: audit-service
+    pullPolicy: IfNotPresent
+    tag: "latest"
+  service:
+    type: ClusterIP
+    port: 8001
+  env:
+    DATABASE_URL: "postgresql://postgres:password@todo-postgresql:5432/todo_db"
+
+# Notification service configuration
+notificationService:
+  enabled: true
+  replicaCount: 1
+  image:
+    repository: notification-service
+    pullPolicy: IfNotPresent
+    tag: "latest"
+  service:
+    type: ClusterIP
+    port: 8002
+
+# Kafka configuration
+kafka:
+  enabled: true
+  auth:
+    clientProtocol: plaintext
+  zookeeper:
+    enabled: true
+
+# PostgreSQL configuration
+postgresql:
+  enabled: true
+  auth:
+    postgresPassword: password
+    database: todo_db
+  primary:
+    persistence:
+      enabled: false
+
+# Dapr configuration
+dapr:
+  enabled: true
+  version: "1.12.0"
+
+# Resources configuration
+resources:
+  backend:
+    limits:
+      cpu: 500m
+      memory: 512Mi
+    requests:
+      cpu: 250m
+      memory: 256Mi
+  frontend:
+    limits:
+      cpu: 200m
+      memory: 256Mi
+    requests:
+      cpu: 100m
+      memory: 128Mi
+  auditService:
+    limits:
+      cpu: 300m
+      memory: 256Mi
+    requests:
+      cpu: 150m
+      memory: 128Mi
+  notificationService:
+    limits:
+      cpu: 200m
+      memory: 128Mi
+    requests:
+      cpu: 100m
+      memory: 64Mi
+
+# Node selector
+nodeSelector: {}
+
+# Tolerations
+tolerations: []
+
+# Affinity
+affinity: {}

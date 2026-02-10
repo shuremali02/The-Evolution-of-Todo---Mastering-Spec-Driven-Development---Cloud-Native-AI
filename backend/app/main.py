@@ -52,12 +52,14 @@ async def root():
 # Register API routers here
 from app.api import auth_router
 from app.api.v1.endpoints.dashboard import router as dashboard_router
+from app.api.v1.endpoints.audit import router as audit_router  # Task: T020
 from app.api.tasks import router as tasks_router  # Task: T019
 from app.api.chat import router as chat_router  # Task: T027
 
 app.include_router(auth_router)
 # Include dashboard routes first to avoid conflicts with /tasks/{task_id}
 app.include_router(dashboard_router, prefix="/api/v1")  # Dashboard endpoints
+app.include_router(audit_router, prefix="/api/v1")  # Audit trail endpoints
 app.include_router(tasks_router)  # Task: T019
 # Include chat routes - these are registered directly with full path in the router
 app.include_router(chat_router)
