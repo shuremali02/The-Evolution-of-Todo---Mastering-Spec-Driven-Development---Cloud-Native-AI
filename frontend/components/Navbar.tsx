@@ -6,7 +6,7 @@
 'use client';
 
 import { useState, useEffect, useRef, Fragment } from 'react';
-import { Avatar } from '@/src/components/ui/Avatar';
+import { Avatar, AvatarFallback } from '@/src/components/ui/Avatar';
 import { apiClient } from '@/lib/api';
 import type { UserProfile as User } from '@/types/auth';
 import toast from 'react-hot-toast';
@@ -148,7 +148,11 @@ export function Navbar({ onLogout }: NavbarProps) {
                   aria-expanded={isOpen}
                   aria-haspopup="true"
                 >
-                  <Avatar username={user.username} size="md" />
+                  <Avatar className="h-8 w-8">
+                    <AvatarFallback className="bg-blue-500 text-white text-xs font-semibold">
+                      {(user.username || 'U')[0].toUpperCase()}
+                    </AvatarFallback>
+                  </Avatar>
                   <svg
                     className={`w-4 h-4 text-gray-500 dark:text-gray-400 transition-transform ${isOpen ? 'rotate-180' : ''}`}
                     fill="none"

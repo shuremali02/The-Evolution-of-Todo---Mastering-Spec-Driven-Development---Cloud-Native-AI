@@ -7,7 +7,7 @@
 
 import React, { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
-import { Avatar } from '../ui/Avatar';
+import { Avatar, AvatarFallback } from '../ui/Avatar';
 import { apiClient } from '@/lib/api';
 import type { UserProfile as User } from '@/types/auth';
 import toast from 'react-hot-toast';
@@ -71,7 +71,11 @@ export const UserProfile: React.FC<UserProfileProps> = ({ user }) => {
     <div className="space-y-6">
       <div className="flex flex-col items-center">
         <div className="flex items-center space-x-4 mb-6">
-          <Avatar username={user.username} size="lg" />
+          <Avatar className="h-16 w-16">
+            <AvatarFallback className="bg-blue-500 text-white font-semibold text-lg">
+              {(user.username || 'U')[0].toUpperCase()}
+            </AvatarFallback>
+          </Avatar>
           <div>
             <h3 className="text-xl font-bold text-gray-900 dark:text-white">{user.username}</h3>
             <p className="text-gray-600 dark:text-gray-400">{user.email}</p>

@@ -7,7 +7,7 @@
 
 import React, { useState, useRef, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
-import { Avatar } from '@/src/components/ui/Avatar';
+import { Avatar, AvatarFallback } from '@/src/components/ui/Avatar';
 import { apiClient } from '@/lib/api';
 import type { UserProfile as User } from '@/types/auth';
 import toast from 'react-hot-toast';
@@ -134,7 +134,11 @@ export function EnhancedProfile({ user }: EnhancedProfileProps) {
                 className="w-24 h-24 rounded-full object-cover border-4 border-white dark:border-gray-700 shadow-lg"
               />
             ) : (
-              <Avatar username={user?.username || 'User'} size="lg" />
+              <Avatar className="h-24 w-24">
+                <AvatarFallback className="bg-blue-500 text-white font-semibold">
+                  {(user?.username || 'U')[0].toUpperCase()}
+                </AvatarFallback>
+              </Avatar>
             )}
 
             <button

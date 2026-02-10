@@ -1,9 +1,6 @@
 "use client";
 
-'use client';
-
 import { useState, useEffect } from 'react';
-import { useUser } from '@clerk/nextjs';
 import { Card, CardHeader, CardTitle, CardContent } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Skeleton } from '@/components/ui/skeleton';
@@ -19,6 +16,7 @@ import {
   RefreshCw
 } from 'lucide-react';
 import { auditService } from '@/lib/audit-service';
+import { useAuth } from '@/context/AuthContext';
 
 interface AuditEvent {
   event_id: string;
@@ -33,13 +31,13 @@ interface AuditEvent {
 }
 
 export default function AuditTrailPage() {
-  const { user, isLoaded } = useUser();
+  const { user, loading: authLoading } = useAuth();
   const [auditEvents, setAuditEvents] = useState<AuditEvent[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [filter, setFilter] = useState<'all' | AuditEvent['event_type']>('all');
 
-  // Get user ID from Clerk
+  // Get user ID from custom auth context
   const userId = user?.id;
 
   useEffect(() => {
@@ -115,7 +113,7 @@ export default function AuditTrailPage() {
     });
   };
 
-  if (!isLoaded) {
+  if (authLoading) {
     return (
       <div className="container mx-auto py-8 px-4">
         <Skeleton className="h-10 w-64 mb-6" />

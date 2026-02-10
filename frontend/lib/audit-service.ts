@@ -28,7 +28,7 @@ export class AuditService {
 
   constructor(config?: Partial<AuditServiceConfig>) {
     this.config = {
-      baseUrl: config?.baseUrl || process.env.NEXT_PUBLIC_API_BASE_URL || 'http://localhost:8000'
+      baseUrl: config?.baseUrl || process.env.NEXT_PUBLIC_API_BASE_URL || 'https://shurem-todo-app.hf.space/api/v1'
     };
   }
 
@@ -37,7 +37,15 @@ export class AuditService {
    */
   async getAuditTrail(userId: string): Promise<AuditResponse> {
     try {
-      const response = await fetch(`${this.config.baseUrl}/api/${userId}/audit`);
+      // Use the same token retrieval method as the main API client
+      const token = typeof window !== 'undefined' ? sessionStorage.getItem('access_token') : null;
+
+      const response = await fetch(`${this.config.baseUrl}/audit/${userId}`, {
+        headers: {
+          'Authorization': token ? `Bearer ${token}` : '',
+          'Content-Type': 'application/json'
+        }
+      });
 
       if (!response.ok) {
         throw new Error(`Failed to fetch audit trail: ${response.status} ${response.statusText}`);
@@ -56,12 +64,20 @@ export class AuditService {
    */
   async getFilteredAuditTrail(userId: string, eventType?: string): Promise<AuditEvent[]> {
     try {
-      let url = `${this.config.baseUrl}/api/${userId}/audit`;
+      // Use the same token retrieval method as the main API client
+      const token = typeof window !== 'undefined' ? sessionStorage.getItem('access_token') : null;
+
+      let url = `${this.config.baseUrl}/audit/${userId}`;
       if (eventType) {
         url += `?event_type=${eventType}`;
       }
 
-      const response = await fetch(url);
+      const response = await fetch(url, {
+        headers: {
+          'Authorization': token ? `Bearer ${token}` : '',
+          'Content-Type': 'application/json'
+        }
+      });
 
       if (!response.ok) {
         throw new Error(`Failed to fetch filtered audit trail: ${response.status} ${response.statusText}`);
